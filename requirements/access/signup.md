@@ -26,6 +26,8 @@
 
 - ❌ Retorna erro 404 se o endpoint não existir
 - ❌ Retorna erro 400 se algum dos dados requeridos não for informado pelo client
+- ❌ Retorna erro 400 se o client informar mais dados do que os requeridos
+- ❌ Retorna erro 400 se o tipo do dado informado não for válido
 - ❌ Retorna erro 400 se o **password** e **passwordConfirmation** não forem iguais
 - ❌ Retorna erro 400 se o campo **email** for inválido
 - ❌ Retorna erro 400 se o email fornecido já estiver em uso

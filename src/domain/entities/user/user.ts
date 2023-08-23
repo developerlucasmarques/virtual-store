@@ -5,7 +5,9 @@ import { Email, Name, Password } from './value-objects'
 
 export class User {
   private constructor (
-    private readonly name: string
+    private readonly name: Name,
+    private readonly email: Email,
+    private readonly password: Password
   ) {}
 
   static create (data: UserData): Either<InvalidNameError | InvalidEmailError | InvalidPasswordError, User> {
@@ -21,6 +23,8 @@ export class User {
     if (password.isLeft()) {
       return left(password.value)
     }
-    return right(new User(data.name))
+    return right(
+      new User(name.value, email.value, password.value)
+    )
   }
 }

@@ -1,8 +1,8 @@
 import { left } from '../../../shared/either'
-import { InvalidEmailError, InvalidNameError } from './errors'
+import { InvalidEmailError, InvalidNameError, InvalidPasswordError } from './errors'
 import { User } from './user'
 import type { UserData } from './user-data'
-import { Email, Name } from './value-objects'
+import { Email, Name, Password } from './value-objects'
 
 const makeUserData = (): UserData => ({
   name: 'any name',
@@ -25,5 +25,13 @@ describe('User Entity', () => {
     )
     const sut = User.create(makeUserData())
     expect(sut.value).toEqual(new InvalidEmailError('any_email@mail.com'))
+  })
+
+  it('Should return InvalidPasswordError if create Password fails', () => {
+    jest.spyOn(Password, 'create').mockReturnValueOnce(
+      left(new InvalidPasswordError('abcd1234'))
+    )
+    const sut = User.create(makeUserData())
+    expect(sut.value).toEqual(new InvalidPasswordError('abcd1234'))
   })
 })

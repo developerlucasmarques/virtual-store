@@ -1,7 +1,8 @@
 import { User, type UserData } from '../../domain/entities/user'
+import { left } from '../../shared/either'
 import { AddUserUseCase } from './add-user-usecase'
 
-const makeUserData = (): UserData => ({
+const makeFakeUserData = (): UserData => ({
   name: 'any name',
   email: 'any_email@mail.com',
   password: 'abcd1234'
@@ -20,7 +21,16 @@ describe('AddUser UseCase', () => {
   it('Should call User Entity with correct values', async () => {
     const { sut } = makeSut()
     const createSpy = jest.spyOn(User, 'create')
-    await sut.perform(makeUserData())
-    expect(createSpy).toHaveBeenCalledWith(makeUserData())
+    await sut.perform(makeFakeUserData())
+    expect(createSpy).toHaveBeenCalledWith(makeFakeUserData())
+  })
+
+  it('Should return a Error if create User fails', async () => {
+    const { sut } = makeSut()
+    jest.spyOn(User, 'create').mockReturnValueOnce(
+      left(new Error('any message'))
+    )
+    const result = await sut.perform(makeFakeUserData())
+    expect(result.value).toEqual(new Error('any message'))
   })
 })

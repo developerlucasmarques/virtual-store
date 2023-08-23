@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "CommonJS",
+    "target": "ES2021",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": [
+    "src", 
+    "tsconfig.eslint.json" 
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}

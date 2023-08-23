@@ -7,11 +7,6 @@
     "strict": true
   },
   "include": [
-    "src", 
-    "tsconfig.eslint.json" 
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "src"
   ]
 }

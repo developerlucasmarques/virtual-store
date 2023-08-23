@@ -18,7 +18,7 @@
 - ❌ Gera uma senha criptografada
 - ❌ Gera um ID para o usuário
 - ❌ Gera um token criptografado a partir do ID do usuário
-- ❌ Salva os dados do usuário
+- ❌ Salva os dados do usuário no DB
 - ❌ Retorna 201 com o token de acesso do usuário
 
 
@@ -33,7 +33,7 @@
 - ❌ Retorna erro 400 se o email fornecido já estiver em uso
 - ❌ Retorna erro 500 se der erro ao tentar gerar uma senha criptografada
 - ❌ Retorna erro 500 se der erro ao tentar gerar o token de acesso
-- ❌ Retorna erro 500 se der erro ao tentar criar a conta do usuário
+- ❌ Retorna erro 500 se der erro ao tentar salvar os dados do usuário no DB
 
 
 

@@ -11,7 +11,7 @@ const makeUserData = (): UserData => ({
 })
 
 describe('User Entity', () => {
-  test('Should return InvalidNameError if create Name fails', () => {
+  it('Should return InvalidNameError if create Name fails', () => {
     jest.spyOn(Name, 'create').mockReturnValueOnce(
       left(new InvalidNameError('invalid_name'))
     )

@@ -9,7 +9,6 @@
 ## Caso de Sucesso
 
 - ❌ Recebe uma requisição do tipo POST na rota /api/signup
-- ❌ Recebe uma requisição do tipo POST na rota /api/signup
 - ❌ Valida os dados obrigatórios
 - ❌ Valida o tipo do dado informado
 - ❌ Valida se não há dados a mais dos requeridos

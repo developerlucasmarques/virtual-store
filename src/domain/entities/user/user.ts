@@ -1,6 +1,5 @@
-import { type Either, left, right } from '../../../shared/either'
-import type { InvalidEmailError, InvalidNameError, InvalidPasswordError } from './errors'
-import type { UserData } from './user-data'
+import { left, right } from '../../../shared/either'
+import type { UserData, UserResponse } from '.'
 import { Email, Name, Password } from './value-objects'
 
 export class User {
@@ -10,7 +9,7 @@ export class User {
     private readonly password: Password
   ) {}
 
-  static create (data: UserData): Either<InvalidNameError | InvalidEmailError | InvalidPasswordError, User> {
+  static create (data: UserData): UserResponse {
     const name = Name.create(data.name)
     if (name.isLeft()) {
       return left(name.value)

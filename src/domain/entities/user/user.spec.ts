@@ -1,7 +1,6 @@
 import { left } from '../../../shared/either'
 import { InvalidEmailError, InvalidNameError, InvalidPasswordError } from './errors'
-import { User } from './user'
-import type { UserData } from './user-data'
+import { type UserData, User } from '.'
 import { Email, Name, Password } from './value-objects'
 
 const makeUserData = (): UserData => ({

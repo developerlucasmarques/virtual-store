@@ -92,6 +92,15 @@ describe('AddUser UseCase', () => {
     expect(result.value).toEqual(new EmailInUseError('any_email@mail.com'))
   })
 
+  it('Should throw if LoadUserByEmailRepo throws', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeSut()
+    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeUserData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call Hasher with correct password', async () => {
     const { sut, hasherStub } = makeSut()
     const hashingSpy = jest.spyOn(hasherStub, 'hashing')

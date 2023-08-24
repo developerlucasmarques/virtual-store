@@ -2,9 +2,10 @@ import { type Either, right, left } from '@/shared/either'
 import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { SignUpController } from './signup-controller'
-import { badRequest } from '../helpers/http/http-helpers'
+import { badRequest, serverError } from '../helpers/http/http-helpers'
 import type { AddUserResponse, AddUser } from '@/domain/usecases'
 import type { UserData } from '@/domain/entities/user'
+import { ServerError } from '../errors/server-error'
 
 const makeValidationComposite = (): Validation => {
   class ValidationCompositeStub implements Validation {
@@ -63,8 +64,18 @@ describe('SignUp Controller', () => {
     jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
       left(new Error('any_message'))
     )
-    const response = await sut.handle(makeFakeRequest())
-    expect(response).toEqual(badRequest(new Error('any_message')))
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should return 500 if ValidationComposite throws', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    jest.spyOn(validationCompositeStub, 'validate').mockImplementationOnce(() => {
+      throw new Error('any_message')
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 
   it('Should call AddUser with correct values', async () => {
@@ -83,7 +94,7 @@ describe('SignUp Controller', () => {
     jest.spyOn(addUserStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
-    const response = await sut.handle(makeFakeRequest())
-    expect(response).toEqual(badRequest(new Error('any_message')))
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 })

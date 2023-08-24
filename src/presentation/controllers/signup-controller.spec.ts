@@ -77,4 +77,13 @@ describe('SignUp Controller', () => {
       password: 'abcd1234'
     })
   })
+
+  it('Should return 400 if AddUser fails', async () => {
+    const { sut, addUserStub } = makeSut()
+    jest.spyOn(addUserStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const response = await sut.handle(makeFakeRequest())
+    expect(response).toEqual(badRequest(new Error('any_message')))
+  })
 })

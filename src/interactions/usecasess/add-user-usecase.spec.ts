@@ -5,6 +5,7 @@ import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-rep
 import type { Id, IdBuilder } from '../contracts/id/id-builder'
 import { EmailInUseError } from '../errors/email-in-use-error'
 import { AddUserUseCase } from './add-user-usecase'
+import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases/access-token-builder'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -33,6 +34,15 @@ const makeIdBuilderStub = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
+const makeAccessTokenBuilderStub = (): AccessTokenBuilder => {
+  class AccessTokenBuilderStub implements AccessTokenBuilder {
+    build (value: string): AccessToken {
+      return { accesToken: 'any_token' }
+    }
+  }
+  return new AccessTokenBuilderStub()
+}
+
 const makeFakeHash = (): Hash => ({
   hash: 'hashed_password'
 })
@@ -57,18 +67,21 @@ type SutTypes = {
   loadUserByEmailRepoStub: LoadUserByEmailRepo
   hasherStub: Hasher
   idBuilderStub: IdBuilder
+  accessTokenBuilderStub: AccessTokenBuilder
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
   const hasherStub = makeHasherStub()
   const idBuilderStub = makeIdBuilderStub()
-  const sut = new AddUserUseCase(loadUserByEmailRepoStub, hasherStub, idBuilderStub)
+  const accessTokenBuilderStub = makeAccessTokenBuilderStub()
+  const sut = new AddUserUseCase(loadUserByEmailRepoStub, hasherStub, idBuilderStub, accessTokenBuilderStub)
   return {
     sut,
     loadUserByEmailRepoStub,
     hasherStub,
-    idBuilderStub
+    idBuilderStub,
+    accessTokenBuilderStub
   }
 }
 
@@ -145,5 +158,12 @@ describe('AddUser UseCase', () => {
     )
     const promise = sut.perform(makeFakeUserData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call AccessTokenBuilder with correct Id', async () => {
+    const { sut, accessTokenBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(accessTokenBuilderStub, 'build')
+    await sut.perform(makeFakeUserData())
+    expect(buildSpy).toHaveBeenCalledWith('any_id')
   })
 })

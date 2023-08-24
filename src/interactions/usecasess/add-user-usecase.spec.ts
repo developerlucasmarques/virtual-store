@@ -8,7 +8,7 @@ const makeFakeUserData = (): UserData => ({
   password: 'abcd1234'
 })
 
-interface SutTypes {
+type SutTypes = {
   sut: AddUserUseCase
 }
 

@@ -1,5 +1,5 @@
 import type { AddUser } from '@/domain/usecases'
-import type { Validation, Controller } from '../contracts'
+import type { Controller, Validation } from '../contracts'
 import { badRequest } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 
@@ -15,7 +15,10 @@ export class SignUpController implements Controller {
       return badRequest(validation.value)
     }
     const { name, email, password } = httpRequest.body
-    await this.addUser.perform({ name, email, password })
+    const addUserResult = await this.addUser.perform({ name, email, password })
+    if (addUserResult.isLeft()) {
+      return badRequest(addUserResult.value)
+    }
     return await Promise.resolve({
       body: '',
       statusCode: 0

@@ -1,4 +1,4 @@
-import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases'
+import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases-contracts'
 import type { Ecrypter } from '../contracts'
 
 export class AccessTokenBuilderUseCase implements AccessTokenBuilder {

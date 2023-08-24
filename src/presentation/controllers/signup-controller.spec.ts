@@ -3,7 +3,7 @@ import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { SignUpController } from './signup-controller'
 import { badRequest, created, serverError } from '../helpers/http/http-helpers'
-import type { AddUserResponse, AddUser } from '@/domain/usecases'
+import type { AddUserResponse, AddUser } from '@/domain/usecases-contracts'
 import type { UserData } from '@/domain/entities/user'
 import { ServerError } from '../errors/server-error'
 

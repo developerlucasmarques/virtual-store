@@ -3,7 +3,7 @@ import { left } from '@/shared/either'
 import type { LoadUserByEmailRepo, AddUserRepo, Id, IdBuilder, Hash, Hasher } from '../contracts'
 import { EmailInUseError } from '../errors'
 import { AddUserUseCase } from './add-user-usecase'
-import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases'
+import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases-contracts'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {

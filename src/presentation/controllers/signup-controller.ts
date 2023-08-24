@@ -1,4 +1,4 @@
-import type { AddUser } from '@/domain/usecases'
+import type { AddUser } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '../contracts'
 import { badRequest, created, serverError } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'

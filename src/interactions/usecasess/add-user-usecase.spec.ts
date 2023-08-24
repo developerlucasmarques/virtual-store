@@ -107,4 +107,13 @@ describe('AddUser UseCase', () => {
     await sut.perform(makeFakeUserData())
     expect(hashingSpy).toHaveBeenCalledWith('abcd1234')
   })
+
+  test('Should throw if Hasher throws', async () => {
+    const { sut, hasherStub } = makeSut()
+    jest.spyOn(hasherStub, 'hashing').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeUserData())
+    await expect(promise).rejects.toThrow()
+  })
 })

@@ -2,7 +2,7 @@ import { type Either, right, left } from '@/shared/either'
 import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { SignUpController } from './signup-controller'
-import { badRequest, serverError } from '../helpers/http/http-helpers'
+import { badRequest, created, serverError } from '../helpers/http/http-helpers'
 import type { AddUserResponse, AddUser } from '@/domain/usecases'
 import type { UserData } from '@/domain/entities/user'
 import { ServerError } from '../errors/server-error'
@@ -19,7 +19,7 @@ const makeValidationComposite = (): Validation => {
 const makeAddUser = (): AddUser => {
   class AddUserStub implements AddUser {
     async perform (account: UserData): Promise<AddUserResponse> {
-      return await Promise.resolve(right({ accessToken: 'access_token' }))
+      return await Promise.resolve(right({ accessToken: 'any_token' }))
     }
   }
   return new AddUserStub()
@@ -106,5 +106,11 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should return 201 if AddUser success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(created({ accessToken: 'any_token' }))
   })
 })

@@ -1,6 +1,16 @@
-import { User, type UserData } from '@/domain/entities/user'
+import { User, type UserModel, type UserData } from '@/domain/entities/user'
 import { left } from '@/shared/either'
 import { AddUserUseCase } from './add-user-usecase'
+import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
+
+const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
+  class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
+    async loadByEmail (email: string): Promise<null | UserModel> {
+      return await Promise.resolve(null)
+    }
+  }
+  return new LoadUserByEmailRepoStub()
+}
 
 const makeFakeUserData = (): UserData => ({
   name: 'any name',
@@ -10,11 +20,16 @@ const makeFakeUserData = (): UserData => ({
 
 type SutTypes = {
   sut: AddUserUseCase
+  loadUserByEmailRepoStub: LoadUserByEmailRepo
 }
 
 const makeSut = (): SutTypes => {
-  const sut = new AddUserUseCase()
-  return { sut }
+  const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
+  const sut = new AddUserUseCase(loadUserByEmailRepoStub)
+  return {
+    sut,
+    loadUserByEmailRepoStub
+  }
 }
 
 describe('AddUser UseCase', () => {
@@ -32,5 +47,12 @@ describe('AddUser UseCase', () => {
     )
     const result = await sut.perform(makeFakeUserData())
     expect(result.value).toEqual(new Error('any message'))
+  })
+
+  it('Should call LoadUserByEmailRepo with correct email', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeSut()
+    const loadByEmailSpy = jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail')
+    await sut.perform(makeFakeUserData())
+    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 })

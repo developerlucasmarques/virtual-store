@@ -1,12 +1,9 @@
 import { User, type UserData, type UserModel } from '@/domain/entities/user'
 import { left } from '@/shared/either'
-import type { Hash, Hasher } from '../contracts/cryptography/hasher'
-import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
-import type { Id, IdBuilder } from '../contracts/id/id-builder'
-import { EmailInUseError } from '../errors/email-in-use-error'
+import type { LoadUserByEmailRepo, AddUserRepo, Id, IdBuilder, Hash, Hasher } from '../contracts'
+import { EmailInUseError } from '../errors'
 import { AddUserUseCase } from './add-user-usecase'
-import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases/access-token-builder'
-import type { AddUserRepo } from '../contracts/db/add-user-repo'
+import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {

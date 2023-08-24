@@ -1,12 +1,8 @@
 import { User, type UserData } from '@/domain/entities/user'
-import type { AddUser, AddUserResponse } from '@/domain/usecases/add-user'
+import type { AddUser, AddUserResponse, AccessTokenBuilder } from '@/domain/usecases'
 import { left, right } from '@/shared/either'
-import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
-import { EmailInUseError } from '../errors/email-in-use-error'
-import type { Hasher } from '../contracts/cryptography/hasher'
-import type { IdBuilder } from '../contracts/id/id-builder'
-import type { AccessTokenBuilder } from '@/domain/usecases/access-token-builder'
-import type { AddUserRepo } from '../contracts/db/add-user-repo'
+import { EmailInUseError } from '../errors'
+import type { IdBuilder, AddUserRepo, LoadUserByEmailRepo, Hasher } from '../contracts'
 
 export class AddUserUseCase implements AddUser {
   constructor (

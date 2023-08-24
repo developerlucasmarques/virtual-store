@@ -4,6 +4,7 @@ import { AddUserUseCase } from './add-user-usecase'
 import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
 import { EmailInUseError } from '../errors/email-in-use-error'
 import type { Hash, Hasher } from '../contracts/cryptography/hasher'
+import type { Id, IdBuilder } from '../contracts/id/id-builder'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -21,6 +22,15 @@ const makeHasherStub = (): Hasher => {
     }
   }
   return new HasherStub()
+}
+
+const makeIdBuilderStub = (): IdBuilder => {
+  class IdBuilderStub implements IdBuilder {
+    build (): Id {
+      return { id: 'any_id' }
+    }
+  }
+  return new IdBuilderStub()
 }
 
 const makeFakeHash = (): Hash => ({
@@ -46,16 +56,19 @@ type SutTypes = {
   sut: AddUserUseCase
   loadUserByEmailRepoStub: LoadUserByEmailRepo
   hasherStub: Hasher
+  idBuilderStub: IdBuilder
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
   const hasherStub = makeHasherStub()
-  const sut = new AddUserUseCase(loadUserByEmailRepoStub, hasherStub)
+  const idBuilderStub = makeIdBuilderStub()
+  const sut = new AddUserUseCase(loadUserByEmailRepoStub, hasherStub, idBuilderStub)
   return {
     sut,
     loadUserByEmailRepoStub,
-    hasherStub
+    hasherStub,
+    idBuilderStub
   }
 }
 
@@ -108,12 +121,19 @@ describe('AddUser UseCase', () => {
     expect(hashingSpy).toHaveBeenCalledWith('abcd1234')
   })
 
-  test('Should throw if Hasher throws', async () => {
+  it('Should throw if Hasher throws', async () => {
     const { sut, hasherStub } = makeSut()
     jest.spyOn(hasherStub, 'hashing').mockReturnValueOnce(
       Promise.reject(new Error())
     )
     const promise = sut.perform(makeFakeUserData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call IdBuilder', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    await sut.perform(makeFakeUserData())
+    expect(buildSpy).toHaveBeenCalled()
   })
 })

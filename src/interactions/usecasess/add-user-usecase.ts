@@ -33,6 +33,6 @@ export class AddUserUseCase implements AddUser {
     await this.addUserRepo.add({
       id, name, email, password: hash, role: 'customer', accessToken
     })
-    return right({ accessToken: 'any' })
+    return right({ accessToken })
   }
 }

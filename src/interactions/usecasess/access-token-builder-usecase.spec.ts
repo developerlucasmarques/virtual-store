@@ -45,4 +45,10 @@ describe('AccessTokenBuilder UseCase', () => {
     const promise = sut.perform('any_value')
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return AccessToken if Encrypter success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform('any_value')
+    expect(result).toEqual({ accessToken: 'any_token' })
+  })
 })

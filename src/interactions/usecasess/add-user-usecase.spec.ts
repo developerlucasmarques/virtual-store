@@ -3,6 +3,7 @@ import { left } from '@/shared/either'
 import { AddUserUseCase } from './add-user-usecase'
 import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
 import { EmailInUseError } from '../errors/email-in-use-error'
+import type { Hash, Hasher } from '../contracts/cryptography/hasher'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -12,6 +13,19 @@ const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   }
   return new LoadUserByEmailRepoStub()
 }
+
+const makeHasherStub = (): Hasher => {
+  class HasherStub implements Hasher {
+    async hashing (value: string): Promise<Hash> {
+      return await Promise.resolve(makeFakeHash())
+    }
+  }
+  return new HasherStub()
+}
+
+const makeFakeHash = (): Hash => ({
+  hash: 'hashed_password'
+})
 
 const makeFakeUserModel = (): UserModel => ({
   id: 'any_id',
@@ -31,14 +45,17 @@ const makeFakeUserData = (): UserData => ({
 type SutTypes = {
   sut: AddUserUseCase
   loadUserByEmailRepoStub: LoadUserByEmailRepo
+  hasherStub: Hasher
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
-  const sut = new AddUserUseCase(loadUserByEmailRepoStub)
+  const hasherStub = makeHasherStub()
+  const sut = new AddUserUseCase(loadUserByEmailRepoStub, hasherStub)
   return {
     sut,
-    loadUserByEmailRepoStub
+    loadUserByEmailRepoStub,
+    hasherStub
   }
 }
 
@@ -73,5 +90,12 @@ describe('AddUser UseCase', () => {
     )
     const result = await sut.perform(makeFakeUserData())
     expect(result.value).toEqual(new EmailInUseError('any_email@mail.com'))
+  })
+
+  it('Should call Hasher with correct password', async () => {
+    const { sut, hasherStub } = makeSut()
+    const hashingSpy = jest.spyOn(hasherStub, 'hashing')
+    await sut.perform(makeFakeUserData())
+    expect(hashingSpy).toHaveBeenCalledWith('abcd1234')
   })
 })

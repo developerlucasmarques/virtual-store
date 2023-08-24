@@ -6,4 +6,5 @@ export type UserModel = {
   email: string
   password: string
   role: RoleModel
+  accessToken: string
 }

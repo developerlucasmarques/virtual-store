@@ -18,7 +18,8 @@ const makeFakeUserModel = (): UserModel => ({
   name: 'any name',
   email: 'any_email@mail.com',
   password: 'abcd1234',
-  role: 'customer'
+  role: 'customer',
+  accessToken: 'any_token'
 })
 
 const makeFakeUserData = (): UserData => ({

@@ -71,7 +71,7 @@ describe('SignUp Controller', () => {
   it('Should return 500 if ValidationComposite throws', async () => {
     const { sut, validationCompositeStub } = makeSut()
     jest.spyOn(validationCompositeStub, 'validate').mockImplementationOnce(() => {
-      throw new Error('any_message')
+      throw new Error()
     })
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
@@ -96,5 +96,15 @@ describe('SignUp Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should return 500 if AddUser throws', async () => {
+    const { sut, addUserStub } = makeSut()
+    jest.spyOn(addUserStub, 'perform').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 })

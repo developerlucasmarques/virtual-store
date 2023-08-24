@@ -201,4 +201,10 @@ describe('AddUser UseCase', () => {
     const promise = sut.perform(makeFakeUserData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return access token if perform success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeUserData())
+    expect(result.value).toEqual({ accessToken: 'any_token' })
+  })
 })

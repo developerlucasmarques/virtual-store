@@ -3,5 +3,5 @@ export type AccessToken = {
 }
 
 export interface AccessTokenBuilder {
-  build: (value: string) => AccessToken
+  perform: (value: string) => Promise<AccessToken>
 }

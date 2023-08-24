@@ -1,12 +1,12 @@
-export type AccessTokenEcrypterData = {
+export type EncrypterData = {
   value: string
-  expiresInHours: number
+  expiresInHours?: number
 }
 
-export type AccessToken = {
-  accessToken: string
+export type Token = {
+  token: string
 }
 
-export interface AccessTokenEcrypter {
-  encryptAccessToken: (data: AccessTokenEcrypterData) => AccessToken
+export interface Ecrypter {
+  encrypt: (data: EncrypterData) => Promise<Token>
 }

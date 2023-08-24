@@ -25,7 +25,7 @@ export class AddUserUseCase implements AddUser {
     }
     const { hash } = await this.hasher.hashing(password)
     const { id } = this.idBuilder.build()
-    const { accessToken } = this.accessTokenBuilder.build(id)
+    const { accessToken } = await this.accessTokenBuilder.perform(id)
     await this.addUserRepo.add({
       id, name, email, password: hash, role: 'customer', accessToken
     })

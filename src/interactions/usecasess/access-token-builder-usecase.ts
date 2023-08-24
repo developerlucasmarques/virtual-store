@@ -1,11 +1,11 @@
 import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases'
-import type { AccessTokenEcrypter } from '../contracts'
+import type { Ecrypter } from '../contracts'
 
 export class AccessTokenBuilderUseCase implements AccessTokenBuilder {
-  constructor (private readonly accessTokenEncrypter: AccessTokenEcrypter) {}
+  constructor (private readonly encrypter: Ecrypter) {}
 
-  build (value: string): AccessToken {
-    this.accessTokenEncrypter.encryptAccessToken({
+  async perform (value: string): Promise<AccessToken> {
+    await this.encrypter.encrypt({
       value,
       expiresInHours: 24
     })

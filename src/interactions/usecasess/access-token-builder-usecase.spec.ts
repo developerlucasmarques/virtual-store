@@ -1,39 +1,39 @@
-import type { AccessToken, AccessTokenEcrypter, AccessTokenEcrypterData } from '../contracts'
-import { AccessTokenBuilderUseCase } from './access-toekn-builder-usecase'
+import type { Token, Ecrypter, EncrypterData } from '../contracts'
+import { AccessTokenBuilderUseCase } from './access-token-builder-usecase'
 
-const makeAccessTokenEncrypterStub = (): AccessTokenEcrypter => {
-  class AccessTokenEcrypterStub implements AccessTokenEcrypter {
-    encryptAccessToken (data: AccessTokenEcrypterData): AccessToken {
-      return { accessToken: 'any_token' }
+const makeAccessTokenEncrypterStub = (): Ecrypter => {
+  class AccessTokenEcrypterStub implements Ecrypter {
+    async encrypt (data: EncrypterData): Promise<Token> {
+      return { token: 'any_token' }
     }
   }
   return new AccessTokenEcrypterStub()
 }
 
-const makeFakeAccessTokenEncrypterData = (): AccessTokenEcrypterData => ({
+const makeFakeEncrypterData = (): EncrypterData => ({
   value: 'any_value',
   expiresInHours: 24
 })
 
 type SutTypes = {
   sut: AccessTokenBuilderUseCase
-  accessTokenEncrypterStub: AccessTokenEcrypter
+  encrypterStub: Ecrypter
 }
 
 const makeSut = (): SutTypes => {
-  const accessTokenEncrypterStub = makeAccessTokenEncrypterStub()
-  const sut = new AccessTokenBuilderUseCase(accessTokenEncrypterStub)
+  const encrypterStub = makeAccessTokenEncrypterStub()
+  const sut = new AccessTokenBuilderUseCase(encrypterStub)
   return {
     sut,
-    accessTokenEncrypterStub
+    encrypterStub
   }
 }
 
 describe('AccessTokenBuilder UseCase', () => {
-  it('Should call AccessTokenEcrypter with correct values', async () => {
-    const { sut, accessTokenEncrypterStub } = makeSut()
-    const buildSpy = jest.spyOn(accessTokenEncrypterStub, 'encryptAccessToken')
-    sut.build('any_value')
-    expect(buildSpy).toHaveBeenCalledWith(makeFakeAccessTokenEncrypterData())
+  it('Should call Ecrypter with correct values', async () => {
+    const { sut, encrypterStub } = makeSut()
+    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+    await sut.perform('any_value')
+    expect(encryptSpy).toHaveBeenCalledWith(makeFakeEncrypterData())
   })
 })

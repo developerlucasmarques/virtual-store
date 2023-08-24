@@ -34,7 +34,7 @@ const makeIdBuilderStub = (): IdBuilder => {
 
 const makeAccessTokenBuilderStub = (): AccessTokenBuilder => {
   class AccessTokenBuilderStub implements AccessTokenBuilder {
-    build (value: string): AccessToken {
+    async perform (value: string): Promise<AccessToken> {
       return { accessToken: 'any_token' }
     }
   }
@@ -169,14 +169,14 @@ describe('AddUser UseCase', () => {
 
   it('Should call AccessTokenBuilder with correct Id', async () => {
     const { sut, accessTokenBuilderStub } = makeSut()
-    const buildSpy = jest.spyOn(accessTokenBuilderStub, 'build')
+    const buildSpy = jest.spyOn(accessTokenBuilderStub, 'perform')
     await sut.perform(makeFakeUserData())
     expect(buildSpy).toHaveBeenCalledWith('any_id')
   })
 
   it('Should throw if AccessTokenBuilder throws', async () => {
     const { sut, accessTokenBuilderStub } = makeSut()
-    jest.spyOn(accessTokenBuilderStub, 'build').mockImplementation(() => {
+    jest.spyOn(accessTokenBuilderStub, 'perform').mockImplementation(() => {
       throw new Error()
     })
     const promise = sut.perform(makeFakeUserData())

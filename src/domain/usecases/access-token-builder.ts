@@ -1,5 +1,5 @@
 export type AccessToken = {
-  accesToken: string
+  accessToken: string
 }
 
 export interface AccessTokenBuilder {

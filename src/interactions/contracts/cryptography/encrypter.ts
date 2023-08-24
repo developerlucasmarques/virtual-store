@@ -7,6 +7,6 @@ export type Token = {
   token: string
 }
 
-export interface Ecrypter {
+export interface Encrypter {
   encrypt: (data: EncrypterData) => Promise<Token>
 }

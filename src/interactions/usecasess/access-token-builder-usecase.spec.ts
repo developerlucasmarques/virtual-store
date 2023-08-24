@@ -1,8 +1,8 @@
-import type { Token, Ecrypter, EncrypterData } from '../contracts'
+import type { Token, Encrypter, EncrypterData } from '../contracts'
 import { AccessTokenBuilderUseCase } from './access-token-builder-usecase'
 
-const makeAccessTokenEncrypterStub = (): Ecrypter => {
-  class AccessTokenEcrypterStub implements Ecrypter {
+const makeAccessTokenEncrypterStub = (): Encrypter => {
+  class AccessTokenEcrypterStub implements Encrypter {
     async encrypt (data: EncrypterData): Promise<Token> {
       return { token: 'any_token' }
     }
@@ -17,7 +17,7 @@ const makeFakeEncrypterData = (): EncrypterData => ({
 
 type SutTypes = {
   sut: AccessTokenBuilderUseCase
-  encrypterStub: Ecrypter
+  encrypterStub: Encrypter
 }
 
 const makeSut = (): SutTypes => {

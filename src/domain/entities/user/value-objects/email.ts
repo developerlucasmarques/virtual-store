@@ -1,4 +1,4 @@
-import { type Either, left, right } from '../../../../shared/either'
+import { type Either, left, right } from '@/shared/either'
 import { InvalidEmailError } from '../errors/invalid-email-error'
 
 export class Email {

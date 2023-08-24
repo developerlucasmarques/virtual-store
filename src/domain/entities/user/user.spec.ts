@@ -1,4 +1,4 @@
-import { left } from '../../../shared/either'
+import { left } from '@/shared/either'
 import { InvalidEmailError, InvalidNameError, InvalidPasswordError } from './errors'
 import { type UserData, User } from '.'
 import { Email, Name, Password } from './value-objects'

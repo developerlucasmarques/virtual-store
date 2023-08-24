@@ -1,4 +1,4 @@
-import { type Either, left, right } from '../../../../shared/either'
+import { type Either, left, right } from '@/shared/either'
 import { InvalidPasswordError } from '../errors'
 
 export class Password {

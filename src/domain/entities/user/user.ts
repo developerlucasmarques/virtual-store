@@ -1,4 +1,4 @@
-import { left, right } from '../../../shared/either'
+import { left, right } from '@/shared/either'
 import type { UserData, UserResponse } from '.'
 import { Email, Name, Password } from './value-objects'
 

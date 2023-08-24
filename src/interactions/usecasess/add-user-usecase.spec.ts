@@ -1,5 +1,5 @@
-import { User, type UserData } from '../../domain/entities/user'
-import { left } from '../../shared/either'
+import { User, type UserData } from '@/domain/entities/user'
+import { left } from '@/shared/either'
 import { AddUserUseCase } from './add-user-usecase'
 
 const makeFakeUserData = (): UserData => ({

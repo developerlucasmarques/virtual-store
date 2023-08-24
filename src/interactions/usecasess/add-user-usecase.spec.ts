@@ -1,10 +1,10 @@
-import { User, type UserModel, type UserData } from '@/domain/entities/user'
+import { User, type UserData, type UserModel } from '@/domain/entities/user'
 import { left } from '@/shared/either'
-import { AddUserUseCase } from './add-user-usecase'
-import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
-import { EmailInUseError } from '../errors/email-in-use-error'
 import type { Hash, Hasher } from '../contracts/cryptography/hasher'
+import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
 import type { Id, IdBuilder } from '../contracts/id/id-builder'
+import { EmailInUseError } from '../errors/email-in-use-error'
+import { AddUserUseCase } from './add-user-usecase'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -135,5 +135,15 @@ describe('AddUser UseCase', () => {
     const buildSpy = jest.spyOn(idBuilderStub, 'build')
     await sut.perform(makeFakeUserData())
     expect(buildSpy).toHaveBeenCalled()
+  })
+
+  it('Should throw if IdBuilder throws', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    jest.spyOn(idBuilderStub, 'build').mockImplementation(() => {
+      throw new Error()
+    }
+    )
+    const promise = sut.perform(makeFakeUserData())
+    await expect(promise).rejects.toThrow()
   })
 })

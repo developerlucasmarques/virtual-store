@@ -4,11 +4,13 @@ import { left, right } from '@/shared/either'
 import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
 import { EmailInUseError } from '../errors/email-in-use-error'
 import type { Hasher } from '../contracts/cryptography/hasher'
+import type { IdBuilder } from '../contracts/id/id-builder'
 
 export class AddUserUseCase implements AddUser {
   constructor (
     private readonly loadUserByEmailRepo: LoadUserByEmailRepo,
-    private readonly hasher: Hasher
+    private readonly hasher: Hasher,
+    private readonly idBuilder: IdBuilder
   ) {}
 
   async perform (data: UserData): Promise<AddUserResponse> {
@@ -22,6 +24,7 @@ export class AddUserUseCase implements AddUser {
       return left(new EmailInUseError(email))
     }
     await this.hasher.hashing(password)
+    this.idBuilder.build()
     return right({ accesToken: 'any' })
   }
 }

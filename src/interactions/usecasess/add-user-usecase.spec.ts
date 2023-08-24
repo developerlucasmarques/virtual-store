@@ -2,6 +2,7 @@ import { User, type UserModel, type UserData } from '@/domain/entities/user'
 import { left } from '@/shared/either'
 import { AddUserUseCase } from './add-user-usecase'
 import type { LoadUserByEmailRepo } from '../contracts/db/load-user-by-email-repo'
+import { EmailInUseError } from '../errors/email-in-use-error'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -11,6 +12,14 @@ const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   }
   return new LoadUserByEmailRepoStub()
 }
+
+const makeFakeUserModel = (): UserModel => ({
+  id: 'any_id',
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'abcd1234',
+  role: 'customer'
+})
 
 const makeFakeUserData = (): UserData => ({
   name: 'any name',
@@ -54,5 +63,14 @@ describe('AddUser UseCase', () => {
     const loadByEmailSpy = jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail')
     await sut.perform(makeFakeUserData())
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should return EmailInUseError if LoadUserByEmailRepo return a UserModel', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeSut()
+    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
+      Promise.resolve(makeFakeUserModel())
+    )
+    const result = await sut.perform(makeFakeUserData())
+    expect(result.value).toEqual(new EmailInUseError('any_email@mail.com'))
   })
 })

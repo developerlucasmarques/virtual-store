@@ -7,6 +7,8 @@ jest.mock('jsonwebtoken', () => ({
   }
 }))
 
+const expiresIn = undefined
+
 const makeSut = (): JwtAdapter => {
   return new JwtAdapter('any_secret')
 }
@@ -23,21 +25,21 @@ describe('JWT Adapter', () => {
     const sut = makeSut()
     const signSpy = jest.spyOn(jwt, 'sign')
     await sut.encrypt({ value: 'any_id' })
-    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn: undefined })
+    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn })
   })
 
   test('Should call sign with expiresIn undefined if expires in hours is equal 0', async () => {
     const sut = makeSut()
     const signSpy = jest.spyOn(jwt, 'sign')
     await sut.encrypt({ value: 'any_id', expiresInHours: 0 })
-    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn: undefined })
+    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn })
   })
 
   test('Should call sign with expiresIn undefined if expires in hours is less than 0', async () => {
     const sut = makeSut()
     const signSpy = jest.spyOn(jwt, 'sign')
     await sut.encrypt({ value: 'any_id', expiresInHours: -1 })
-    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn: undefined })
+    expect(signSpy).toHaveBeenCalledWith({ id: 'any_id' }, 'any_secret', { expiresIn })
   })
 
   test('Should throw if sign throws', async () => {

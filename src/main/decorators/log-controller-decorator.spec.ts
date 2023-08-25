@@ -60,20 +60,20 @@ const makeSut = (): SutTypes => {
 }
 
 describe('LogController Decorator', () => {
-  test('Should call controller handle', async () => {
+  it('Should call controller handle', async () => {
     const { sut, controllerStub } = makeSut()
     const handleSpy = jest.spyOn(controllerStub, 'handle')
     await sut.handle(makeFakeRequest())
     expect(handleSpy).toHaveBeenCalledWith(makeFakeRequest())
   })
 
-  test('Should return the same result of the controller', async () => {
+  it('Should return the same result of the controller', async () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(created(makeFakeAccessToken()))
   })
 
-  test('Should call LogErrorRepo with correct error if controller returns a server error', async () => {
+  it('Should call LogErrorRepo with correct error if controller returns a server error', async () => {
     const { sut, controllerStub, logErrorRepoStub } = makeSut()
     jest.spyOn(controllerStub, 'handle').mockReturnValueOnce(
       Promise.resolve(makeFakeServerError())

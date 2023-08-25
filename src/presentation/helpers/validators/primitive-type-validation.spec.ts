@@ -3,7 +3,7 @@ import { left, right } from '@/shared/either'
 import { PrimitiveTypeValidation } from '.'
 
 describe('PrimitiveType Validation', () => {
-  test('Should return ValidationTypeError if validation fails', () => {
+  it('Should return ValidationTypeError if validation fails', () => {
     const sut = new PrimitiveTypeValidation('name', 'string')
     const result = sut.validate({
       name: 0,
@@ -12,7 +12,7 @@ describe('PrimitiveType Validation', () => {
     expect(result).toEqual(left(new ValidationTypeError('name')))
   })
 
-  test('Should return null if validation success', () => {
+  it('Should return null if validation success', () => {
     const sut = new PrimitiveTypeValidation('name', 'string')
     const result = sut.validate({
       name: 'any name',
@@ -21,7 +21,7 @@ describe('PrimitiveType Validation', () => {
     expect(result).toEqual(right(null))
   })
 
-  test('Should return ValidationTypeError if field type is array and validation fails', () => {
+  it('Should return ValidationTypeError if field type is array and validation fails', () => {
     const sut = new PrimitiveTypeValidation('messages', 'array')
     const result = sut.validate({
       name: 'any name',
@@ -30,7 +30,7 @@ describe('PrimitiveType Validation', () => {
     expect(result).toEqual(left(new ValidationTypeError('messages')))
   })
 
-  test('Should return null if fieldType is array and validation success', () => {
+  it('Should return null if fieldType is array and validation success', () => {
     const sut = new PrimitiveTypeValidation('messages', 'array')
     const result = sut.validate({
       name: 'any name',

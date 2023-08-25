@@ -7,7 +7,7 @@ const makeSut = (): OnlyRequiredFieldsValidation => {
 }
 
 describe('OnlyRequiredField Validation', () => {
-  test('Should return UnnecessaryFieldError if received field unnecessary', () => {
+  it('Should return UnnecessaryFieldError if received field unnecessary', () => {
     const sut = makeSut()
     const result = sut.validate({
       name: 'any_name',
@@ -17,7 +17,7 @@ describe('OnlyRequiredField Validation', () => {
     expect(result).toEqual(left(new UnnecessaryFieldError('role')))
   })
 
-  test('Should return null if received only required fields', () => {
+  it('Should return null if received only required fields', () => {
     const sut = makeSut()
     const result = sut.validate({
       name: 'any_name',
@@ -26,7 +26,7 @@ describe('OnlyRequiredField Validation', () => {
     expect(result).toEqual(right(null))
   })
 
-  test('Should return UnnecessaryFieldError contain a field that has a list of required objects', () => {
+  it('Should return UnnecessaryFieldError contain a field that has a list of required objects', () => {
     const requiredFields = ['name', 'email', 'list']
     const listWithRequiredFields = {
       listName: 'list',
@@ -51,7 +51,7 @@ describe('OnlyRequiredField Validation', () => {
     expect(result).toEqual(left(new UnnecessaryFieldError('anyField')))
   })
 
-  test('Should return null if ListWithRequiredFields validation is success', () => {
+  it('Should return null if ListWithRequiredFields validation is success', () => {
     const requiredFields = ['name', 'email', 'list']
     const listWithRequiredFields = {
       listName: 'list',

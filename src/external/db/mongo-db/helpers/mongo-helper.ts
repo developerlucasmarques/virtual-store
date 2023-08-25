@@ -28,6 +28,14 @@ export const MongoHelper = {
     return this.client.db().collection(name)
   },
 
+  mapAddCollection (collection: any): any {
+    if (!collection || Object.keys(collection).length === 0 || !collection.id) {
+      return null
+    }
+    const { id, ...collectionWithoutId } = collection
+    return { ...collectionWithoutId, _id: new ObjectId(id) }
+  },
+
   mapCollection (collection: any): any {
     if (!collection || Object.keys(collection).length === 0) {
       return null

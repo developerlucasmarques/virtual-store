@@ -3,7 +3,9 @@ module.exports = {
   clearMocks: true,
   collectCoverageFrom: [
     '<rootDir>/src/**/*.ts',
-    '!<rootDir>/src/main/**'
+    '!<rootDir>/src/main/**',
+    '!<rootDir>/src/**/index.ts',
+    '!<rootDir>/src/shared/either.ts'
   ],
   testEnvironment: 'node',
   preset: '',

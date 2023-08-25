@@ -60,7 +60,7 @@ describe('Mongo Helper', () => {
   })
 
   it('Should connect to the default URL if no URL provided', async () => {
-    const defaultUrl = 'mongodb://127.0.0.1:27017/clean-node-api'
+    const defaultUrl = 'mongodb://127.0.0.1:27017/virtual-store'
     const mongoClientMock = {
       connect: jest.fn().mockResolvedValue(true)
     }

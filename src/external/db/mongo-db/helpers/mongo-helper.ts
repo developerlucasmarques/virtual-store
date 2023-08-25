@@ -6,7 +6,7 @@ export const MongoHelper = {
 
   async connect (uri: string | undefined): Promise<void> {
     if (!uri) {
-      this.uri = 'mongodb://127.0.0.1:27017/clean-node-api'
+      this.uri = 'mongodb://127.0.0.1:27017/virtual-store'
     } else {
       this.uri = uri
     }

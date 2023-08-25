@@ -8,7 +8,7 @@ module.exports = {
     '!<rootDir>/src/shared/either.ts'
   ],
   testEnvironment: 'node',
-  preset: '',
+  preset: '@shelf/jest-mongodb',
   transform: {
     '.+\\.ts$': 'ts-jest'
   },

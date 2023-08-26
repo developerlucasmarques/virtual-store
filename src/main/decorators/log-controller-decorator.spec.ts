@@ -1,4 +1,4 @@
-import { type AccessToken } from '@/domain/usecases-contracts'
+import type { AccessToken } from '@/domain/usecases-contracts'
 import type { LogErrorRepo } from '@/interactions/contracts'
 import type { Controller } from '@/presentation/contracts'
 import { created, serverError } from '@/presentation/helpers/http/http-helpers'

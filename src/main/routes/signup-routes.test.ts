@@ -1,6 +1,6 @@
 import request from 'supertest'
 import app from '../config/app'
-import { type Collection } from 'mongodb'
+import type { Collection } from 'mongodb'
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
 
 let userCollection: Collection

@@ -1,4 +1,4 @@
-import { type UserData } from '@/domain/entities/user'
+import type { UserData } from '@/domain/entities/user'
 import { MongoHelper, MongoHelper as sut } from './mongo-helper'
 import { MongoClient, ObjectId } from 'mongodb'
 

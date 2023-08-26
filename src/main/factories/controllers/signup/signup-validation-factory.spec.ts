@@ -5,7 +5,7 @@ import { CompareFieldsValidation, OnlyRequiredFieldsValidation, PrimitiveTypeVal
 jest.mock('@/presentation/helpers/validators/validation-composite')
 
 describe('SignUpValidation Factory', () => {
-  test('Should call ValidationComposite with all validations', () => {
+  it('Should call ValidationComposite with all validations', () => {
     makeSignUpValidation()
     const validations: Validation[] = []
     const requiredFields = ['name', 'email', 'password', 'passwordConfirmation']

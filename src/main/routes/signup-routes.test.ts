@@ -19,7 +19,7 @@ describe('Access Routes', () => {
     await userCollection.deleteMany({})
   })
 
-  test('Should return 201 on signup', async () => {
+  it('Should return 201 on signup', async () => {
     await request(app)
       .post('/api/signup')
       .send({

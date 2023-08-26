@@ -1,7 +1,7 @@
 {
   "name": "virtual-store",
   "version": "1.0.0",
-  "description": "",
+  "description": "Api Rest utilizando TDD, DDD, Clean Architecture e TypeScript",
   "main": "index.js",
   "scripts": {
     "start": "node dist/main/server.js",
@@ -13,7 +13,7 @@
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:ci": "npm test -- --coverage"
   },
-  "author": "",
+  "author": "Lucas Marques",
   "license": "ISC",
   "devDependencies": {
     "@shelf/jest-mongodb": "^4.1.7",

@@ -47,4 +47,10 @@ describe('UserMongo Repository', () => {
     const userWithStringId = MongoHelper.mapCollection(userData)
     expect(user).toEqual(userWithStringId)
   })
+
+  it('Should return null if loadByEmail fails', async () => {
+    const sut = new UserMongoRepo()
+    const user = await sut.loadByEmail('any_email@mail.com')
+    expect(user).toBeNull()
+  })
 })

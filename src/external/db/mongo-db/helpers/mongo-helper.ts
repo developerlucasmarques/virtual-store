@@ -28,7 +28,7 @@ export const MongoHelper = {
     return this.client.db().collection(name)
   },
 
-  mapAddCollection (collection: any): any {
+  convertCollectionIdStringToObjectId (collection: any): any {
     if (!collection || Object.keys(collection).length === 0 || !collection.id) {
       return null
     }
@@ -36,7 +36,7 @@ export const MongoHelper = {
     return { ...collectionWithoutId, _id: new ObjectId(id) }
   },
 
-  mapCollection (collection: any): any {
+  convertCollectionIdObjectIdToString (collection: any): any {
     if (!collection || Object.keys(collection).length === 0) {
       return null
     }

@@ -1,4 +1,4 @@
-import type { UserData } from '@/domain/entities/user'
+import { type UserData } from '@/domain/entities/user'
 import { MongoHelper, MongoHelper as sut } from './mongo-helper'
 import { MongoClient, ObjectId } from 'mongodb'
 
@@ -25,7 +25,7 @@ describe('Mongo Helper', () => {
     const userCollection = await sut.getCollection('user')
     const result = await userCollection.insertOne(makeFakeUserData())
     const { insertedId: id } = result
-    const user = sut.mapCollection(await userCollection.findOne({ _id: id }))
+    const user = sut.convertCollectionIdObjectIdToString(await userCollection.findOne({ _id: id }))
     expect(user).toEqual({
       id: id.toHexString(),
       ...makeFakeUserData()
@@ -34,7 +34,7 @@ describe('Mongo Helper', () => {
   })
 
   it('Should return null if map not received collection', () => {
-    const sut = MongoHelper.mapCollection({})
+    const sut = MongoHelper.convertCollectionIdObjectIdToString({})
     expect(sut).toBeNull()
   })
 

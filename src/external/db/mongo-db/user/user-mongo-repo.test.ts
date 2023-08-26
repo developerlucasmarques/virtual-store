@@ -35,6 +35,16 @@ describe('UserMongo Repository', () => {
     const sut = new UserMongoRepo()
     await sut.add(makeFakeUserModel())
     const user = await userCollection.findOne({ _id: objectId })
-    expect(user).toEqual(MongoHelper.mapAddCollection(makeFakeUserModel()))
+    const userWithMongoId = MongoHelper.mapAddCollection(makeFakeUserModel())
+    expect(user).toEqual(userWithMongoId)
+  })
+
+  it('Should return an user if loadByEmail on success', async () => {
+    const sut = new UserMongoRepo()
+    const userData = MongoHelper.mapAddCollection(makeFakeUserModel())
+    await userCollection.insertOne(userData)
+    const user = await sut.loadByEmail('any_email@mail.com')
+    const userWithStringId = MongoHelper.mapCollection(userData)
+    expect(user).toEqual(userWithStringId)
   })
 })

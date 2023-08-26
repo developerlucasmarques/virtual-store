@@ -2,7 +2,7 @@ import { UnnecessaryFieldError } from '@/presentation/errors'
 import { type Either, left, right } from '@/shared/either'
 import type { Validation } from '@/presentation/contracts'
 
-export interface ListWithRequiredFields {
+export type ListWithRequiredFields = {
   listName: string
   listFields: string[]
 }

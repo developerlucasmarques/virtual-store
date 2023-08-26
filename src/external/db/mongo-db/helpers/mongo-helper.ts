@@ -37,7 +37,7 @@ export const MongoHelper = {
   },
 
   convertCollectionIdObjectIdToString (collection: any): any {
-    if (!collection || Object.keys(collection).length === 0) {
+    if (!collection || Object.keys(collection).length === 0 || !collection._id) {
       return null
     }
     const { _id, ...collectionWithoutId } = collection

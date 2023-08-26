@@ -33,8 +33,13 @@ describe('Mongo Helper', () => {
     await sut.disconnect()
   })
 
-  it('Should return null if map not received collection', () => {
+  it('Should return null if convertCollectionIdObjectIdToString() not received collection', () => {
     const sut = MongoHelper.convertCollectionIdObjectIdToString({})
+    expect(sut).toBeNull()
+  })
+
+  it('Should return null if convertCollectionIdStringToObjectId() not received collection', () => {
+    const sut = MongoHelper.convertCollectionIdStringToObjectId({})
     expect(sut).toBeNull()
   })
 

@@ -3,6 +3,7 @@ import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { LoginController } from './login-controller'
 import { badRequest } from '../helpers/http/http-helpers'
+import type { Auth, AuthData, AuthResponse } from '@/domain/usecases-contracts'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -20,17 +21,29 @@ const makeValidationComposite = (): Validation => {
   return new ValidationCompositeStub()
 }
 
+const makeAuthStub = (): Auth => {
+  class AuthStub implements Auth {
+    async perform (data: AuthData): Promise<AuthResponse> {
+      return await Promise.resolve(right({ accessToken: 'any_token' }))
+    }
+  }
+  return new AuthStub()
+}
+
 type SutTypes = {
   sut: LoginController
   validationCompositeStub: Validation
+  authStub: Auth
 }
 
 const makeSut = (): SutTypes => {
   const validationCompositeStub = makeValidationComposite()
-  const sut = new LoginController(validationCompositeStub)
+  const authStub = makeAuthStub()
+  const sut = new LoginController(validationCompositeStub, authStub)
   return {
     sut,
-    validationCompositeStub
+    validationCompositeStub,
+    authStub
   }
 }
 
@@ -49,5 +62,12 @@ describe('Login Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should call Auth with correct values', async () => {
+    const { sut, authStub } = makeSut()
+    const performSpy = jest.spyOn(authStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledWith(makeFakeRequest().body)
   })
 })

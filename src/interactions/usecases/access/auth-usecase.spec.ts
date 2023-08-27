@@ -97,4 +97,13 @@ describe('Auth UseCase', () => {
       hash: 'hashed_password'
     })
   })
+
+  it('Should return InvalidCredentialsError if HashComparer fails', async () => {
+    const { sut, hashComparerStub } = makeFakeSut()
+    jest.spyOn(hashComparerStub, 'comparer').mockReturnValueOnce(
+      Promise.resolve(false)
+    )
+    const result = await sut.perform(makeFakeAuthData())
+    expect(result.value).toEqual(new InvalidCredentialsError())
+  })
 })

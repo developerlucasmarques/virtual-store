@@ -3,20 +3,34 @@ import { AuthUseCase } from './auth-usecase'
 import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 import type { AuthData } from '@/domain/usecases-contracts'
+import type { LoadUserByEmailRepo } from '@/interactions/contracts'
+import type { UserModel } from '@/domain/models'
 
 const makeFakeAuthData = (): AuthData => ({
   email: 'any_email@mail.com',
   password: 'abcd1234'
 })
 
+const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
+  class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
+    async loadByEmail (email: string): Promise<null | UserModel> {
+      return await Promise.resolve(null)
+    }
+  }
+  return new LoadUserByEmailRepoStub()
+}
+
 type SutTypes = {
   sut: AuthUseCase
+  loadUserByEmailRepoStub: LoadUserByEmailRepo
 }
 
 const makeFakeSut = (): SutTypes => {
-  const sut = new AuthUseCase()
+  const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
+  const sut = new AuthUseCase(loadUserByEmailRepoStub)
   return {
-    sut
+    sut,
+    loadUserByEmailRepoStub
   }
 }
 
@@ -35,5 +49,12 @@ describe('Auth UseCase', () => {
     )
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual(new InvalidEmailError('any_email@mail.com'))
+  })
+
+  it('Should call LoadUserByEmailRepo with correct email', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeFakeSut()
+    const loadByEmailSpy = jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail')
+    await sut.perform(makeFakeAuthData())
+    expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 })

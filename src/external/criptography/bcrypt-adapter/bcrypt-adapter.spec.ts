@@ -34,8 +34,8 @@ describe('Bcrypt Adapter', () => {
 
     it('Should return a valid hash on hash success', async () => {
       const sut = makeSut()
-      const hash = await sut.hashing('any_value')
-      expect(hash).toEqual({ hash: 'hash' })
+      const result = await sut.hashing('any_value')
+      expect(result).toEqual({ hash: 'hash' })
     })
 
     it('Should throw if bcrypt throws', async () => {
@@ -82,6 +82,12 @@ describe('Bcrypt Adapter', () => {
       )
       const promise = sut.comparer(makeHashComparerData())
       await expect(promise).rejects.toThrow()
+    })
+
+    test('Should return true when bcrypt compare on success', async () => {
+      const sut = makeSut()
+      const retulst = await sut.comparer(makeHashComparerData())
+      expect(retulst).toBe(true)
     })
   })
 })

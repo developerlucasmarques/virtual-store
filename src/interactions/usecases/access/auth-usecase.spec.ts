@@ -2,7 +2,7 @@ import { User } from '@/domain/entities/user'
 import { AuthUseCase } from './auth-usecase'
 import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
-import type { AuthData } from '@/domain/usecases-contracts'
+import { InvalidCredentialsError, type AuthData } from '@/domain/usecases-contracts'
 import type { LoadUserByEmailRepo } from '@/interactions/contracts'
 import type { UserModel } from '@/domain/models'
 
@@ -11,10 +11,19 @@ const makeFakeAuthData = (): AuthData => ({
   password: 'abcd1234'
 })
 
+const makeFakeUserModel = (): UserModel => ({
+  id: 'any_id',
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'hashed_password',
+  role: 'customer',
+  accessToken: 'any_token'
+})
+
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
     async loadByEmail (email: string): Promise<null | UserModel> {
-      return await Promise.resolve(null)
+      return await Promise.resolve(makeFakeUserModel())
     }
   }
   return new LoadUserByEmailRepoStub()
@@ -56,5 +65,14 @@ describe('Auth UseCase', () => {
     const loadByEmailSpy = jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail')
     await sut.perform(makeFakeAuthData())
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  it('Should return InvalidCredentialsError if LoadUserByEmailRepo returns null', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeFakeSut()
+    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeAuthData())
+    expect(result.value).toEqual(new InvalidCredentialsError())
   })
 })

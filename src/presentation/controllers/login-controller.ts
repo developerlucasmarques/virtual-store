@@ -15,7 +15,10 @@ export class LoginController implements Controller {
       return badRequest(validations.value)
     }
     const { email, password } = httpRequest.body
-    await this.auth.perform({ email, password })
+    const authResult = await this.auth.perform({ email, password })
+    if (authResult.isLeft()) {
+      return badRequest(authResult.value)
+    }
     return { statusCode: 0, body: '' }
   }
 }

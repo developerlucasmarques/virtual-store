@@ -54,7 +54,7 @@ type SutTypes = {
   accessTokenBuilderStub: AccessTokenBuilder
 }
 
-const makeFakeSut = (): SutTypes => {
+const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
   const hashComparerStub = makeHashComparer()
   const accessTokenBuilderStub = makeAccessTokenBuilder()
@@ -69,14 +69,14 @@ const makeFakeSut = (): SutTypes => {
 
 describe('Auth UseCase', () => {
   it('Should call User Entity validateEmail with correct email', async () => {
-    const { sut } = makeFakeSut()
+    const { sut } = makeSut()
     const validateEmailSpy = jest.spyOn(User, 'validateEmail')
     await sut.perform(makeFakeAuthData())
     expect(validateEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
   it('Should return InvalidEmailError if User Entity validateEmail returs InvalidEmailError', async () => {
-    const { sut } = makeFakeSut()
+    const { sut } = makeSut()
     jest.spyOn(User, 'validateEmail').mockReturnValueOnce(
       left(new InvalidEmailError('any_email@mail.com'))
     )
@@ -85,14 +85,23 @@ describe('Auth UseCase', () => {
   })
 
   it('Should call LoadUserByEmailRepo with correct email', async () => {
-    const { sut, loadUserByEmailRepoStub } = makeFakeSut()
+    const { sut, loadUserByEmailRepoStub } = makeSut()
     const loadByEmailSpy = jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail')
     await sut.perform(makeFakeAuthData())
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
+  it('Should throw if LoadUserByEmailRepo throws', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeSut()
+    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAuthData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return InvalidCredentialsError if LoadUserByEmailRepo returns null', async () => {
-    const { sut, loadUserByEmailRepoStub } = makeFakeSut()
+    const { sut, loadUserByEmailRepoStub } = makeSut()
     jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
       Promise.resolve(null)
     )
@@ -101,7 +110,7 @@ describe('Auth UseCase', () => {
   })
 
   it('Should call HashComparer with correct values', async () => {
-    const { sut, hashComparerStub } = makeFakeSut()
+    const { sut, hashComparerStub } = makeSut()
     const comparerSpy = jest.spyOn(hashComparerStub, 'comparer')
     await sut.perform(makeFakeAuthData())
     expect(comparerSpy).toHaveBeenCalledWith({
@@ -111,7 +120,7 @@ describe('Auth UseCase', () => {
   })
 
   it('Should return InvalidCredentialsError if HashComparer fails', async () => {
-    const { sut, hashComparerStub } = makeFakeSut()
+    const { sut, hashComparerStub } = makeSut()
     jest.spyOn(hashComparerStub, 'comparer').mockReturnValueOnce(
       Promise.resolve(false)
     )
@@ -120,14 +129,14 @@ describe('Auth UseCase', () => {
   })
 
   it('Should call AccessTokenBuilder with correct user id', async () => {
-    const { sut, accessTokenBuilderStub } = makeFakeSut()
+    const { sut, accessTokenBuilderStub } = makeSut()
     const performSpy = jest.spyOn(accessTokenBuilderStub, 'perform')
     await sut.perform(makeFakeAuthData())
     expect(performSpy).toHaveBeenCalledWith('any_id')
   })
 
   it('Should return access token if AccessTokenBuilder on success', async () => {
-    const { sut } = makeFakeSut()
+    const { sut } = makeSut()
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual({ accessToken: 'any_token' })
   })

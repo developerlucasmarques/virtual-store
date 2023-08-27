@@ -125,4 +125,10 @@ describe('Auth UseCase', () => {
     await sut.perform(makeFakeAuthData())
     expect(performSpy).toHaveBeenCalledWith('any_id')
   })
+
+  it('Should return access token if AccessTokenBuilder on success', async () => {
+    const { sut } = makeFakeSut()
+    const result = await sut.perform(makeFakeAuthData())
+    expect(result.value).toEqual({ accessToken: 'any_token' })
+  })
 })

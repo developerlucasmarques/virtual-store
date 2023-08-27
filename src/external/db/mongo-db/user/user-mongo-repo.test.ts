@@ -3,7 +3,7 @@ import { type Collection, ObjectId } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { UserMongoRepo } from './user-mongo-repo'
 
-const idString = new ObjectId().toString()
+const idString = new ObjectId().toHexString()
 const objectId = new ObjectId(idString)
 
 const makeFakeUserModel = (): UserModel => ({
@@ -31,26 +31,41 @@ describe('UserMongo Repository', () => {
     await userCollection.deleteMany({})
   })
 
-  it('Should create a user if add on success', async () => {
-    const sut = new UserMongoRepo()
-    await sut.add(makeFakeUserModel())
-    const user = await userCollection.findOne({ _id: objectId })
-    const userWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
-    expect(user).toEqual(userWithMongoId)
+  describe('add()', () => {
+    it('Should create a user if add on success', async () => {
+      const sut = new UserMongoRepo()
+      await sut.add(makeFakeUserModel())
+      const user = await userCollection.findOne({ _id: objectId })
+      const userWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      expect(user).toEqual(userWithMongoId)
+    })
   })
 
-  it('Should return an user if loadByEmail on success', async () => {
-    const sut = new UserMongoRepo()
-    const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
-    await userCollection.insertOne(userData)
-    const user = await sut.loadByEmail('any_email@mail.com')
-    const userWithStringId = MongoHelper.convertCollectionIdObjectIdToString(userData)
-    expect(user).toEqual(userWithStringId)
+  describe('loadByEmail()', () => {
+    it('Should return an user if loadByEmail on success', async () => {
+      const sut = new UserMongoRepo()
+      const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      await userCollection.insertOne(userData)
+      const user = await sut.loadByEmail('any_email@mail.com')
+      const userWithStringId = MongoHelper.convertCollectionIdObjectIdToString(userData)
+      expect(user).toEqual(userWithStringId)
+    })
+
+    it('Should return null if loadByEmail fails', async () => {
+      const sut = new UserMongoRepo()
+      const user = await sut.loadByEmail('any_email@mail.com')
+      expect(user).toBeNull()
+    })
   })
 
-  it('Should return null if loadByEmail fails', async () => {
-    const sut = new UserMongoRepo()
-    const user = await sut.loadByEmail('any_email@mail.com')
-    expect(user).toBeNull()
+  describe('updateAccessToken', () => {
+    it('Should update access token if updateAccessToken on success', async () => {
+      const sut = new UserMongoRepo()
+      const userModel = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      await userCollection.insertOne(userModel)
+      await sut.updateAccessToken({ userId: idString, accessToken: 'another_token' })
+      const user = await userCollection.findOne({ _id: objectId })
+      expect(user?.accessToken).toBe('another_token')
+    })
   })
 })

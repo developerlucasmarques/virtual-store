@@ -2,9 +2,9 @@ import { User } from '@/domain/entities/user'
 import { AuthUseCase } from './auth-usecase'
 import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
-import { InvalidCredentialsError, type AuthData } from '@/domain/usecases-contracts'
+import { InvalidCredentialsError, type AuthData, type AccessTokenBuilder } from '@/domain/usecases-contracts'
 import type { ComparerData, HashComparer, LoadUserByEmailRepo } from '@/interactions/contracts'
-import type { UserModel } from '@/domain/models'
+import type { AccessTokenModel, UserModel } from '@/domain/models'
 
 const makeFakeAuthData = (): AuthData => ({
   email: 'any_email@mail.com',
@@ -38,20 +38,32 @@ const makeHashComparer = (): HashComparer => {
   return new HashComparerStub()
 }
 
+const makeAccessTokenBuilder = (): AccessTokenBuilder => {
+  class AccessTokenBuilderStub implements AccessTokenBuilder {
+    async perform (value: string): Promise<AccessTokenModel> {
+      return { accessToken: 'any_token' }
+    }
+  }
+  return new AccessTokenBuilderStub()
+}
+
 type SutTypes = {
   sut: AuthUseCase
   loadUserByEmailRepoStub: LoadUserByEmailRepo
   hashComparerStub: HashComparer
+  accessTokenBuilderStub: AccessTokenBuilder
 }
 
 const makeFakeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
   const hashComparerStub = makeHashComparer()
-  const sut = new AuthUseCase(loadUserByEmailRepoStub, hashComparerStub)
+  const accessTokenBuilderStub = makeAccessTokenBuilder()
+  const sut = new AuthUseCase(loadUserByEmailRepoStub, hashComparerStub, accessTokenBuilderStub)
   return {
     sut,
     loadUserByEmailRepoStub,
-    hashComparerStub
+    hashComparerStub,
+    accessTokenBuilderStub
   }
 }
 
@@ -105,5 +117,12 @@ describe('Auth UseCase', () => {
     )
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual(new InvalidCredentialsError())
+  })
+
+  it('Should call AccessTokenBuilder with correct user id', async () => {
+    const { sut, accessTokenBuilderStub } = makeFakeSut()
+    const performSpy = jest.spyOn(accessTokenBuilderStub, 'perform')
+    await sut.perform(makeFakeAuthData())
+    expect(performSpy).toHaveBeenCalledWith('any_id')
   })
 })

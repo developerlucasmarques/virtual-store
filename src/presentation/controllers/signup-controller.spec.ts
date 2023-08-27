@@ -7,6 +7,15 @@ import type { AddUserResponse, AddUser } from '@/domain/usecases-contracts'
 import type { UserData } from '@/domain/entities/user'
 import { ServerError } from '../errors/server-error'
 
+const makeFakeRequest = (): HttpRequest => ({
+  body: {
+    name: 'any name',
+    email: 'any_email@mail.com',
+    password: 'abcd1234',
+    passwordConfirmation: 'abcd1234'
+  }
+})
+
 const makeValidationComposite = (): Validation => {
   class ValidationCompositeStub implements Validation {
     validate (input: any): Either<Error, null> {
@@ -41,15 +50,6 @@ const makeSut = (): SutTypes => {
     addUserStub
   }
 }
-
-const makeFakeRequest = (): HttpRequest => ({
-  body: {
-    name: 'any name',
-    email: 'any_email@mail.com',
-    password: 'abcd1234',
-    passwordConfirmation: 'abcd1234'
-  }
-})
 
 describe('SignUp Controller', () => {
   it('Should call ValidationComposite with correct values', async () => {

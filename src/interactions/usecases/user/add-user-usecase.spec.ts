@@ -6,6 +6,21 @@ import type { AccessTokenBuilder } from '@/domain/usecases-contracts'
 import { EmailInUseError } from '@/domain/usecases-contracts/export-errors'
 import type { AccessTokenModel, UserModel } from '@/domain/models'
 
+const makeFakeUserModel = (): UserModel => ({
+  id: 'any_id',
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'hashed_password',
+  role: 'customer',
+  accessToken: 'any_token'
+})
+
+const makeFakeUserData = (): UserData => ({
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'abcd1234'
+})
+
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
     async loadByEmail (email: string): Promise<null | UserModel> {
@@ -50,21 +65,6 @@ const makeAddUserRepoStub = (): AddUserRepo => {
   }
   return new AddUserRepoStub()
 }
-
-const makeFakeUserModel = (): UserModel => ({
-  id: 'any_id',
-  name: 'any name',
-  email: 'any_email@mail.com',
-  password: 'hashed_password',
-  role: 'customer',
-  accessToken: 'any_token'
-})
-
-const makeFakeUserData = (): UserData => ({
-  name: 'any name',
-  email: 'any_email@mail.com',
-  password: 'abcd1234'
-})
 
 type SutTypes = {
   sut: AddUserUseCase

@@ -20,7 +20,7 @@ const makeValidationComposite = (): Validation => {
   return new ValidationCompositeStub()
 }
 
-interface SutTypes {
+type SutTypes = {
   sut: LoginController
   validationCompositeStub: Validation
 }

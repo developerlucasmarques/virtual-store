@@ -1,4 +1,4 @@
-import type { AccessToken } from '@/domain/usecases-contracts'
+import type { AccessTokenModel } from '@/domain/models'
 import type { LogErrorRepo } from '@/interactions/contracts'
 import type { Controller } from '@/presentation/contracts'
 import { created, serverError } from '@/presentation/helpers/http/http-helpers'
@@ -32,7 +32,7 @@ const makeFakeRequest = (): HttpRequest => ({
   }
 })
 
-const makeFakeAccessToken = (): AccessToken => ({
+const makeFakeAccessToken = (): AccessTokenModel => ({
   accessToken: 'any_token'
 })
 

@@ -1,9 +1,9 @@
-import { User, type UserData, type UserModel } from '@/domain/entities/user'
+import { User, type UserData } from '@/domain/entities/user'
 import { left } from '@/shared/either'
 import type { LoadUserByEmailRepo, AddUserRepo, Id, IdBuilder, Hash, Hasher } from '../contracts'
-import { EmailInUseError } from '../errors'
 import { AddUserUseCase } from './add-user-usecase'
-import type { AccessToken, AccessTokenBuilder } from '@/domain/usecases-contracts'
+import { EmailInUseError, type AccessTokenBuilder } from '@/domain/usecases-contracts'
+import type { AccessTokenModel, UserModel } from '@/domain/models'
 
 const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   class LoadUserByEmailRepoStub implements LoadUserByEmailRepo {
@@ -34,7 +34,7 @@ const makeIdBuilderStub = (): IdBuilder => {
 
 const makeAccessTokenBuilderStub = (): AccessTokenBuilder => {
   class AccessTokenBuilderStub implements AccessTokenBuilder {
-    async perform (value: string): Promise<AccessToken> {
+    async perform (value: string): Promise<AccessTokenModel> {
       return { accessToken: 'any_token' }
     }
   }

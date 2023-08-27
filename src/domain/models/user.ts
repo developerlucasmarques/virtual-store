@@ -1,4 +1,4 @@
-export type RoleModel = 'admin' | 'customer'
+import type { RoleModel } from './role'
 
 export type UserModel = {
   id: string

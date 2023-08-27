@@ -3,7 +3,7 @@ import type { InvalidEmailError, InvalidNameError, InvalidPasswordError } from '
 import type { User } from '../user'
 import type { Email } from '../value-objects'
 
-export type UserResponse = Either<
+export type CreateUserResponse = Either<
 InvalidNameError | InvalidEmailError | InvalidPasswordError, User
 >
 

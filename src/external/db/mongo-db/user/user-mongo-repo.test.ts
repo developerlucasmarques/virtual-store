@@ -1,4 +1,4 @@
-import type { UserModel } from '@/domain/entities/user'
+import type { UserModel } from '@/domain/models'
 import { type Collection, ObjectId } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { UserMongoRepo } from './user-mongo-repo'

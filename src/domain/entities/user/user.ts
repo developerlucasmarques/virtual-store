@@ -1,5 +1,5 @@
 import { left, right } from '@/shared/either'
-import type { UserData, UserResponse, ValidateEmailResponse } from '.'
+import type { UserData, CreateUserResponse, ValidateEmailResponse } from '.'
 import { Email, Name, Password } from './value-objects'
 
 export class User {
@@ -9,7 +9,7 @@ export class User {
     private readonly password: Password
   ) {}
 
-  static create (data: UserData): UserResponse {
+  static create (data: UserData): CreateUserResponse {
     const name = Name.create(data.name)
     if (name.isLeft()) {
       return left(name.value)

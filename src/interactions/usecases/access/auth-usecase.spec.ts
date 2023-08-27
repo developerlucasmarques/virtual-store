@@ -4,7 +4,7 @@ import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 import type { AuthData, AccessTokenBuilder } from '@/domain/usecases-contracts'
 import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
-import type { ComparerData, HashComparer, LoadUserByEmailRepo } from '@/interactions/contracts'
+import type { ComparerData, HashComparer, LoadUserByEmailRepo, UpdateAccessTokenData, UpdateAccessTokenRepo } from '@/interactions/contracts'
 import type { AccessTokenModel, UserModel } from '@/domain/models'
 
 const makeFakeAuthData = (): AuthData => ({
@@ -42,10 +42,19 @@ const makeHashComparer = (): HashComparer => {
 const makeAccessTokenBuilder = (): AccessTokenBuilder => {
   class AccessTokenBuilderStub implements AccessTokenBuilder {
     async perform (value: string): Promise<AccessTokenModel> {
-      return { accessToken: 'any_token' }
+      return await Promise.resolve({ accessToken: 'any_token' })
     }
   }
   return new AccessTokenBuilderStub()
+}
+
+const makeUpdateAccessToken = (): UpdateAccessTokenRepo => {
+  class UpdateAccessTokenRepoStub implements UpdateAccessTokenRepo {
+    async updateAccessToken (data: UpdateAccessTokenData): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new UpdateAccessTokenRepoStub()
 }
 
 type SutTypes = {
@@ -53,18 +62,26 @@ type SutTypes = {
   loadUserByEmailRepoStub: LoadUserByEmailRepo
   hashComparerStub: HashComparer
   accessTokenBuilderStub: AccessTokenBuilder
+  updateAccessTokenRepoStub: UpdateAccessTokenRepo
 }
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
   const hashComparerStub = makeHashComparer()
   const accessTokenBuilderStub = makeAccessTokenBuilder()
-  const sut = new AuthUseCase(loadUserByEmailRepoStub, hashComparerStub, accessTokenBuilderStub)
+  const updateAccessTokenRepoStub = makeUpdateAccessToken()
+  const sut = new AuthUseCase(
+    loadUserByEmailRepoStub,
+    hashComparerStub,
+    accessTokenBuilderStub,
+    updateAccessTokenRepoStub
+  )
   return {
     sut,
     loadUserByEmailRepoStub,
     hashComparerStub,
-    accessTokenBuilderStub
+    accessTokenBuilderStub,
+    updateAccessTokenRepoStub
   }
 }
 
@@ -152,6 +169,16 @@ describe('Auth UseCase', () => {
     )
     const promise = sut.perform(makeFakeAuthData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call UpdateAccessTokenRepo with correct values', async () => {
+    const { sut, updateAccessTokenRepoStub } = makeSut()
+    const updateAccessTokenSpy = jest.spyOn(updateAccessTokenRepoStub, 'updateAccessToken')
+    await sut.perform(makeFakeAuthData())
+    expect(updateAccessTokenSpy).toHaveBeenCalledWith({
+      userId: 'any_id',
+      accessToken: 'any_token'
+    })
   })
 
   it('Should return access token if AccessTokenBuilder on success', async () => {

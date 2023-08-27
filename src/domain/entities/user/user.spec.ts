@@ -53,5 +53,10 @@ describe('User Entity', () => {
       const sut = User.validateEmail('any_email@mail.com')
       expect(sut.value).toEqual(new InvalidEmailError('any_email@mail.com'))
     })
+
+    it('Should return an Email if create Email on success', () => {
+      const sut = User.validateEmail('any_email@mail.com')
+      expect(sut.value).toEqual({ email: 'any_email@mail.com' })
+    })
   })
 })

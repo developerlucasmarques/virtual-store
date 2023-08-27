@@ -26,7 +26,7 @@ export class AuthUseCase implements Auth {
     if (!comparer) {
       return left(new InvalidCredentialsError())
     }
-    await this.accessTokenBuilder.perform(user.id)
-    return right({ accessToken: 'any' })
+    const accessToken = await this.accessTokenBuilder.perform(user.id)
+    return right(accessToken)
   }
 }

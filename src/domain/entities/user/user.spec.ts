@@ -38,9 +38,9 @@ describe('User Entity', () => {
     it('Should create User if all data is valid', () => {
       const sut = User.create(makeUserData())
       expect(sut.value).toEqual({
-        name: Name.create('any name').value,
-        email: Email.create('any_email@mail.com').value,
-        password: Password.create('abcd1234').value
+        name: { name: 'any name' },
+        email: { email: 'any_email@mail.com' },
+        password: { password: 'abcd1234' }
       })
     })
   })

@@ -181,6 +181,15 @@ describe('Auth UseCase', () => {
     })
   })
 
+  it('Should throw if UpdateAccessTokenRepo throws', async () => {
+    const { sut, updateAccessTokenRepoStub } = makeSut()
+    jest.spyOn(updateAccessTokenRepoStub, 'updateAccessToken').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAuthData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return access token if AccessTokenBuilder on success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAuthData())

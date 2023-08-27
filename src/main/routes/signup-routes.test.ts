@@ -2,6 +2,7 @@ import request from 'supertest'
 import app from '../config/app'
 import type { Collection } from 'mongodb'
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
+import { hash } from 'bcrypt'
 
 let userCollection: Collection
 
@@ -19,15 +20,35 @@ describe('Access Routes', () => {
     await userCollection.deleteMany({})
   })
 
-  it('Should return 201 on signup', async () => {
-    await request(app)
-      .post('/api/signup')
-      .send({
+  describe('/signup', () => {
+    it('Should return 201 on signup', async () => {
+      await request(app)
+        .post('/api/signup')
+        .send({
+          name: 'any name',
+          email: 'any_email@mail.com',
+          password: 'abcd1234',
+          passwordConfirmation: 'abcd1234'
+        })
+        .expect(201)
+    })
+  })
+
+  describe('/login', () => {
+    it('Should return 200 on login', async () => {
+      const encryptedPassword = await hash('abcd1234', 12)
+      await userCollection.insertOne({
         name: 'any name',
         email: 'any_email@mail.com',
-        password: 'abcd1234',
-        passwordConfirmation: 'abcd1234'
+        password: encryptedPassword
       })
-      .expect(201)
+      await request(app)
+        .post('/api/login')
+        .send({
+          email: 'any_email@mail.com',
+          password: 'abcd1234'
+        })
+        .expect(200)
+    })
   })
 })

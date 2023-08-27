@@ -2,7 +2,7 @@ import { right, type Either, left } from '@/shared/either'
 import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { LoginController } from './login-controller'
-import { badRequest, serverError, unauthorized } from '../helpers/http/http-helpers'
+import { badRequest, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
 import type { Auth, AuthData, AuthResponse } from '@/domain/usecases-contracts'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
@@ -98,5 +98,11 @@ describe('Login Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new Error()))
+  })
+
+  test('Should return access token if Auth on success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(ok({ accessToken: 'any_token' }))
   })
 })

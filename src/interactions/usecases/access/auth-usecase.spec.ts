@@ -144,6 +144,15 @@ describe('Auth UseCase', () => {
     expect(performSpy).toHaveBeenCalledWith('any_id')
   })
 
+  it('Should throw if AccessTokenBuilder throws', async () => {
+    const { sut, accessTokenBuilderStub } = makeSut()
+    jest.spyOn(accessTokenBuilderStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAuthData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return access token if AccessTokenBuilder on success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAuthData())

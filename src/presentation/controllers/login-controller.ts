@@ -1,6 +1,6 @@
 import type { Auth } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '../contracts'
-import { badRequest, serverError, unauthorized } from '../helpers/http/http-helpers'
+import { badRequest, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 
@@ -24,7 +24,7 @@ export class LoginController implements Controller {
         }
         return unauthorized(authResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return ok({ accessToken: authResult.value.accessToken })
     } catch (error: any) {
       console.error(error)
       return serverError(error)

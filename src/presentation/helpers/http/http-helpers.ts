@@ -1,6 +1,11 @@
 import { ServerError } from '@/presentation/errors/server-error'
 import type { HttpResponse } from '@/presentation/http-types/http'
 
+export const ok = (data: any): HttpResponse => ({
+  statusCode: 200,
+  body: data
+})
+
 export const created = (data: any): HttpResponse => ({
   statusCode: 201,
   body: data

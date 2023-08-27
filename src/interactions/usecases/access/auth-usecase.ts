@@ -1,5 +1,5 @@
 import { User } from '@/domain/entities/user'
-import type { Auth, AuthData, AuthResponse } from '@/domain/usecases-contracts'
+import { InvalidCredentialsError, type Auth, type AuthData, type AuthResponse } from '@/domain/usecases-contracts'
 import type { LoadUserByEmailRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -11,7 +11,10 @@ export class AuthUseCase implements Auth {
     if (emailOrError.isLeft()) {
       return left(emailOrError.value)
     }
-    await this.loadUserByEmailRepo.loadByEmail(data.email)
+    const userOrNull = await this.loadUserByEmailRepo.loadByEmail(data.email)
+    if (!userOrNull) {
+      return left(new InvalidCredentialsError())
+    }
     return right({ accessToken: 'any' })
   }
 }

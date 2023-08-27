@@ -11,9 +11,9 @@ export class SignUpController implements Controller {
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const validation = this.validationComposite.validate(httpRequest.body)
-      if (validation.isLeft()) {
-        return badRequest(validation.value)
+      const validations = this.validationComposite.validate(httpRequest.body)
+      if (validations.isLeft()) {
+        return badRequest(validations.value)
       }
       const { name, email, password } = httpRequest.body
       const addUserResult = await this.addUser.perform({ name, email, password })

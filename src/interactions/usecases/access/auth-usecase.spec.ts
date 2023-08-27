@@ -91,15 +91,6 @@ describe('Auth UseCase', () => {
     expect(loadByEmailSpy).toHaveBeenCalledWith('any_email@mail.com')
   })
 
-  it('Should throw if LoadUserByEmailRepo throws', async () => {
-    const { sut, loadUserByEmailRepoStub } = makeSut()
-    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
-      Promise.reject(new Error())
-    )
-    const promise = sut.perform(makeFakeAuthData())
-    await expect(promise).rejects.toThrow()
-  })
-
   it('Should return InvalidCredentialsError if LoadUserByEmailRepo returns null', async () => {
     const { sut, loadUserByEmailRepoStub } = makeSut()
     jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
@@ -107,6 +98,15 @@ describe('Auth UseCase', () => {
     )
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual(new InvalidCredentialsError())
+  })
+
+  it('Should throw if LoadUserByEmailRepo throws', async () => {
+    const { sut, loadUserByEmailRepoStub } = makeSut()
+    jest.spyOn(loadUserByEmailRepoStub, 'loadByEmail').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAuthData())
+    await expect(promise).rejects.toThrow()
   })
 
   it('Should call HashComparer with correct values', async () => {
@@ -126,6 +126,15 @@ describe('Auth UseCase', () => {
     )
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual(new InvalidCredentialsError())
+  })
+
+  it('Should throw if HashComparer throws', async () => {
+    const { sut, hashComparerStub } = makeSut()
+    jest.spyOn(hashComparerStub, 'comparer').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAuthData())
+    await expect(promise).rejects.toThrow()
   })
 
   it('Should call AccessTokenBuilder with correct user id', async () => {

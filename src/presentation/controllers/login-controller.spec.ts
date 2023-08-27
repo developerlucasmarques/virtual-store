@@ -1,7 +1,8 @@
-import { right, type Either } from '@/shared/either'
+import { right, type Either, left } from '@/shared/either'
 import type { Validation } from '../contracts/validation'
 import type { HttpRequest } from '../http-types/http'
 import { LoginController } from './login-controller'
+import { badRequest } from '../helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -39,5 +40,14 @@ describe('Login Controller', () => {
     const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
     await sut.handle(makeFakeRequest())
     expect(validateSpy).toHaveBeenCalledWith(makeFakeRequest().body)
+  })
+
+  it('Should return 400 if ValidationComposite fails', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+      left(new Error('any_message'))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 })

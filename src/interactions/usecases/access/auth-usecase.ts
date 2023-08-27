@@ -1,5 +1,6 @@
 import { User } from '@/domain/entities/user'
-import { InvalidCredentialsError, type Auth, type AuthData, type AuthResponse, type AccessTokenBuilder } from '@/domain/usecases-contracts'
+import type { Auth, AuthData, AuthResponse, AccessTokenBuilder } from '@/domain/usecases-contracts'
+import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
 import type { HashComparer, LoadUserByEmailRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 

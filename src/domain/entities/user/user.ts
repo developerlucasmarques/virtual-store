@@ -1,5 +1,5 @@
 import { left, right } from '@/shared/either'
-import type { UserData, UserResponse } from '.'
+import type { UserData, UserResponse, ValidateEmailResponse } from '.'
 import { Email, Name, Password } from './value-objects'
 
 export class User {
@@ -25,5 +25,13 @@ export class User {
     return right(
       new User(name.value, email.value, password.value)
     )
+  }
+
+  static validateEmail (email: string): ValidateEmailResponse {
+    const emailOrError = Email.create(email)
+    if (emailOrError.isLeft()) {
+      return left(emailOrError.value)
+    }
+    return right(emailOrError.value)
   }
 }

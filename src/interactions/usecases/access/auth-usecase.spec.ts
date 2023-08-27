@@ -3,7 +3,7 @@ import { AuthUseCase } from './auth-usecase'
 import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 import { InvalidCredentialsError, type AuthData } from '@/domain/usecases-contracts'
-import type { LoadUserByEmailRepo } from '@/interactions/contracts'
+import type { ComparerData, HashComparer, LoadUserByEmailRepo } from '@/interactions/contracts'
 import type { UserModel } from '@/domain/models'
 
 const makeFakeAuthData = (): AuthData => ({
@@ -29,17 +29,29 @@ const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   return new LoadUserByEmailRepoStub()
 }
 
+const makeHashComparer = (): HashComparer => {
+  class HashComparerStub implements HashComparer {
+    async comparer (data: ComparerData): Promise<boolean> {
+      return await Promise.resolve(true)
+    }
+  }
+  return new HashComparerStub()
+}
+
 type SutTypes = {
   sut: AuthUseCase
   loadUserByEmailRepoStub: LoadUserByEmailRepo
+  hashComparerStub: HashComparer
 }
 
 const makeFakeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
-  const sut = new AuthUseCase(loadUserByEmailRepoStub)
+  const hashComparerStub = makeHashComparer()
+  const sut = new AuthUseCase(loadUserByEmailRepoStub, hashComparerStub)
   return {
     sut,
-    loadUserByEmailRepoStub
+    loadUserByEmailRepoStub,
+    hashComparerStub
   }
 }
 
@@ -74,5 +86,15 @@ describe('Auth UseCase', () => {
     )
     const result = await sut.perform(makeFakeAuthData())
     expect(result.value).toEqual(new InvalidCredentialsError())
+  })
+
+  it('Should call HashComparer with correct values', async () => {
+    const { sut, hashComparerStub } = makeFakeSut()
+    const comparerSpy = jest.spyOn(hashComparerStub, 'comparer')
+    await sut.perform(makeFakeAuthData())
+    expect(comparerSpy).toHaveBeenCalledWith({
+      value: 'abcd1234',
+      hash: 'hashed_password'
+    })
   })
 })

@@ -4,6 +4,7 @@ import type { HttpRequest } from '../http-types/http'
 import { LoginController } from './login-controller'
 import { badRequest } from '../helpers/http/http-helpers'
 import type { Auth, AuthData, AuthResponse } from '@/domain/usecases-contracts'
+import { InvalidEmailError } from '@/domain/entities/user/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -69,5 +70,14 @@ describe('Login Controller', () => {
     const performSpy = jest.spyOn(authStub, 'perform')
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledWith(makeFakeRequest().body)
+  })
+
+  it('Should return 400 if Auth returns InvalidEmailError', async () => {
+    const { sut, authStub } = makeSut()
+    jest.spyOn(authStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new InvalidEmailError('any_email@mail.com')))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new InvalidEmailError('any_email@mail.com')))
   })
 })

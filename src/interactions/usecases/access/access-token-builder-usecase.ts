@@ -1,5 +1,5 @@
 import type { AccessTokenBuilder } from '@/domain/usecases-contracts'
-import type { Encrypter } from '../contracts'
+import type { Encrypter } from '@/interactions/contracts'
 import type { AccessTokenModel } from '@/domain/models'
 
 export class AccessTokenBuilderUseCase implements AccessTokenBuilder {

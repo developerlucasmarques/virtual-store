@@ -1,7 +1,7 @@
 import { User, type UserData } from '@/domain/entities/user'
 import { type AddUser, type AddUserResponse, type AccessTokenBuilder, EmailInUseError } from '@/domain/usecases-contracts'
 import { left, right } from '@/shared/either'
-import type { IdBuilder, AddUserRepo, LoadUserByEmailRepo, Hasher } from '../contracts'
+import type { IdBuilder, AddUserRepo, LoadUserByEmailRepo, Hasher } from '@/interactions/contracts'
 
 export class AddUserUseCase implements AddUser {
   constructor (

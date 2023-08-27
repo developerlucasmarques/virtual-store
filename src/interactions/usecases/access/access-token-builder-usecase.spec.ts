@@ -1,4 +1,4 @@
-import type { Token, Encrypter, EncrypterData } from '../contracts'
+import type { Token, Encrypter, EncrypterData } from '@/interactions/contracts'
 import { AccessTokenBuilderUseCase } from './access-token-builder-usecase'
 
 const makeAccessTokenEncrypterStub = (): Encrypter => {

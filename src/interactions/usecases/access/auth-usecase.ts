@@ -1,14 +1,15 @@
 import { User } from '@/domain/entities/user'
 import type { Auth, AuthData, AuthResponse, AccessTokenBuilder } from '@/domain/usecases-contracts'
 import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
-import type { HashComparer, LoadUserByEmailRepo } from '@/interactions/contracts'
+import type { HashComparer, LoadUserByEmailRepo, UpdateAccessTokenRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class AuthUseCase implements Auth {
   constructor (
     private readonly loadUserByEmailRepo: LoadUserByEmailRepo,
     private readonly hashComparer: HashComparer,
-    private readonly accessTokenBuilder: AccessTokenBuilder
+    private readonly accessTokenBuilder: AccessTokenBuilder,
+    private readonly updateAccessTokenRepo: UpdateAccessTokenRepo
   ) {}
 
   async perform (data: AuthData): Promise<AuthResponse> {
@@ -27,7 +28,11 @@ export class AuthUseCase implements Auth {
     if (!comparer) {
       return left(new InvalidCredentialsError())
     }
-    const accessToken = await this.accessTokenBuilder.perform(user.id)
-    return right(accessToken)
+    const { accessToken } = await this.accessTokenBuilder.perform(user.id)
+    await this.updateAccessTokenRepo.updateAccessToken({
+      userId: user.id,
+      accessToken
+    })
+    return right({ accessToken })
   }
 }

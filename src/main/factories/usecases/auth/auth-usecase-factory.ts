@@ -8,5 +8,5 @@ export const makeAuthUseCase = (): Auth => {
   const userMongoRepo = new UserMongoRepo()
   const salt = 12
   const bcryptAdapter = new BcryptAdapter(salt)
-  return new AuthUseCase(userMongoRepo, bcryptAdapter, makeAccessTokenBuilderUseCase())
+  return new AuthUseCase(userMongoRepo, bcryptAdapter, makeAccessTokenBuilderUseCase(), userMongoRepo)
 }

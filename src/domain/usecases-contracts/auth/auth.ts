@@ -8,7 +8,7 @@ export type AuthData = {
   password: string
 }
 
-type AuthResponse = Either<InvalidEmailError | InvalidCredentialsError, AccessTokenModel>
+export type AuthResponse = Either<InvalidEmailError | InvalidCredentialsError, AccessTokenModel>
 
 export interface Auth {
   perform: (data: AuthData) => Promise<AuthResponse>

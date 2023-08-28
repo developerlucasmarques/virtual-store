@@ -91,4 +91,13 @@ describe('AddProduct UseCase', () => {
     await sut.perform(makeFakeProductData())
     expect(addSpy).toHaveBeenCalledWith(makeFakeProductModel())
   })
+
+  it('Should throw if AddProductRepo throws', async () => {
+    const { sut, addProductRepoStub } = makeSut()
+    jest.spyOn(addProductRepoStub, 'add').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeProductData())
+    await expect(promise).rejects.toThrow()
+  })
 })

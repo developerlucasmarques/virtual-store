@@ -1,9 +1,11 @@
+import type { ProductData } from '@/domain/entities/product'
+import type { AddProduct, AddProductResponse } from '@/domain/usecases-contracts'
 import type { Validation } from '@/presentation/contracts'
-import type { HttpRequest } from '@/presentation/http-types/http'
-import { type Either, right, left } from '@/shared/either'
-import { AddProductController } from './add-product-controller'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
 import { ServerError } from '@/presentation/errors'
+import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import type { HttpRequest } from '@/presentation/http-types/http'
+import { left, right, type Either } from '@/shared/either'
+import { AddProductController } from './add-product-controller'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -22,17 +24,29 @@ const makeValidationComposite = (): Validation => {
   return new ValidationCompositeStub()
 }
 
+const makeAddProduct = (): AddProduct => {
+  class AddProductStub implements AddProduct {
+    async perform (account: ProductData): Promise<AddProductResponse> {
+      return await Promise.resolve(right(null))
+    }
+  }
+  return new AddProductStub()
+}
+
 type SutTypes = {
   sut: AddProductController
   validationCompositeStub: Validation
+  addProductStub: AddProduct
 }
 
 const makeSut = (): SutTypes => {
   const validationCompositeStub = makeValidationComposite()
-  const sut = new AddProductController(validationCompositeStub)
+  const addProductStub = makeAddProduct()
+  const sut = new AddProductController(validationCompositeStub, addProductStub)
   return {
     sut,
-    validationCompositeStub
+    validationCompositeStub,
+    addProductStub
   }
 }
 
@@ -61,5 +75,16 @@ describe('AddProduct Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should call AddProduct with correct values', async () => {
+    const { sut, addProductStub } = makeSut()
+    const performSpy = jest.spyOn(addProductStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledWith({
+      name: 'any name',
+      description: 'any_description',
+      amount: 10.90
+    })
   })
 })

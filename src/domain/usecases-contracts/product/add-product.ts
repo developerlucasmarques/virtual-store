@@ -3,7 +3,7 @@ import type { InvalidProductAmountError, InvalidProductDescriptionError, Invalid
 import type { Either } from '@/shared/either'
 
 export type AddProductResponse = Either<
-InvalidProductNameError | InvalidProductAmountError | InvalidProductDescriptionError, void
+InvalidProductNameError | InvalidProductAmountError | InvalidProductDescriptionError, null
 >
 
 export interface AddProduct {

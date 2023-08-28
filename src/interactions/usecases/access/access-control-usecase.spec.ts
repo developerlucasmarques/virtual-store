@@ -1,6 +1,8 @@
 import type { AccessControlData } from '@/domain/usecases-contracts'
-import type { Decrypter, DecrypterResponse } from '@/interactions/contracts'
+import type { Decrypter } from '@/interactions/contracts'
 import { AccessControlUseCase } from './access-control-usecase'
+import { left } from '@/shared/either'
+import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
 
 const makeFakeAccessControlData = (): AccessControlData => ({
   accessToken: 'any_token',
@@ -9,8 +11,8 @@ const makeFakeAccessControlData = (): AccessControlData => ({
 
 const makeDecrypter = (): Decrypter => {
   class DecrypterStub implements Decrypter {
-    async decrypt (token: string): Promise<DecrypterResponse> {
-      return await Promise.resolve({ id: 'any_id' })
+    async decrypt (token: string): Promise<null | string> {
+      return await Promise.resolve('any_id')
     }
   }
   return new DecrypterStub()
@@ -36,5 +38,12 @@ describe('AccessControl UseCase', () => {
     const decryptSpy = jest.spyOn(decrypterStub, 'decrypt')
     await sut.perform(makeFakeAccessControlData())
     expect(decryptSpy).toBeCalledWith('any_token')
+  })
+
+  test('Should return InvalidTokenError if Decrypter return null', async () => {
+    const { sut, decrypterStub } = makeSut()
+    jest.spyOn(decrypterStub, 'decrypt').mockReturnValueOnce(Promise.resolve(null))
+    const loadResult = await sut.perform(makeFakeAccessControlData())
+    expect(loadResult).toEqual(left(new InvalidTokenError()))
   })
 })

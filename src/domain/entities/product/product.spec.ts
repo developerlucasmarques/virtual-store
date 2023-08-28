@@ -33,4 +33,13 @@ describe('Product Entity', () => {
     const sut = Product.create(makeFakeProductData())
     expect(sut.value).toEqual(new InvalidProductDescriptionError('invalid description'))
   })
+
+  it('Should return an Product if create on success', () => {
+    const sut = Product.create(makeFakeProductData())
+    expect(sut.value).toEqual({
+      name: { name: 'any_name' },
+      amount: { amount: 10.90 },
+      description: { description: 'any_description' }
+    })
+  })
 })

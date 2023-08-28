@@ -1,12 +1,12 @@
 import { left, type Either, right } from '@/shared/either'
-import { InvalidProductAmount } from '../errors'
+import { InvalidProductAmountError } from '../errors'
 
 export class ProductAmount {
   private constructor (private readonly amount: number) {}
 
-  static create (amount: number): Either<InvalidProductAmount, ProductAmount> {
+  static create (amount: number): Either<InvalidProductAmountError, ProductAmount> {
     if (!ProductAmount.validade(amount)) {
-      return left(new InvalidProductAmount(amount))
+      return left(new InvalidProductAmountError(amount))
     }
     return right(new ProductAmount(amount))
   }

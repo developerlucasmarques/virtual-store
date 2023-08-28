@@ -1,6 +1,6 @@
-export class InvalidProductAmount extends Error {
+export class InvalidProductAmountError extends Error {
   constructor (amount: number) {
     super(`The product amount '${amount}' is invalid`)
-    this.name = 'InvalidProductAmount'
+    this.name = 'InvalidProductAmountError'
   }
 }

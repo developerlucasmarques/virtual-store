@@ -1,10 +1,10 @@
-import { InvalidProductAmount } from '../errors'
+import { InvalidProductAmountError } from '../errors'
 import { ProductAmount } from './product-amount'
 
 describe('ProductAmount ValueObject', () => {
   it('Should return InvalidProductAmount if amount is less than 0', () => {
     const sut = ProductAmount.create(-1)
-    expect(sut.value).toEqual(new InvalidProductAmount(-1))
+    expect(sut.value).toEqual(new InvalidProductAmountError(-1))
   })
 
   it('Should return an ProductAmount if amount is float', () => {

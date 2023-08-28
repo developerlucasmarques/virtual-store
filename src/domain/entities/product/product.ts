@@ -1,5 +1,5 @@
 import { right, type Either, left } from '@/shared/either'
-import { ProductAmount, ProductName } from './value-objects'
+import { ProductAmount, ProductDescription, ProductName } from './value-objects'
 import type { InvalidProductAmountError, InvalidProductNameError } from './errors'
 
 export type ProductData = {
@@ -21,6 +21,10 @@ export class Product {
     const amount = ProductAmount.create(data.amount)
     if (amount.isLeft()) {
       return left(amount.value)
+    }
+    const description = ProductDescription.create(data.description)
+    if (description.isLeft()) {
+      return left(description.value)
     }
     return right(new Product(name.value))
   }

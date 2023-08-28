@@ -1,6 +1,6 @@
 import { left } from '@/shared/either'
-import { ProductAmount, ProductName } from './value-objects'
-import { InvalidProductAmountError, InvalidProductNameError } from './errors'
+import { ProductAmount, ProductDescription, ProductName } from './value-objects'
+import { InvalidProductAmountError, InvalidProductDescriptionError, InvalidProductNameError } from './errors'
 import { Product, type ProductData } from './product'
 
 const makeFakeProductData = (): ProductData => ({
@@ -24,5 +24,13 @@ describe('Product Entity', () => {
     )
     const sut = Product.create(makeFakeProductData())
     expect(sut.value).toEqual(new InvalidProductAmountError(10))
+  })
+
+  it('Should return InvalidProductDescriptionError if create ProductDescription fails', () => {
+    jest.spyOn(ProductDescription, 'create').mockReturnValueOnce(
+      left(new InvalidProductDescriptionError('invalid description'))
+    )
+    const sut = Product.create(makeFakeProductData())
+    expect(sut.value).toEqual(new InvalidProductDescriptionError('invalid description'))
   })
 })

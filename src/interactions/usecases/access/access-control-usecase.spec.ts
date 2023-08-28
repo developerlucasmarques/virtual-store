@@ -46,4 +46,13 @@ describe('AccessControl UseCase', () => {
     const loadResult = await sut.perform(makeFakeAccessControlData())
     expect(loadResult).toEqual(left(new InvalidTokenError()))
   })
+
+  it('Should throw if Decrypter throws', async () => {
+    const { sut, decrypterStub } = makeSut()
+    jest.spyOn(decrypterStub, 'decrypt').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAccessControlData())
+    await expect(promise).rejects.toThrow()
+  })
 })

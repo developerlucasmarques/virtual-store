@@ -5,8 +5,7 @@ import { left } from '@/shared/either'
 const makeFakeProductData = (): ProductData => ({
   name: 'any name',
   amount: 10.90,
-  description: 'any description',
-  image: 'any image'
+  description: 'any description'
 })
 
 type SutTypes = {

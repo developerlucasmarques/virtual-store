@@ -1,9 +1,17 @@
 import { Product, type ProductData } from '@/domain/entities/product'
 import { AddProductUseCase } from './add-product-usecase'
 import { left } from '@/shared/either'
-import type { Id, IdBuilder } from '@/interactions/contracts'
+import type { AddProductRepo, Id, IdBuilder } from '@/interactions/contracts'
+import type { ProductModel } from '@/domain/models'
 
 const makeFakeProductData = (): ProductData => ({
+  name: 'any name',
+  amount: 10.90,
+  description: 'any description'
+})
+
+const makeFakeProductModel = (): ProductModel => ({
+  id: 'any_id',
   name: 'any name',
   amount: 10.90,
   description: 'any description'
@@ -18,17 +26,29 @@ const makeIdBuilderStub = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
+const makeAddProductRepoStub = (): AddProductRepo => {
+  class AddProductRepoStub implements AddProductRepo {
+    async add (data: ProductModel): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new AddProductRepoStub()
+}
+
 type SutTypes = {
   sut: AddProductUseCase
   idBuilderStub: IdBuilder
+  addProductRepoStub: AddProductRepo
 }
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilderStub()
-  const sut = new AddProductUseCase(idBuilderStub)
+  const addProductRepoStub = makeAddProductRepoStub()
+  const sut = new AddProductUseCase(idBuilderStub, addProductRepoStub)
   return {
     sut,
-    idBuilderStub
+    idBuilderStub,
+    addProductRepoStub
   }
 }
 
@@ -63,5 +83,12 @@ describe('AddProduct UseCase', () => {
     })
     const promise = sut.perform(makeFakeProductData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call AddProductRepo with ProductModel', async () => {
+    const { sut, addProductRepoStub } = makeSut()
+    const addSpy = jest.spyOn(addProductRepoStub, 'add')
+    await sut.perform(makeFakeProductData())
+    expect(addSpy).toHaveBeenCalledWith(makeFakeProductModel())
   })
 })

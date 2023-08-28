@@ -96,4 +96,14 @@ describe('AddProduct Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
+
+  it('Should return 500 if AddUser throws', async () => {
+    const { sut, addProductStub } = makeSut()
+    jest.spyOn(addProductStub, 'perform').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
 })

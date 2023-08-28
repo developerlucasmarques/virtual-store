@@ -8,7 +8,7 @@ describe('ProductName ValueObject', () => {
   })
 
   it('Should return InvalidProductNameError if length of name is greater than 80 characters', () => {
-    const name = 'a'.repeat(80)
+    const name = 'a'.repeat(81)
     const sut = ProductName.create(name)
     expect(sut.value).toEqual(new InvalidProductNameError(name))
   })

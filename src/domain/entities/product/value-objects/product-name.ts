@@ -16,7 +16,7 @@ export class ProductName {
   }
 
   private static validade (name: string): boolean {
-    if (name.length < 3 || name.length > 50) {
+    if (name.length < 3 || name.length > 80) {
       return false
     }
     return true

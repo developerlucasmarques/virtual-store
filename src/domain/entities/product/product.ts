@@ -1,14 +1,6 @@
-import { right, type Either, left } from '@/shared/either'
+import { right, left } from '@/shared/either'
 import { ProductAmount, ProductDescription, ProductName } from './value-objects'
-import type { InvalidProductAmountError, InvalidProductNameError } from './errors'
-
-export type ProductData = {
-  name: string
-  amount: number
-  description: string
-}
-
-export type CreateProductResponse = Either<InvalidProductNameError | InvalidProductAmountError, Product>
+import type { CreateProductResponse, ProductData } from '.'
 
 export class Product {
   private constructor (

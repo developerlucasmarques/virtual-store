@@ -1,7 +1,7 @@
 import { left } from '@/shared/either'
 import { ProductAmount, ProductDescription, ProductName } from './value-objects'
 import { InvalidProductAmountError, InvalidProductDescriptionError, InvalidProductNameError } from './errors'
-import { Product, type ProductData } from './product'
+import { type ProductData, Product } from '.'
 
 const makeFakeProductData = (): ProductData => ({
   name: 'any_name',

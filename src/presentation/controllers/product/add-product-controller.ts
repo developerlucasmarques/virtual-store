@@ -1,6 +1,6 @@
 import type { AddProduct } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '@/presentation/contracts'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class AddProductController implements Controller {
@@ -19,7 +19,7 @@ export class AddProductController implements Controller {
       if (addProductResult.isLeft()) {
         return badRequest(addProductResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return noContent()
     } catch (error: any) {
       return serverError(error)
     }

@@ -87,4 +87,13 @@ describe('AddProduct Controller', () => {
       amount: 10.90
     })
   })
+
+  it('Should return 400 if AddUser fails', async () => {
+    const { sut, addProductStub } = makeSut()
+    jest.spyOn(addProductStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
 })

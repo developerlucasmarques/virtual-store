@@ -6,7 +6,8 @@ export class Product {
   private constructor (
     private readonly name: ProductName,
     private readonly amount: ProductAmount,
-    private readonly description: ProductDescription
+    private readonly description: ProductDescription,
+    private readonly image: any
   ) {}
 
   static create (data: ProductData): CreateProductResponse {
@@ -23,7 +24,7 @@ export class Product {
       return left(description.value)
     }
     return right(
-      new Product(name.value, amount.value, description.value)
+      new Product(name.value, amount.value, description.value, data.image)
     )
   }
 }

@@ -1,6 +1,7 @@
 import { Product, type ProductData } from '@/domain/entities/product'
 import { AddProductUseCase } from './add-product-usecase'
 import { left } from '@/shared/either'
+import type { Id, IdBuilder } from '@/interactions/contracts'
 
 const makeFakeProductData = (): ProductData => ({
   name: 'any name',
@@ -8,13 +9,27 @@ const makeFakeProductData = (): ProductData => ({
   description: 'any description'
 })
 
+const makeIdBuilderStub = (): IdBuilder => {
+  class IdBuilderStub implements IdBuilder {
+    build (): Id {
+      return { id: 'any_id' }
+    }
+  }
+  return new IdBuilderStub()
+}
+
 type SutTypes = {
   sut: AddProductUseCase
+  idBuilderStub: IdBuilder
 }
 
 const makeSut = (): SutTypes => {
-  const sut = new AddProductUseCase()
-  return { sut }
+  const idBuilderStub = makeIdBuilderStub()
+  const sut = new AddProductUseCase(idBuilderStub)
+  return {
+    sut,
+    idBuilderStub
+  }
 }
 
 describe('AddProduct UseCase', () => {
@@ -32,5 +47,12 @@ describe('AddProduct UseCase', () => {
     )
     const result = await sut.perform(makeFakeProductData())
     expect(result.value).toEqual(new Error('any message'))
+  })
+
+  it('Should call IdBuilder', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    await sut.perform(makeFakeProductData())
+    expect(buildSpy).toHaveBeenCalled()
   })
 })

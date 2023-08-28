@@ -11,7 +11,11 @@ export type ProductData = {
 export type CreateProductResponse = Either<InvalidProductNameError | InvalidProductAmountError, Product>
 
 export class Product {
-  private constructor (private readonly name: ProductName) {}
+  private constructor (
+    private readonly name: ProductName,
+    private readonly amount: ProductAmount,
+    private readonly description: ProductDescription
+  ) {}
 
   static create (data: ProductData): CreateProductResponse {
     const name = ProductName.create(data.name)
@@ -26,6 +30,8 @@ export class Product {
     if (description.isLeft()) {
       return left(description.value)
     }
-    return right(new Product(name.value))
+    return right(
+      new Product(name.value, amount.value, description.value)
+    )
   }
 }

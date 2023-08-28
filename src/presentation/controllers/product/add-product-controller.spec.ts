@@ -2,7 +2,7 @@ import type { ProductData } from '@/domain/entities/product'
 import type { AddProduct, AddProductResponse } from '@/domain/usecases-contracts'
 import type { Validation } from '@/presentation/contracts'
 import { ServerError } from '@/presentation/errors'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right, type Either } from '@/shared/either'
 import { AddProductController } from './add-product-controller'
@@ -88,7 +88,7 @@ describe('AddProduct Controller', () => {
     })
   })
 
-  it('Should return 400 if AddUser fails', async () => {
+  it('Should return 400 if AddProduct fails', async () => {
     const { sut, addProductStub } = makeSut()
     jest.spyOn(addProductStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
@@ -97,7 +97,7 @@ describe('AddProduct Controller', () => {
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 
-  it('Should return 500 if AddUser throws', async () => {
+  it('Should return 500 if AddProduct throws', async () => {
     const { sut, addProductStub } = makeSut()
     jest.spyOn(addProductStub, 'perform').mockImplementationOnce(() => {
       throw new Error()
@@ -105,5 +105,11 @@ describe('AddProduct Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should return 204 if AddProduct success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(noContent())
   })
 })

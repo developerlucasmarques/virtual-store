@@ -100,4 +100,10 @@ describe('AddProduct UseCase', () => {
     const promise = sut.perform(makeFakeProductData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if AddProductRepo on success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeProductData())
+    expect(result.value).toBe(null)
+  })
 })

@@ -1,5 +1,5 @@
 import { InvalidProductNameError } from '../errors'
-import { ProductName } from './name'
+import { ProductName } from './product-name'
 
 describe('ProductName ValueObject', () => {
   it('Should return InvalidProductNameError if length of name is less than 3 characters', () => {

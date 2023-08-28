@@ -1,7 +1,7 @@
 import type { Auth } from '@/domain/usecases-contracts'
-import type { Controller, Validation } from '../contracts'
-import { badRequest, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
-import type { HttpRequest, HttpResponse } from '../http-types/http'
+import type { Controller, Validation } from '@/presentation/contracts'
+import { badRequest, ok, serverError, unauthorized } from '@/presentation/helpers/http/http-helpers'
+import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 
 export class LoginController implements Controller {

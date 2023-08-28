@@ -1,7 +1,7 @@
 import type { AddUser } from '@/domain/usecases-contracts'
-import type { Controller, Validation } from '../contracts'
-import { badRequest, created, serverError } from '../helpers/http/http-helpers'
-import type { HttpRequest, HttpResponse } from '../http-types/http'
+import type { Controller, Validation } from '@/presentation/contracts'
+import { badRequest, created, serverError } from '@/presentation/helpers/http/http-helpers'
+import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class SignUpController implements Controller {
   constructor (

@@ -1,11 +1,11 @@
 import { type Either, right, left } from '@/shared/either'
-import type { Validation } from '../contracts/validation'
-import type { HttpRequest } from '../http-types/http'
+import type { Validation } from '@/presentation/contracts/validation'
+import type { HttpRequest } from '@/presentation/http-types/http'
 import { SignUpController } from './signup-controller'
-import { badRequest, created, serverError } from '../helpers/http/http-helpers'
+import { badRequest, created, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { AddUserResponse, AddUser } from '@/domain/usecases-contracts'
 import type { UserData } from '@/domain/entities/user'
-import { ServerError } from '../errors/server-error'
+import { ServerError } from '@/presentation/errors/server-error'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {

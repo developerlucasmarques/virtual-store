@@ -1,6 +1,6 @@
 import { right, type Either, left } from '@/shared/either'
-import { ProductName } from './value-objects'
-import type { InvalidNameError } from '../user/errors'
+import { ProductAmount, ProductName } from './value-objects'
+import type { InvalidProductAmountError, InvalidProductNameError } from './errors'
 
 export type ProductData = {
   name: string
@@ -8,7 +8,7 @@ export type ProductData = {
   description: string
 }
 
-export type CreateProductResponse = Either<InvalidNameError, Product>
+export type CreateProductResponse = Either<InvalidProductNameError | InvalidProductAmountError, Product>
 
 export class Product {
   private constructor (private readonly name: ProductName) {}
@@ -17,6 +17,10 @@ export class Product {
     const name = ProductName.create(data.name)
     if (name.isLeft()) {
       return left(name.value)
+    }
+    const amount = ProductAmount.create(data.amount)
+    if (amount.isLeft()) {
+      return left(amount.value)
     }
     return right(new Product(name.value))
   }

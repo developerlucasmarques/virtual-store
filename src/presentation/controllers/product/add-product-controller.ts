@@ -15,7 +15,10 @@ export class AddProductController implements Controller {
       if (validations.isLeft()) {
         return badRequest(validations.value)
       }
-      await this.addProduct.perform(httpRequest.body)
+      const addProductResult = await this.addProduct.perform(httpRequest.body)
+      if (addProductResult.isLeft()) {
+        return badRequest(addProductResult.value)
+      }
       return { statusCode: 0, body: '' }
     } catch (error: any) {
       return serverError(error)

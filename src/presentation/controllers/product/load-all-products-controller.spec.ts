@@ -1,7 +1,7 @@
 import type { ProductModel } from '@/domain/models'
 import type { LoadAllProducts } from '@/domain/usecases-contracts'
 import { LoadAllProductsController } from './load-all-products-controller'
-import { serverError } from '@/presentation/helpers/http/http-helpers'
+import { noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import { ServerError } from '@/presentation/errors'
 
 const makeFakeProducts = (): ProductModel[] => [{
@@ -55,5 +55,12 @@ describe('LoadAllProducts Controller', () => {
     const httpResponse = await sut.handle({})
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should return 204 if LoadAllProducts returns empty list', async () => {
+    const { sut, loadAllProductsStub } = makeSut()
+    jest.spyOn(loadAllProductsStub, 'perform').mockReturnValueOnce(Promise.resolve([]))
+    const httpResponse = await sut.handle({})
+    expect(httpResponse).toEqual(noContent())
   })
 })

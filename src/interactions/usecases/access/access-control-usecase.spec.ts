@@ -1,9 +1,8 @@
+import type { UserModel } from '@/domain/models'
 import type { AccessControlData } from '@/domain/usecases-contracts'
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
 import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { AccessControlUseCase } from './access-control-usecase'
-import { left } from '@/shared/either'
-import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
-import type { UserModel } from '@/domain/models'
 
 const makeFakeAccessControlData = (): AccessControlData => ({
   accessToken: 'any_token',
@@ -15,7 +14,7 @@ const makeFakeUserModel = (): UserModel => ({
   name: 'any name',
   email: 'any_email@mail.com',
   password: 'hashed_password',
-  role: 'customer',
+  role: 'admin',
   accessToken: 'any_token'
 })
 
@@ -66,7 +65,7 @@ describe('AccessControl UseCase', () => {
     const { sut, decrypterStub } = makeSut()
     jest.spyOn(decrypterStub, 'decrypt').mockReturnValueOnce(Promise.resolve(null))
     const result = await sut.perform(makeFakeAccessControlData())
-    expect(result).toEqual(left(new InvalidTokenError()))
+    expect(result.value).toEqual(new InvalidTokenError())
   })
 
   it('Should throw if Decrypter throws', async () => {
@@ -89,7 +88,7 @@ describe('AccessControl UseCase', () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(Promise.resolve(null))
     const result = await sut.perform(makeFakeAccessControlData())
-    expect(result).toEqual(left(new AccessDeniedError()))
+    expect(result.value).toEqual(new AccessDeniedError())
   })
 
   it('Should throw if LoadUsertById throws', async () => {
@@ -114,6 +113,18 @@ describe('AccessControl UseCase', () => {
       })
     )
     const result = await sut.perform(makeFakeAccessControlData())
-    expect(result).toEqual(left(new AccessDeniedError()))
+    expect(result.value).toEqual(new AccessDeniedError())
+  })
+
+  test('Should return an userId if the user role is admin', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(makeFakeUserModel())
+    )
+    const result = await sut.perform({
+      accessToken: 'any_token',
+      role: 'customer'
+    })
+    expect(result.value).toEqual({ userId: 'any_id' })
   })
 })

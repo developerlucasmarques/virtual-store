@@ -1,6 +1,8 @@
 import type { ProductModel } from '@/domain/models'
 import type { LoadAllProducts } from '@/domain/usecases-contracts'
 import { LoadAllProductsController } from './load-all-products-controller'
+import { serverError } from '@/presentation/helpers/http/http-helpers'
+import { ServerError } from '@/presentation/errors'
 
 const makeFakeProducts = (): ProductModel[] => [{
   id: 'any_id',
@@ -43,5 +45,15 @@ describe('LoadAllProducts Controller', () => {
     const performSpy = jest.spyOn(loadAllProductsStub, 'perform')
     await sut.handle({})
     expect(performSpy).toHaveBeenCalled()
+  })
+
+  it('Should return 500 if LoadAllProducts throws', async () => {
+    const { sut, loadAllProductsStub } = makeSut()
+    jest.spyOn(loadAllProductsStub, 'perform').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle({})
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 })

@@ -44,4 +44,13 @@ describe('LoadAllProducts UseCase', () => {
     await sut.perform()
     expect(loadAllSpy).toHaveBeenCalled()
   })
+
+  it('Should throw if LoadAllProductsRepo throws', async () => {
+    const { sut, loadAllProductsRepoStub } = makeSut()
+    jest.spyOn(loadAllProductsRepoStub, 'loadAll').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform()
+    await expect(promise).rejects.toThrow()
+  })
 })

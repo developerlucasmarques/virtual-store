@@ -1,7 +1,7 @@
 import type { Auth } from '@/domain/usecases-contracts'
 import { BcryptAdapter } from '@/external/criptography/bcrypt-adapter/bcrypt-adapter'
 import { UserMongoRepo } from '@/external/db/mongo-db/user/user-mongo-repo'
-import { AuthUseCase } from '@/interactions/usecases/access/auth-usecase'
+import { AuthUseCase } from '@/interactions/usecases/access'
 import { makeAccessTokenBuilderUseCase } from '../'
 
 export const makeAuthUseCase = (): Auth => {

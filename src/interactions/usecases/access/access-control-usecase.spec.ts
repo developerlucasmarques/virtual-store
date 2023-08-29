@@ -2,7 +2,7 @@ import type { AccessControlData } from '@/domain/usecases-contracts'
 import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { AccessControlUseCase } from './access-control-usecase'
 import { left } from '@/shared/either'
-import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
 import type { UserModel } from '@/domain/models'
 
 const makeFakeAccessControlData = (): AccessControlData => ({
@@ -65,8 +65,8 @@ describe('AccessControl UseCase', () => {
   test('Should return InvalidTokenError if Decrypter return null', async () => {
     const { sut, decrypterStub } = makeSut()
     jest.spyOn(decrypterStub, 'decrypt').mockReturnValueOnce(Promise.resolve(null))
-    const loadResult = await sut.perform(makeFakeAccessControlData())
-    expect(loadResult).toEqual(left(new InvalidTokenError()))
+    const result = await sut.perform(makeFakeAccessControlData())
+    expect(result).toEqual(left(new InvalidTokenError()))
   })
 
   it('Should throw if Decrypter throws', async () => {
@@ -83,5 +83,12 @@ describe('AccessControl UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform(makeFakeAccessControlData())
     expect(loadByIdSpy).toBeCalledWith('any_id')
+  })
+
+  test('Should return AccessDeniedError if LoadUsertById return null', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(Promise.resolve(null))
+    const result = await sut.perform(makeFakeAccessControlData())
+    expect(result).toEqual(left(new AccessDeniedError()))
   })
 })

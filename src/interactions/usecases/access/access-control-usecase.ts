@@ -1,5 +1,5 @@
 import type { AccessControl, AccessControlData, AccessControlResponse } from '@/domain/usecases-contracts'
-import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
 import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -14,7 +14,10 @@ export class AccessControlUseCase implements AccessControl {
     if (!id) {
       return left(new InvalidTokenError())
     }
-    await this.loadUserByIdRepo.loadById(id)
+    const user = await this.loadUserByIdRepo.loadById(id)
+    if (!user) {
+      return left(new AccessDeniedError())
+    }
     return right({ userId: '' })
   }
 }

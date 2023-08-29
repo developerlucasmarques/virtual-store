@@ -12,7 +12,7 @@
 ## Caso de Sucesso
 
 - ✅ Recebe uma requisição do tipo POST na rota /api/product
-- ❌ Valida se a requisição foi feita por um admin
+- ✅ Valida se a requisição foi feita por um admin
 - ✅ Valida os dados obrigatórios
 - ✅ Valida o tipo do dado informado
 - ✅ Valida se não há dados a mais dos requeridos

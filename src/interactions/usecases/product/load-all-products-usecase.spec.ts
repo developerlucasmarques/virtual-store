@@ -14,7 +14,7 @@ const makeFakeProducts = (): ProductModel[] => [{
   description: 'another description'
 }]
 
-const makeLoadAllProductsStub = (): LoadAllProductsRepo => {
+const makeLoadAllProducts = (): LoadAllProductsRepo => {
   class LoadAllProductsRepoStub implements LoadAllProductsRepo {
     async loadAll (): Promise<ProductModel[]> {
       return await Promise.resolve(makeFakeProducts())
@@ -29,7 +29,7 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const loadAllProductsRepoStub = makeLoadAllProductsStub()
+  const loadAllProductsRepoStub = makeLoadAllProducts()
   const sut = new LoadAllProductsUseCase(loadAllProductsRepoStub)
   return {
     sut,

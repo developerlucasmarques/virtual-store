@@ -23,7 +23,7 @@ const makeValidationComposite = (): Validation => {
   return new ValidationCompositeStub()
 }
 
-const makeAuthStub = (): Auth => {
+const makeAuth = (): Auth => {
   class AuthStub implements Auth {
     async perform (data: AuthData): Promise<AuthResponse> {
       return await Promise.resolve(right({ accessToken: 'any_token' }))
@@ -40,7 +40,7 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const validationCompositeStub = makeValidationComposite()
-  const authStub = makeAuthStub()
+  const authStub = makeAuth()
   const sut = new LoginController(validationCompositeStub, authStub)
   return {
     sut,

@@ -17,7 +17,7 @@ const makeFakeProductModel = (): ProductModel => ({
   description: 'any description'
 })
 
-const makeIdBuilderStub = (): IdBuilder => {
+const makeIdBuilder = (): IdBuilder => {
   class IdBuilderStub implements IdBuilder {
     build (): Id {
       return { id: 'any_id' }
@@ -26,7 +26,7 @@ const makeIdBuilderStub = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
-const makeAddProductRepoStub = (): AddProductRepo => {
+const makeAddProductRepo = (): AddProductRepo => {
   class AddProductRepoStub implements AddProductRepo {
     async add (data: ProductModel): Promise<void> {
       await Promise.resolve()
@@ -42,8 +42,8 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const idBuilderStub = makeIdBuilderStub()
-  const addProductRepoStub = makeAddProductRepoStub()
+  const idBuilderStub = makeIdBuilder()
+  const addProductRepoStub = makeAddProductRepo()
   const sut = new AddProductUseCase(idBuilderStub, addProductRepoStub)
   return {
     sut,

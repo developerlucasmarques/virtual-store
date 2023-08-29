@@ -30,7 +30,7 @@ const makeLoadUserByEmailRepo = (): LoadUserByEmailRepo => {
   return new LoadUserByEmailRepoStub()
 }
 
-const makeHasherStub = (): Hasher => {
+const makeHasher = (): Hasher => {
   class HasherStub implements Hasher {
     async hashing (value: string): Promise<Hash> {
       return await Promise.resolve({ hash: 'hashed_password' })
@@ -39,7 +39,7 @@ const makeHasherStub = (): Hasher => {
   return new HasherStub()
 }
 
-const makeIdBuilderStub = (): IdBuilder => {
+const makeIdBuilder = (): IdBuilder => {
   class IdBuilderStub implements IdBuilder {
     build (): Id {
       return { id: 'any_id' }
@@ -48,7 +48,7 @@ const makeIdBuilderStub = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
-const makeAccessTokenBuilderStub = (): AccessTokenBuilder => {
+const makeAccessTokenBuilder = (): AccessTokenBuilder => {
   class AccessTokenBuilderStub implements AccessTokenBuilder {
     async perform (value: string): Promise<AccessTokenModel> {
       return { accessToken: 'any_token' }
@@ -57,7 +57,7 @@ const makeAccessTokenBuilderStub = (): AccessTokenBuilder => {
   return new AccessTokenBuilderStub()
 }
 
-const makeAddUserRepoStub = (): AddUserRepo => {
+const makeAddUserRepo = (): AddUserRepo => {
   class AddUserRepoStub implements AddUserRepo {
     async add (data: UserModel): Promise<void> {
       await Promise.resolve()
@@ -77,10 +77,10 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const loadUserByEmailRepoStub = makeLoadUserByEmailRepo()
-  const hasherStub = makeHasherStub()
-  const idBuilderStub = makeIdBuilderStub()
-  const accessTokenBuilderStub = makeAccessTokenBuilderStub()
-  const addUserRepoStub = makeAddUserRepoStub()
+  const hasherStub = makeHasher()
+  const idBuilderStub = makeIdBuilder()
+  const accessTokenBuilderStub = makeAccessTokenBuilder()
+  const addUserRepoStub = makeAddUserRepo()
   const sut = new AddUserUseCase(
     loadUserByEmailRepoStub, hasherStub, idBuilderStub, accessTokenBuilderStub, addUserRepoStub
   )

@@ -2,6 +2,11 @@ import bcrypt from 'bcrypt'
 import { BcryptAdapter } from './bcrypt-adapter'
 import type { ComparerData } from '@/interactions/contracts'
 
+const makeHashComparerData = (): ComparerData => ({
+  value: 'any_value',
+  hash: 'any_hash'
+})
+
 jest.mock('bcrypt', () => ({
   async hash (): Promise<string> {
     return await Promise.resolve('hash')
@@ -11,11 +16,6 @@ jest.mock('bcrypt', () => ({
     return await Promise.resolve(true)
   }
 }))
-
-const makeHashComparerData = (): ComparerData => ({
-  value: 'any_value',
-  hash: 'any_hash'
-})
 
 const salt = 12
 

@@ -75,8 +75,13 @@ describe('UserMongo Repository', () => {
       const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
       const user = await sut.loadById(idString)
-      console.log(user)
       expect(user).toEqual(makeFakeUserModel())
+    })
+
+    test('Should return null if loadById fails', async () => {
+      const sut = new UserMongoRepo()
+      const user = await sut.loadById(idString)
+      expect(user).toBeNull()
     })
   })
 })

@@ -1,4 +1,5 @@
 import type { ProductModel } from '@/domain/models'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
 import type { LoadProductByIdRepo } from '@/interactions/contracts'
 import { LoadProductByIdUseCase } from './load-product-by-id-usecase'
 
@@ -38,5 +39,14 @@ describe('LoadProductById UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadProductByIdRepoStub, 'loadById')
     await sut.perform('any_product_id')
     expect(loadByIdSpy).toHaveBeenCalledWith('any_product_id')
+  })
+
+  it('Should return ProductNotFoundError if LoadProductByIdRepo returns null', async () => {
+    const { sut, loadProductByIdRepoStub } = makeSut()
+    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform('any_product_id')
+    expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
 })

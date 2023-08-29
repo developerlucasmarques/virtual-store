@@ -18,6 +18,9 @@ export class AccessControlUseCase implements AccessControl {
     if (!user) {
       return left(new AccessDeniedError())
     }
+    if (data.role === 'admin' && user.role !== 'admin') {
+      return left(new AccessDeniedError())
+    }
     return right({ userId: '' })
   }
 }

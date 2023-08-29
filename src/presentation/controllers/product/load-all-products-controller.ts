@@ -1,6 +1,6 @@
 import type { LoadAllProducts } from '@/domain/usecases-contracts'
 import type { Controller } from '@/presentation/contracts'
-import { noContent, serverError } from '@/presentation/helpers/http/http-helpers'
+import { noContent, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class LoadAllProductsController implements Controller {
@@ -9,7 +9,7 @@ export class LoadAllProductsController implements Controller {
     try {
       const products = await this.loadAllProducts.perform()
       if (products.length === 0) return noContent()
-      return { statusCode: 0, body: '' }
+      return ok(products)
     } catch (error: any) {
       console.error(error)
       return serverError(error)

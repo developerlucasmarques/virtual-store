@@ -84,4 +84,13 @@ describe('LoadProductById UseCase', () => {
     const result = await sut.perform('any_product_id')
     expect(result.value).toEqual(new InvalidIdError('any_product_id'))
   })
+
+  it('Should throw if ValidationId throws', async () => {
+    const { sut, validationIdStub } = makeSut()
+    jest.spyOn(validationIdStub, 'isValid').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_product_id')
+    await expect(promise).rejects.toThrow()
+  })
 })

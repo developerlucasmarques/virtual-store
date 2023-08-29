@@ -1,5 +1,5 @@
 import type { ProductModel } from '@/domain/models'
-import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import { InvalidIdError, ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
 import type { LoadProductByIdRepo, ValidationId } from '@/interactions/contracts'
 import { LoadProductByIdUseCase } from './load-product-by-id-usecase'
 
@@ -76,5 +76,12 @@ describe('LoadProductById UseCase', () => {
     const isValidSpy = jest.spyOn(validationIdStub, 'isValid')
     await sut.perform('any_product_id')
     expect(isValidSpy).toHaveBeenCalledWith('any_product_id')
+  })
+
+  it('Should return InvalidIdError if ValidationId fails', async () => {
+    const { sut, validationIdStub } = makeSut()
+    jest.spyOn(validationIdStub, 'isValid').mockReturnValueOnce(false)
+    const result = await sut.perform('any_product_id')
+    expect(result.value).toEqual(new InvalidIdError('any_product_id'))
   })
 })

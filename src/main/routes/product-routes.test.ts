@@ -11,7 +11,7 @@ describe('Product Routes', () => {
     await MongoHelper.disconnect()
   })
 
-  it('Should return 204 on add product', async () => {
+  it('Should return 401 on add product without x-access-token', async () => {
     await request(app)
       .post('/api/product')
       .send({
@@ -19,6 +19,6 @@ describe('Product Routes', () => {
         amount: 10.90,
         description: 'any_description'
       })
-      .expect(204)
+      .expect(401)
   })
 })

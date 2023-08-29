@@ -127,4 +127,10 @@ describe('AccessControl UseCase', () => {
     })
     expect(result.value).toEqual({ userId: 'any_id' })
   })
+
+  test('Should return an userId if validations on success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeAccessControlData())
+    expect(result.value).toEqual({ userId: 'any_id' })
+  })
 })

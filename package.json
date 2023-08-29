@@ -1,6 +1,6 @@
 {
   "name": "virtual-store",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Api Rest utilizando TDD, DDD, Clean Architecture e TypeScript",
   "main": "server.ts",
   "scripts": {

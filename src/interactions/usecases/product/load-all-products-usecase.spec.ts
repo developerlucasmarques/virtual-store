@@ -2,7 +2,7 @@ import type { ProductModel } from '@/domain/models'
 import type { LoadAllProductsRepo } from '@/interactions/contracts'
 import { LoadAllProductsUseCase } from './load-all-products-usecase'
 
-const makeFakeProductModel = (): ProductModel[] => [{
+const makeFakeProducts = (): ProductModel[] => [{
   id: 'any_id',
   name: 'any name',
   amount: 10.90,
@@ -17,7 +17,7 @@ const makeFakeProductModel = (): ProductModel[] => [{
 const makeLoadAllProductsStub = (): LoadAllProductsRepo => {
   class LoadAllProductsRepoStub implements LoadAllProductsRepo {
     async loadAll (): Promise<ProductModel[]> {
-      return await Promise.resolve(makeFakeProductModel())
+      return await Promise.resolve(makeFakeProducts())
     }
   }
   return new LoadAllProductsRepoStub()
@@ -52,5 +52,11 @@ describe('LoadAllProducts UseCase', () => {
     )
     const promise = sut.perform()
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should return the same as LoadAllProductsRepo returns', async () => {
+    const { sut } = makeSut()
+    const surveys = await sut.perform()
+    expect(surveys).toEqual(makeFakeProducts())
   })
 })

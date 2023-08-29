@@ -6,7 +6,6 @@ export class LoadAllProductsUseCase implements LoadAllProducts {
   constructor (private readonly loadAllProductsRepo: LoadAllProductsRepo) {}
 
   async perform (): Promise<ProductModel[]> {
-    await this.loadAllProductsRepo.loadAll()
-    return []
+    return await this.loadAllProductsRepo.loadAll()
   }
 }

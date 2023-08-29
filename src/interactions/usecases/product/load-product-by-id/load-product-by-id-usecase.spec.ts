@@ -1,6 +1,6 @@
 import type { ProductModel } from '@/domain/models'
 import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
-import type { LoadProductByIdRepo } from '@/interactions/contracts'
+import type { LoadProductByIdRepo, ValidationId } from '@/interactions/contracts'
 import { LoadProductByIdUseCase } from './load-product-by-id-usecase'
 
 const makeFakeProductModel = (): ProductModel => ({
@@ -9,6 +9,15 @@ const makeFakeProductModel = (): ProductModel => ({
   amount: 10.90,
   description: 'any description'
 })
+
+const makeValidationId = (): ValidationId => {
+  class ValidationIdStub implements ValidationId {
+    isValid (id: string): boolean {
+      return true
+    }
+  }
+  return new ValidationIdStub()
+}
 
 const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
   class LoadProductByIdRepoStub implements LoadProductByIdRepo {
@@ -21,14 +30,17 @@ const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
 
 type SutTypes = {
   sut: LoadProductByIdUseCase
+  validationIdStub: ValidationId
   loadProductByIdRepoStub: LoadProductByIdRepo
 }
 
 const makeSut = (): SutTypes => {
   const loadProductByIdRepoStub = makeLoadProductByIdRepo()
-  const sut = new LoadProductByIdUseCase(loadProductByIdRepoStub)
+  const validationIdStub = makeValidationId()
+  const sut = new LoadProductByIdUseCase(validationIdStub, loadProductByIdRepoStub)
   return {
     sut,
+    validationIdStub,
     loadProductByIdRepoStub
   }
 }
@@ -57,5 +69,12 @@ describe('LoadProductById UseCase', () => {
     )
     const promise = sut.perform('any_product_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call ValidationId with correct id', async () => {
+    const { sut, validationIdStub } = makeSut()
+    const isValidSpy = jest.spyOn(validationIdStub, 'isValid')
+    await sut.perform('any_product_id')
+    expect(isValidSpy).toHaveBeenCalledWith('any_product_id')
   })
 })

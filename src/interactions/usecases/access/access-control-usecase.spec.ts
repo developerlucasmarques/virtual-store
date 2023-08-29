@@ -100,4 +100,20 @@ describe('AccessControl UseCase', () => {
     const promise = sut.perform(makeFakeAccessControlData())
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return AccessDeniedError if the user role is different from the required role', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve({
+        id: 'any_id',
+        name: 'any name',
+        email: 'any_email@mail.com',
+        password: 'hashed_password',
+        role: 'customer',
+        accessToken: 'any_token'
+      })
+    )
+    const result = await sut.perform(makeFakeAccessControlData())
+    expect(result).toEqual(left(new AccessDeniedError()))
+  })
 })

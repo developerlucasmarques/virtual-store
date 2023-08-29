@@ -10,7 +10,10 @@ export class LoadProductByIdUseCase implements LoadProductById {
   ) {}
 
   async perform (productId: string): Promise<LoadProductByIdResponse> {
-    this.validationId.isValid(productId)
+    const idIsValid = this.validationId.isValid(productId)
+    if (!idIsValid) {
+      return left(new InvalidIdError(productId))
+    }
     const product = await this.loadProductByIdRepo.loadById(productId)
     if (!product) {
       return left(new ProductNotFoundError(productId))

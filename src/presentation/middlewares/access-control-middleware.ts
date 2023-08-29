@@ -1,7 +1,7 @@
 import type { AccessControl } from '@/domain/usecases-contracts'
 import type { Middleware } from '../contracts/middleware'
 import { AccessTokenNotInformedError } from '../errors'
-import { forbidden, serverError, unauthorized } from '../helpers/http/http-helpers'
+import { forbidden, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 import type { RoleModel } from '@/domain/models'
 import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
@@ -27,7 +27,7 @@ export class AccessControlMiddleware implements Middleware {
         }
         return forbidden(accessControleResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return ok({ userId: accessControleResult.value.userId })
     } catch (error: any) {
       return serverError(error)
     }

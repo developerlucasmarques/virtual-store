@@ -29,11 +29,31 @@ describe('ProductMongo Repository', () => {
     await productCollection.deleteMany({})
   })
 
-  it('Should create a Product if add on success', async () => {
-    const sut = new ProductMongoRepo()
-    await sut.add(makeFakeProductModel())
-    const product = await productCollection.findOne({ _id: objectId })
-    const productWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
-    expect(product).toEqual(productWithMongoId)
+  describe('add()', () => {
+    it('Should create a Product if add on success', async () => {
+      const sut = new ProductMongoRepo()
+      await sut.add(makeFakeProductModel())
+      const product = await productCollection.findOne({ _id: objectId })
+      const productWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      expect(product).toEqual(productWithMongoId)
+    })
+  })
+
+  describe('loadAll()', () => {
+    it('Should load all products on success', async () => {
+      const sut = new ProductMongoRepo()
+      const anotherObjectId = new ObjectId()
+      const anyProduct = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const anotherProduct = {
+        _id: anotherObjectId,
+        name: 'another name',
+        amount: 11.90,
+        description: 'any description'
+      }
+      await productCollection.insertMany([anyProduct, anotherProduct])
+      const porducts = await sut.loadAll()
+      expect(porducts[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
+      expect(porducts[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+    })
   })
 })

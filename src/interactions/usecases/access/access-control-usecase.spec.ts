@@ -1,12 +1,22 @@
 import type { AccessControlData } from '@/domain/usecases-contracts'
-import type { Decrypter } from '@/interactions/contracts'
+import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { AccessControlUseCase } from './access-control-usecase'
 import { left } from '@/shared/either'
 import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import type { UserModel } from '@/domain/models'
 
 const makeFakeAccessControlData = (): AccessControlData => ({
   accessToken: 'any_token',
   role: 'admin'
+})
+
+const makeFakeUserModel = (): UserModel => ({
+  id: 'any_id',
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'hashed_password',
+  role: 'customer',
+  accessToken: 'any_token'
 })
 
 const makeDecrypter = (): Decrypter => {
@@ -18,17 +28,29 @@ const makeDecrypter = (): Decrypter => {
   return new DecrypterStub()
 }
 
+const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
+  class LoadUserByIdRepoStub implements LoadUserByIdRepo {
+    async loadById (id: string): Promise<null | UserModel> {
+      return await Promise.resolve(makeFakeUserModel())
+    }
+  }
+  return new LoadUserByIdRepoStub()
+}
+
 type SutTypes = {
   sut: AccessControlUseCase
   decrypterStub: Decrypter
+  loadUserByIdRepoStub: LoadUserByIdRepo
 }
 
 const makeSut = (): SutTypes => {
   const decrypterStub = makeDecrypter()
-  const sut = new AccessControlUseCase(decrypterStub)
+  const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const sut = new AccessControlUseCase(decrypterStub, loadUserByIdRepoStub)
   return {
     sut,
-    decrypterStub
+    decrypterStub,
+    loadUserByIdRepoStub
   }
 }
 
@@ -54,5 +76,12 @@ describe('AccessControl UseCase', () => {
     )
     const promise = sut.perform(makeFakeAccessControlData())
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call LoadUsertById with correct value', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeAccessControlData())
+    expect(loadByIdSpy).toBeCalledWith('any_id')
   })
 })

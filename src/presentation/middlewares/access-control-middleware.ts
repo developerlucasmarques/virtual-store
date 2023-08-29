@@ -1,5 +1,5 @@
 import type { AccessControl } from '@/domain/usecases-contracts'
-import type { Middleware } from '../contracts/middleware'
+import type { Middleware } from '../contracts'
 import { AccessTokenNotInformedError } from '../errors'
 import { forbidden, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'

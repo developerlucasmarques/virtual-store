@@ -49,4 +49,13 @@ describe('LoadProductById UseCase', () => {
     const result = await sut.perform('any_product_id')
     expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
+
+  it('Should throw if LoadProductByIdRepo throws', async () => {
+    const { sut, loadProductByIdRepoStub } = makeSut()
+    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform('any_product_id')
+    await expect(promise).rejects.toThrow()
+  })
 })

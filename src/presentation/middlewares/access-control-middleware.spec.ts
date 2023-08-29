@@ -1,6 +1,6 @@
 import type { AccessControl, AccessControlData, AccessControlResponse } from '@/domain/usecases-contracts'
-import { AccessTokenNotInformedError } from '../errors'
-import { forbidden, unauthorized } from '../helpers/http/http-helpers'
+import { AccessTokenNotInformedError, ServerError } from '../errors'
+import { forbidden, serverError, unauthorized } from '../helpers/http/http-helpers'
 import { AccessControlMiddleware } from './access-control-middleware'
 import { left, right } from '@/shared/either'
 import type { HttpRequest } from '../http-types/http'
@@ -68,5 +68,15 @@ describe('AccessControl Middleware', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(forbidden(new AccessDeniedError()))
+  })
+
+  it('Should return 500 if AccessControl throws', async () => {
+    const { sut, accessControlStub } = makeSut()
+    jest.spyOn(accessControlStub, 'perform').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 })

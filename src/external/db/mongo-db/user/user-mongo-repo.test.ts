@@ -17,6 +17,11 @@ const makeFakeUserModel = (): UserModel => ({
 
 let userCollection: Collection
 
+const makeSut = (): UserMongoRepo => {
+  const sut = new UserMongoRepo()
+  return sut
+}
+
 describe('UserMongo Repository', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -33,7 +38,7 @@ describe('UserMongo Repository', () => {
 
   describe('add()', () => {
     it('Should create a user if add on success', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       await sut.add(makeFakeUserModel())
       const user = await userCollection.findOne({ _id: objectId })
       const userWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
@@ -43,7 +48,7 @@ describe('UserMongo Repository', () => {
 
   describe('loadByEmail()', () => {
     it('Should return an user if loadByEmail on success', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
       const user = await sut.loadByEmail('any_email@mail.com')
@@ -52,7 +57,7 @@ describe('UserMongo Repository', () => {
     })
 
     it('Should return null if loadByEmail fails', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       const user = await sut.loadByEmail('any_email@mail.com')
       expect(user).toBeNull()
     })
@@ -60,7 +65,7 @@ describe('UserMongo Repository', () => {
 
   describe('updateAccessToken', () => {
     it('Should update access token if updateAccessToken on success', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       const userModel = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
       await userCollection.insertOne(userModel)
       await sut.updateAccessToken({ userId: idString, accessToken: 'another_token' })
@@ -71,7 +76,7 @@ describe('UserMongo Repository', () => {
 
   describe('loadById()', () => {
     test('Should return an user if loadById on success', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
       const user = await sut.loadById(idString)
@@ -79,7 +84,7 @@ describe('UserMongo Repository', () => {
     })
 
     test('Should return null if loadById fails', async () => {
-      const sut = new UserMongoRepo()
+      const sut = makeSut()
       const user = await sut.loadById(idString)
       expect(user).toBeNull()
     })

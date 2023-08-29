@@ -16,7 +16,12 @@ export class AccessControlMiddleware implements Middleware {
     if (!accessToken) {
       return unauthorized(new AccessTokenNotInformedError())
     }
-    await this.accessControl.perform({ accessToken, role: this.role })
+    const accessControleResult = await this.accessControl.perform({
+      accessToken, role: this.role
+    })
+    if (accessControleResult.isLeft()) {
+      return unauthorized(accessControleResult.value)
+    }
     return { statusCode: 0, body: '' }
   }
 }

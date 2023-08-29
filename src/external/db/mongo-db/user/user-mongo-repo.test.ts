@@ -68,4 +68,15 @@ describe('UserMongo Repository', () => {
       expect(user?.accessToken).toBe('another_token')
     })
   })
+
+  describe('loadById()', () => {
+    test('Should return an user if loadById on success', async () => {
+      const sut = new UserMongoRepo()
+      const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      await userCollection.insertOne(userData)
+      const user = await sut.loadById(idString)
+      console.log(user)
+      expect(user).toEqual(makeFakeUserModel())
+    })
+  })
 })

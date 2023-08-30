@@ -1,4 +1,5 @@
 import type { IdValidator } from '@/presentation/contracts'
+import { InvalidIdError } from '@/presentation/errors/invalid-id-error'
 import { IdTypeValidation } from './id-type-validation'
 
 const makeIdValidator = (): IdValidator => {
@@ -30,5 +31,12 @@ describe('IdType Validation', () => {
     const isValidSpy = jest.spyOn(idValidatorStub, 'isValid')
     sut.validate({ userId: 'any_id' })
     expect(isValidSpy).toHaveBeenCalledWith('any_id')
+  })
+
+  it('Should return InvalidIdError if IdValidator fails', () => {
+    const { sut, idValidatorStub } = makeSut()
+    jest.spyOn(idValidatorStub, 'isValid').mockReturnValueOnce(false)
+    const result = sut.validate({ userId: 'any_id' })
+    expect(result.value).toEqual(new InvalidIdError('any_id'))
   })
 })

@@ -2,9 +2,10 @@ import type { Validation } from '@/presentation/contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { LoadProductByIdController } from './load-product-by-id-controller'
-import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound } from '@/presentation/helpers/http/http-helpers'
 import type { LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
 import type { ProductModel } from '@/domain/models'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   params: {
@@ -76,5 +77,14 @@ describe('LoadProductById Controller', () => {
     const performSpy = jest.spyOn(loadProductByIdStub, 'perform')
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledWith('any_id')
+  })
+
+  it('Should return 404 if LoadProductById returns ProductNotFoundError', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    jest.spyOn(loadProductByIdStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new ProductNotFoundError('any_id')))
+    )
+    const result = await sut.handle(makeFakeRequest())
+    expect(result).toEqual(notFound(new ProductNotFoundError('any_id')))
   })
 })

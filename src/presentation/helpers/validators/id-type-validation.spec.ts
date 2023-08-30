@@ -1,4 +1,5 @@
 import type { IdValidator } from '@/presentation/contracts'
+import { MissingParamError } from '@/presentation/errors'
 import { InvalidIdError } from '@/presentation/errors/invalid-id-error'
 import { IdTypeValidation } from './id-type-validation'
 
@@ -26,6 +27,12 @@ const makeSut = (): SutTypes => {
 }
 
 describe('IdType Validation', () => {
+  it('Should return MissingParamError if not informed value', () => {
+    const { sut } = makeSut()
+    const result = sut.validate({})
+    expect(result.value).toEqual(new MissingParamError('userId'))
+  })
+
   it('Should call IdValidator with correct id', () => {
     const { sut, idValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(idValidatorStub, 'isValid')

@@ -1,6 +1,6 @@
 import { makeLogControllerDecorator } from '@/main/factories/decorators'
 import type { Controller } from '@/presentation/contracts'
-import { AddProductController } from '@/presentation/controllers/product/add-product-controller'
+import { AddProductController } from '@/presentation/controllers/product'
 import { makeAddProductUseCase } from '../../usecases/product'
 import { makeAddProductValidation } from './add-product-validation-factory'
 

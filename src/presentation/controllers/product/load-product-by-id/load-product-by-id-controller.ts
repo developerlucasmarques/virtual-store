@@ -1,6 +1,6 @@
 import type { LoadProductById } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '@/presentation/contracts'
-import { badRequest, notFound } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class LoadProductByIdController implements Controller {
@@ -10,14 +10,18 @@ export class LoadProductByIdController implements Controller {
   ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const validation = this.validation.validate(httpRequest.params.productId)
-    if (validation.isLeft()) {
-      return badRequest(validation.value)
+    try {
+      const validation = this.validation.validate(httpRequest.params.productId)
+      if (validation.isLeft()) {
+        return badRequest(validation.value)
+      }
+      const productResult = await this.loadProductById.perform(httpRequest.params.productId)
+      if (productResult.isLeft()) {
+        return notFound(productResult.value)
+      }
+      return { statusCode: 0, body: '' }
+    } catch (error: any) {
+      return serverError(error)
     }
-    const productResult = await this.loadProductById.perform(httpRequest.params.productId)
-    if (productResult.isLeft()) {
-      return notFound(productResult.value)
-    }
-    return { statusCode: 0, body: '' }
   }
 }

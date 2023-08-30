@@ -8,6 +8,9 @@ import request from 'supertest'
 let userCollection: Collection
 let productCollection: Collection
 
+const objectId = new ObjectId()
+const idString = objectId.toHexString()
+
 describe('Product Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -37,8 +40,6 @@ describe('Product Routes', () => {
     })
 
     it('Should return 204 on add product with valid accessToken', async () => {
-      const idString = new ObjectId().toHexString()
-      const objectId = new ObjectId(idString)
       const accessToken = sign({ id: idString }, env.jwtSecretKey, { expiresIn: '24h' })
       const userModel = {
         _id: objectId,
@@ -84,6 +85,12 @@ describe('Product Routes', () => {
       await request(app)
         .get(`/api/product/${idString}`)
         .expect(200)
+    })
+
+    it('Should return 404 if load product fails', async () => {
+      await request(app)
+        .get(`/api/product/${idString}`)
+        .expect(404)
     })
   })
 })

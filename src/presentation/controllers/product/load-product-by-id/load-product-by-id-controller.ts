@@ -1,6 +1,6 @@
 import type { LoadProductById } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '@/presentation/contracts'
-import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class LoadProductByIdController implements Controller {
@@ -19,7 +19,7 @@ export class LoadProductByIdController implements Controller {
       if (productResult.isLeft()) {
         return notFound(productResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return ok(productResult.value)
     } catch (error: any) {
       return serverError(error)
     }

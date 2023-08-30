@@ -15,7 +15,7 @@ const makeFakeAccessControlData = (): AccessControlData => ({
   role: 'admin'
 })
 
-const makeAccessControlStub = (): AccessControl => {
+const makeAccessControl = (): AccessControl => {
   class AccessControlStub implements AccessControl {
     async perform (data: AccessControlData): Promise<AccessControlResponse> {
       return await Promise.resolve(right({ userId: 'any_id' }))
@@ -30,7 +30,7 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const accessControlStub = makeAccessControlStub()
+  const accessControlStub = makeAccessControl()
   const sut = new AccessControlMiddleware(accessControlStub, 'admin')
   return {
     sut,

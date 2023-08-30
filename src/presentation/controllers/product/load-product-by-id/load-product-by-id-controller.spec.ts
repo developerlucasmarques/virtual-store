@@ -3,11 +3,20 @@ import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { LoadProductByIdController } from './load-product-by-id-controller'
 import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import type { LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
+import type { ProductModel } from '@/domain/models'
 
 const makeFakeRequest = (): HttpRequest => ({
   params: {
     productId: 'any_id'
   }
+})
+
+const makeFakeProductModel = (): ProductModel => ({
+  id: 'any_id',
+  name: 'any name',
+  amount: 10.90,
+  description: 'any description'
 })
 
 const makeValidation = (): Validation => {
@@ -19,17 +28,29 @@ const makeValidation = (): Validation => {
   return new ValidationStub()
 }
 
+const makeLoadProductById = (): LoadProductById => {
+  class LoadProductByIdStub implements LoadProductById {
+    async perform (productId: string): Promise<LoadProductByIdResponse> {
+      return await Promise.resolve(right(makeFakeProductModel()))
+    }
+  }
+  return new LoadProductByIdStub()
+}
+
 type SutTypes = {
   sut: LoadProductByIdController
   validationStub: Validation
+  loadProductByIdStub: LoadProductById
 }
 
 const makeSut = (): SutTypes => {
   const validationStub = makeValidation()
-  const sut = new LoadProductByIdController(validationStub)
+  const loadProductByIdStub = makeLoadProductById()
+  const sut = new LoadProductByIdController(validationStub, loadProductByIdStub)
   return {
     sut,
-    validationStub
+    validationStub,
+    loadProductByIdStub
   }
 }
 
@@ -48,5 +69,12 @@ describe('LoadProductById Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should call LoadProductById with correct id', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    const performSpy = jest.spyOn(loadProductByIdStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledWith('any_id')
   })
 })

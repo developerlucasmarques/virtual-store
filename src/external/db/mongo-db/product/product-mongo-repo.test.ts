@@ -67,4 +67,14 @@ describe('ProductMongo Repository', () => {
       expect(surveys.length).toBe(0)
     })
   })
+
+  describe('loadById()', () => {
+    it('Should load product on success', async () => {
+      const sut = makeSut()
+      const productData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      await productCollection.insertOne(productData)
+      const porduct = await sut.loadById(idString)
+      expect(porduct).toEqual(MongoHelper.convertCollectionIdObjectIdToString(productData))
+    })
+  })
 })

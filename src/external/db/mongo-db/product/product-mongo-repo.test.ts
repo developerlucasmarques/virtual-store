@@ -56,15 +56,15 @@ describe('ProductMongo Repository', () => {
         description: 'any description'
       }
       await productCollection.insertMany([anyProduct, anotherProduct])
-      const porducts = await sut.loadAll()
-      expect(porducts[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
-      expect(porducts[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+      const products = await sut.loadAll()
+      expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
+      expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
     })
 
     it('Should load empty list if no product was found', async () => {
       const sut = makeSut()
-      const surveys = await sut.loadAll()
-      expect(surveys.length).toBe(0)
+      const products = await sut.loadAll()
+      expect(products.length).toBe(0)
     })
   })
 
@@ -73,8 +73,14 @@ describe('ProductMongo Repository', () => {
       const sut = makeSut()
       const productData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
       await productCollection.insertOne(productData)
-      const porduct = await sut.loadById(idString)
-      expect(porduct).toEqual(MongoHelper.convertCollectionIdObjectIdToString(productData))
+      const product = await sut.loadById(idString)
+      expect(product).toEqual(MongoHelper.convertCollectionIdObjectIdToString(productData))
+    })
+
+    it('Should return null if not found a product', async () => {
+      const sut = makeSut()
+      const product = await sut.loadById(idString)
+      expect(product).toBeNull()
     })
   })
 })

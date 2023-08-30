@@ -1,5 +1,4 @@
 export * from './log/log-error-repo'
-export * from './id/validation-id'
 export * from './id/id-builder'
 export * from './cryptography/hasher'
 export * from './cryptography/hash-comparer'

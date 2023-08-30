@@ -1,6 +1,6 @@
 import type { ProductModel } from '@/domain/models'
-import { InvalidIdError, ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
-import type { LoadProductByIdRepo, ValidationId } from '@/interactions/contracts'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import type { LoadProductByIdRepo } from '@/interactions/contracts'
 import { LoadProductByIdUseCase } from './load-product-by-id-usecase'
 
 const makeFakeProductModel = (): ProductModel => ({
@@ -9,15 +9,6 @@ const makeFakeProductModel = (): ProductModel => ({
   amount: 10.90,
   description: 'any description'
 })
-
-const makeValidationId = (): ValidationId => {
-  class ValidationIdStub implements ValidationId {
-    isValid (id: string): boolean {
-      return true
-    }
-  }
-  return new ValidationIdStub()
-}
 
 const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
   class LoadProductByIdRepoStub implements LoadProductByIdRepo {
@@ -30,17 +21,14 @@ const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
 
 type SutTypes = {
   sut: LoadProductByIdUseCase
-  validationIdStub: ValidationId
   loadProductByIdRepoStub: LoadProductByIdRepo
 }
 
 const makeSut = (): SutTypes => {
   const loadProductByIdRepoStub = makeLoadProductByIdRepo()
-  const validationIdStub = makeValidationId()
-  const sut = new LoadProductByIdUseCase(validationIdStub, loadProductByIdRepoStub)
+  const sut = new LoadProductByIdUseCase(loadProductByIdRepoStub)
   return {
     sut,
-    validationIdStub,
     loadProductByIdRepoStub
   }
 }
@@ -69,34 +57,5 @@ describe('LoadProductById UseCase', () => {
     )
     const promise = sut.perform('any_product_id')
     await expect(promise).rejects.toThrow()
-  })
-
-  it('Should call ValidationId with correct id', async () => {
-    const { sut, validationIdStub } = makeSut()
-    const isValidSpy = jest.spyOn(validationIdStub, 'isValid')
-    await sut.perform('any_product_id')
-    expect(isValidSpy).toHaveBeenCalledWith('any_product_id')
-  })
-
-  it('Should return InvalidIdError if ValidationId fails', async () => {
-    const { sut, validationIdStub } = makeSut()
-    jest.spyOn(validationIdStub, 'isValid').mockReturnValueOnce(false)
-    const result = await sut.perform('any_product_id')
-    expect(result.value).toEqual(new InvalidIdError('any_product_id'))
-  })
-
-  it('Should throw if ValidationId throws', async () => {
-    const { sut, validationIdStub } = makeSut()
-    jest.spyOn(validationIdStub, 'isValid').mockImplementation(() => {
-      throw new Error()
-    })
-    const promise = sut.perform('any_product_id')
-    await expect(promise).rejects.toThrow()
-  })
-
-  it('Should return ProductModel if LoadProductByIdRepo is a success', async () => {
-    const { sut } = makeSut()
-    const result = await sut.perform('any_product_id')
-    expect(result.value).toEqual(makeFakeProductModel())
   })
 })

@@ -2,7 +2,7 @@ import type { Validation } from '@/presentation/contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { LoadProductByIdController } from './load-product-by-id-controller'
-import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
 import type { ProductModel } from '@/domain/models'
 import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
@@ -107,5 +107,11 @@ describe('LoadProductById Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should return 200 if LoadProductById is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.handle(makeFakeRequest())
+    expect(result).toEqual(ok(makeFakeProductModel()))
   })
 })

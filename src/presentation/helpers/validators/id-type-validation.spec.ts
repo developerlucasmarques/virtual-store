@@ -39,4 +39,10 @@ describe('IdType Validation', () => {
     const result = sut.validate({ userId: 'any_id' })
     expect(result.value).toEqual(new InvalidIdError('any_id'))
   })
+
+  it('Should return null if IdValidator is a success', () => {
+    const { sut } = makeSut()
+    const result = sut.validate({ userId: 'any_id' })
+    expect(result.value).toEqual(null)
+  })
 })

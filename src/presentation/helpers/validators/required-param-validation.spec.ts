@@ -11,4 +11,10 @@ describe('RequiredParam Validation', () => {
     const result = sut.validate({ paramId: 'any_id' })
     expect(result.value).toEqual(new InvalidParamsError('userId'))
   })
+
+  it('Should return null if informed required param', () => {
+    const sut = makeSut('userId')
+    const result = sut.validate({ userId: 'any_id' })
+    expect(result.value).toBe(null)
+  })
 })

@@ -1,5 +1,5 @@
 import { makeLogControllerDecorator } from '@/main/factories/decorators'
-import { makeLoadProductByIdUseCase } from '@/main/factories/usecases/product/load-product-by-id/load-product-by-id-usecase-factory'
+import { makeLoadProductByIdUseCase } from '@/main/factories/usecases/product/'
 import type { Controller } from '@/presentation/contracts'
 import { LoadProductByIdController } from '@/presentation/controllers/product'
 import { makeLoadProductByIdValidation } from './load-product-by-id-validation-factory'

@@ -1,9 +1,9 @@
-import request from 'supertest'
-import app from '@/main/config/app'
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
-import { ObjectId, type Collection } from 'mongodb'
-import { sign } from 'jsonwebtoken'
+import app from '@/main/config/app'
 import env from '@/main/config/env'
+import { sign } from 'jsonwebtoken'
+import { ObjectId, type Collection } from 'mongodb'
+import request from 'supertest'
 
 let userCollection: Collection
 let productCollection: Collection
@@ -66,6 +66,24 @@ describe('Product Routes', () => {
       await request(app)
         .get('/api/product')
         .expect(204)
+    })
+  })
+
+  describe('GET /product/:productId', () => {
+    it('Should return 200 on load product', async () => {
+      const objectId = new ObjectId()
+      const idString = objectId.toHexString()
+      const productModel = {
+        _id: objectId,
+        name: 'any name',
+        amount: 10.90,
+        description: 'any description'
+      }
+      await productCollection.insertOne(productModel)
+
+      await request(app)
+        .get(`/api/product/${idString}`)
+        .expect(200)
     })
   })
 })

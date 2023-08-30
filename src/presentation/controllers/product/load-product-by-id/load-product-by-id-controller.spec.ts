@@ -2,10 +2,11 @@ import type { Validation } from '@/presentation/contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { LoadProductByIdController } from './load-product-by-id-controller'
-import { badRequest, notFound } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
 import type { ProductModel } from '@/domain/models'
 import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import { ServerError } from '@/presentation/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   params: {
@@ -70,6 +71,16 @@ describe('LoadProductById Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should return 500 if ValidationComposite throws', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 
   it('Should call LoadProductById with correct id', async () => {

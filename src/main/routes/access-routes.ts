@@ -1,7 +1,6 @@
 import type { Router } from 'express'
-import { makeSignUpController } from '../factories/controllers/signup/signup-factory'
-import { adaptRoute } from '../adapters/express-route-adapter'
-import { makeLoginController } from '../factories/controllers/login/login-factory'
+import { makeSignUpController, makeLoginController } from '@/main/factories/controllers/access'
+import { adaptRoute } from '@/main/adapters/express-route-adapter'
 
 export default async (router: Router): Promise<void> => {
   router.post('/signup', adaptRoute(makeSignUpController()))

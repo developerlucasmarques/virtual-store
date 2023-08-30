@@ -1,5 +1,5 @@
 import request from 'supertest'
-import app from '../config/app'
+import app from '@/main/config/app'
 import type { Collection } from 'mongodb'
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
 import { hash } from 'bcrypt'

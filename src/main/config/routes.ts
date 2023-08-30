@@ -1,4 +1,4 @@
-import { Express, Router } from 'express'
+import { type Express, Router } from 'express'
 import { readdirSync } from 'fs'
 import * as path from 'path'
 

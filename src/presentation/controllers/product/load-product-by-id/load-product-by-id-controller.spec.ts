@@ -61,7 +61,7 @@ describe('LoadProductById Controller', () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
     await sut.handle(makeFakeRequest())
-    expect(validateSpy).toHaveBeenLastCalledWith('any_id')
+    expect(validateSpy).toHaveBeenLastCalledWith(makeFakeRequest().params)
   })
 
   it('Should return 400 if Validation fails', async () => {

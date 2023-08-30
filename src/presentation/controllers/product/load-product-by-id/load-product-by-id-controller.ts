@@ -11,7 +11,7 @@ export class LoadProductByIdController implements Controller {
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const validation = this.validation.validate(httpRequest.params.productId)
+      const validation = this.validation.validate(httpRequest.params)
       if (validation.isLeft()) {
         return badRequest(validation.value)
       }

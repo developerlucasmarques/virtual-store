@@ -18,6 +18,6 @@ export class LoadProductByIdUseCase implements LoadProductById {
     if (!product) {
       return left(new ProductNotFoundError(productId))
     }
-    return right({ id: '', amount: 0, description: '', name: '' })
+    return right(product)
   }
 }

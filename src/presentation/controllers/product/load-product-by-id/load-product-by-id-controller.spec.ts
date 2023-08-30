@@ -73,7 +73,7 @@ describe('LoadProductById Controller', () => {
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 
-  it('Should return 500 if ValidationComposite throws', async () => {
+  it('Should return 500 if Validation throws', async () => {
     const { sut, validationStub } = makeSut()
     jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
       throw new Error()
@@ -97,5 +97,15 @@ describe('LoadProductById Controller', () => {
     )
     const result = await sut.handle(makeFakeRequest())
     expect(result).toEqual(notFound(new ProductNotFoundError('any_id')))
+  })
+
+  it('Should return 500 if LoadProductById throws', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    jest.spyOn(loadProductByIdStub, 'perform').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 })

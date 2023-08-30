@@ -1,5 +1,6 @@
 import type { IdValidator, Validation } from '@/presentation/contracts'
-import { right, type Either } from '@/shared/either'
+import { InvalidIdError } from '@/presentation/errors/invalid-id-error'
+import { right, type Either, left } from '@/shared/either'
 
 export class IdTypeValidation implements Validation {
   constructor (
@@ -8,8 +9,10 @@ export class IdTypeValidation implements Validation {
   ) {}
 
   validate (input: any): Either<Error, null> {
-    this.idValidator.isValid(input[this.fieldName])
-
+    const isValid = this.idValidator.isValid(input[this.fieldName])
+    if (!isValid) {
+      return left(new InvalidIdError(input[this.fieldName]))
+    }
     return right(null)
   }
 }

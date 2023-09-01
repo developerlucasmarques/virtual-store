@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="pTi9WZJJcMSmxZMC4DTO" name="Página-1">
-        <mxGraphModel dx="1325" dy="684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1608" dy="813" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -53,13 +53,13 @@
                     <mxGeometry x="892.5" y="430" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="13" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="1130" y="650" width="240" height="125" as="geometry"/>
+                    <mxGeometry x="1130" y="638" width="240" height="125" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" value="Domain" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="1130" y="619" width="60" height="30" as="geometry"/>
+                    <mxGeometry x="1130" y="607" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="15" value="FindOneProduct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00CCCC;dashed=1;" parent="1" vertex="1">
-                    <mxGeometry x="1190" y="690" width="120" height="60" as="geometry"/>
+                    <mxGeometry x="1190" y="670.5" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#FF3333;" parent="1" source="6" target="15" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -70,7 +70,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="17" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="617.5" y="580" width="470" height="280" as="geometry"/>
+                    <mxGeometry x="617.5" y="601" width="470" height="199" as="geometry"/>
                 </mxCell>
                 <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#ff3333;" parent="1" source="20" target="22" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -86,32 +86,29 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="44" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#FF3333;" edge="1" parent="1" source="20" target="42">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
                 <mxCell id="20" value="FindOneProductUseCase" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
-                    <mxGeometry x="860" y="640" width="192" height="60" as="geometry"/>
+                    <mxGeometry x="872" y="670" width="192" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="21" value="&lt;div style=&quot;text-align: start;&quot;&gt;&lt;span style=&quot;background-color: initial; font-size: 16px;&quot;&gt;&lt;font face=&quot;Söhne, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji&quot; color=&quot;#d1d5db&quot;&gt;Interactions&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="617.5" y="550" width="112.5" height="30" as="geometry"/>
+                    <mxGeometry x="617.5" y="571" width="112.5" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="22" value="FindProductByIdRepo" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00CCCC;dashed=1;" parent="1" vertex="1">
-                    <mxGeometry x="670" y="750" width="175" height="60" as="geometry"/>
+                    <mxGeometry x="660" y="670" width="152.5" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="23" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="250" y="600" width="320" height="260" as="geometry"/>
                 </mxCell>
-                <mxCell id="24" value="Infra" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="250" y="570" width="50" height="30" as="geometry"/>
+                <mxCell id="24" value="External" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="240" y="570" width="70" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="25" value="&lt;font color=&quot;#000000&quot;&gt;MongoDb&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
                     <mxGeometry x="90" y="730" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#6666FF;fillColor=#a20025;dashed=1;" parent="1" source="28" target="22" edge="1">
+                <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#6666FF;fillColor=#a20025;dashed=1;" parent="1" source="28" target="22" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="540" y="780"/>
-                            <mxPoint x="540" y="780"/>
+                            <mxPoint x="590" y="780"/>
+                            <mxPoint x="590" y="700"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
@@ -119,7 +116,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="28" value="ProductMongoRepo" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
-                    <mxGeometry x="350" y="750" width="150" height="60" as="geometry"/>
+                    <mxGeometry x="338.5" y="750" width="150" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="29" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FFFFFF;fontColor=#000000;" parent="1" vertex="1">
                     <mxGeometry x="200" y="250" width="610" height="260" as="geometry"/>
@@ -174,21 +171,10 @@
                 <mxCell id="41" value="&lt;font color=&quot;#000000&quot;&gt;Express&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
                     <mxGeometry x="50" y="283.5" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="42" value="ValidateId" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00CCCC;dashed=1;" vertex="1" parent="1">
-                    <mxGeometry x="660" y="630" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="45" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#6666FF;fillColor=#a20025;dashed=1;" edge="1" parent="1" source="43" target="42">
-                    <mxGeometry relative="1" as="geometry">
-                        <Array as="points">
-                            <mxPoint x="590" y="679"/>
-                            <mxPoint x="590" y="660"/>
-                        </Array>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="47" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;dashed=1;" edge="1" parent="1" source="43" target="25">
+                <mxCell id="47" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;dashed=1;" parent="1" source="43" target="25" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="43" value="MongoObjectIdAdapter" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" vertex="1" parent="1">
+                <mxCell id="43" value="IdMongo" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
                     <mxGeometry x="339" y="649" width="150" height="60" as="geometry"/>
                 </mxCell>
             </root>

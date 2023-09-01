@@ -1,12 +1,12 @@
 import type { Either } from '@/shared/either'
-import type { ProductNotFoundError } from '../errors'
+import type { ProductNotFoundError, InvalidProductQuantityError } from '../errors'
 
 export type AddProductToCartData = {
   productId: string
-  qtyProducts: number
+  productQty: number
 }
 
-export type AddProductToCartReponse = Either<ProductNotFoundError, null>
+export type AddProductToCartReponse = Either<InvalidProductQuantityError | ProductNotFoundError, null>
 
 export interface AddProductToCart {
   perform: (data: AddProductToCartData) => Promise<AddProductToCartReponse>

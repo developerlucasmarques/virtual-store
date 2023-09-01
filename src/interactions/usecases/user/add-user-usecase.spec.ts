@@ -3,7 +3,7 @@ import { left } from '@/shared/either'
 import type { LoadUserByEmailRepo, AddUserRepo, Id, IdBuilder, Hash, Hasher } from '@/interactions/contracts'
 import { AddUserUseCase } from './add-user-usecase'
 import type { AccessTokenBuilder } from '@/domain/usecases-contracts'
-import { EmailInUseError } from '@/domain/usecases-contracts/export-errors'
+import { EmailInUseError } from '@/domain/usecases-contracts/errors'
 import type { AccessTokenModel, UserModel } from '@/domain/models'
 
 const makeFakeUserModel = (): UserModel => ({

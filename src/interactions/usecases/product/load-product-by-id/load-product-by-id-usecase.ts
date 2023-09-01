@@ -1,5 +1,5 @@
 import type { LoadProductByIdResponse, LoadProductById } from '@/domain/usecases-contracts'
-import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadProductByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 

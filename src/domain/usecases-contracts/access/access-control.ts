@@ -1,6 +1,6 @@
 import type { RoleModel } from '@/domain/models'
 import type { Either } from '@/shared/either'
-import type { AccessDeniedError, InvalidTokenError } from './errors'
+import type { AccessDeniedError, InvalidTokenError } from '../errors'
 
 export type AccessControlData = {
   accessToken: string

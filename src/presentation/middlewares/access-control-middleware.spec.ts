@@ -4,7 +4,7 @@ import { forbidden, ok, serverError, unauthorized } from '../helpers/http/http-h
 import { AccessControlMiddleware } from './access-control-middleware'
 import { left, right } from '@/shared/either'
 import type { HttpRequest } from '../http-types/http'
-import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: { 'x-access-token': 'any_token' }

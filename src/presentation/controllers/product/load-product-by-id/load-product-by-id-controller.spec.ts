@@ -5,7 +5,7 @@ import { LoadProductByIdController } from './load-product-by-id-controller'
 import { badRequest, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
 import type { ProductModel } from '@/domain/models'
-import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/errors'
 import { ServerError } from '@/presentation/errors'
 
 const makeFakeRequest = (): HttpRequest => ({

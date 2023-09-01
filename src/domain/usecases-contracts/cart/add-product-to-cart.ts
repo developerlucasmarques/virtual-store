@@ -1,5 +1,5 @@
 import type { Either } from '@/shared/either'
-import type { ProductNotFoundError } from '../export-errors'
+import type { ProductNotFoundError } from '../errors'
 
 export type AddProductToCartData = {
   productId: string

@@ -5,7 +5,7 @@ import { LoginController } from './login-controller'
 import { badRequest, ok, serverError, unauthorized } from '@/presentation/helpers/http/http-helpers'
 import type { Auth, AuthData, AuthResponse } from '@/domain/usecases-contracts'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
-import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
+import { InvalidCredentialsError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {

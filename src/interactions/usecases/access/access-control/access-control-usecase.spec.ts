@@ -1,8 +1,8 @@
 import type { UserModel } from '@/domain/models'
-import type { AccessControlData } from '@/domain/usecases-contracts'
-import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import { type AccessControlData } from '@/domain/usecases-contracts'
 import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { AccessControlUseCase } from './access-control-usecase'
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeAccessControlData = (): AccessControlData => ({
   accessToken: 'any_token',

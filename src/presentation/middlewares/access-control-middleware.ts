@@ -4,7 +4,7 @@ import { AccessTokenNotInformedError } from '../errors'
 import { forbidden, ok, serverError, unauthorized } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 import type { RoleModel } from '@/domain/models'
-import { InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
+import { InvalidTokenError } from '@/domain/usecases-contracts/errors'
 
 export class AccessControlMiddleware implements Middleware {
   constructor (

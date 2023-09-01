@@ -3,7 +3,7 @@ import { AuthUseCase } from './auth-usecase'
 import { left } from '@/shared/either'
 import { InvalidEmailError } from '@/domain/entities/user/errors'
 import type { AuthData, AccessTokenBuilder } from '@/domain/usecases-contracts'
-import { InvalidCredentialsError } from '@/domain/usecases-contracts/export-errors'
+import { InvalidCredentialsError } from '@/domain/usecases-contracts/errors'
 import type { ComparerData, HashComparer, LoadUserByEmailRepo, UpdateAccessTokenData, UpdateAccessTokenRepo } from '@/interactions/contracts'
 import type { AccessTokenModel, UserModel } from '@/domain/models'
 

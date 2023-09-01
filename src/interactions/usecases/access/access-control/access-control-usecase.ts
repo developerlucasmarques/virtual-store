@@ -1,5 +1,5 @@
+import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/errors'
 import type { AccessControl, AccessControlData, AccessControlResponse } from '@/domain/usecases-contracts'
-import { AccessDeniedError, InvalidTokenError } from '@/domain/usecases-contracts/export-errors'
 import type { Decrypter, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 

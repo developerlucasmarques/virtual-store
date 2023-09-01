@@ -1,5 +1,5 @@
 import type { ProductModel } from '@/domain/models'
-import { ProductNotFoundError } from '@/domain/usecases-contracts/export-errors'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadProductByIdRepo } from '@/interactions/contracts'
 import { LoadProductByIdUseCase } from './load-product-by-id-usecase'
 

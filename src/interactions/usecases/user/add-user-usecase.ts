@@ -1,6 +1,6 @@
 import { User, type UserData } from '@/domain/entities/user'
 import type { AddUser, AddUserResponse, AccessTokenBuilder } from '@/domain/usecases-contracts'
-import { EmailInUseError } from '@/domain/usecases-contracts/export-errors'
+import { EmailInUseError } from '@/domain/usecases-contracts/errors'
 import { left, right } from '@/shared/either'
 import type { IdBuilder, AddUserRepo, LoadUserByEmailRepo, Hasher } from '@/interactions/contracts'
 

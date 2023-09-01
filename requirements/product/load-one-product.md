@@ -1,4 +1,4 @@
-# Find One Product
+# Load One Product
 
 ## Path Parameters
 * productId

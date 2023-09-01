@@ -27,6 +27,7 @@
 - ❌ Retorna erro 400 se o tipo do dado informado não for válido
 - ❌ Retorna erro 400 se algum dos dados informados não for válido
 - ❌ Retorna erro 401 se o client não informar o token ou se for inválido
+- ❌ Retorna erro 500 se der erro ao tentar decriptar token do usuário
 - ❌ Retorna erro 500 se der erro ao tentar gerar um id para o carrinho
 - ❌ Retorna erro 500 se der erro ao tentar salvar os dados do carrinho no DB
 

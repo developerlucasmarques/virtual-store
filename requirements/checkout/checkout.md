@@ -1,4 +1,4 @@
-# Checkout Processing
+# Checkout
 
 ## Request Body
 * cpf
@@ -9,7 +9,7 @@
 
 ## Caso de Sucesso
 
-- ❌ Recebe uma requisição do tipo POST na rota /api/payment
+- ❌ Recebe uma requisição do tipo POST na rota /api/checkout
 - ❌ Valida se a requisição foi feita por um usuário
 - ❌ Valida os dados obrigatórios
 - ❌ Valida o tipo do dado informado
@@ -32,6 +32,7 @@
 - ❌ Retorna erro 400 se algum dos dados informados não for válido
 - ❌ Retorna erro 400 se o usuário não tiver produtos no carrinho
 - ❌ Retorna erro 401 se o client não informar o token ou se for inválido
+- ❌ Retorna erro 500 se der erro ao tentar decriptar token do usuário
 - ❌ Retorna erro 500 se der erro ao tentar gerar um id para a compra
 - ❌ Retorna erro 500 se der erro ao tentar salvar os dados da compra no DB
 - ❌ Retorna erro 500 se der erro ao tentar conectar com a Api Stripe

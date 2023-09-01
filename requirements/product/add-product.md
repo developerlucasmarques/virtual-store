@@ -31,6 +31,7 @@
 - ✅ Retorna erro 400 se algum dos dados requeridos não for informado pelo client
 - ✅ Retorna erro 400 se o client informar mais dados do que os requeridos
 - ✅ Retorna erro 400 se o tipo do dado informado não for válido
+- ✅ Retorna erro 500 se der erro ao tentar decriptar token do usuário
 - ✅ Retorna erro 500 se der erro ao tentar gerar um id para o usuário
 - ❌ Retorna erro 500 se der erro no processo de salvar imagem na AWS S3
 - ✅ Retorna erro 500 se der erro ao tentar salvar os dados do produto no DB

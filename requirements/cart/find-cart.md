@@ -7,6 +7,7 @@
 
 - ❌ Recebe uma requisição do tipo GET na rota /api/cart
 - ❌ Valida se a requisição foi feita por um usuário
+- ❌ Calcula o valor total dos produtos no carrinho do usuário
 - ❌ Retorna 204 se não tiver nenhum produto no carrinho
 - ❌ Retorna 200 com os dados dos produtos do carrinho do usuário
 

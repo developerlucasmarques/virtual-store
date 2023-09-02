@@ -171,4 +171,12 @@ describe('CartManager UseCase', () => {
     expect(createCartSpy).toReturnWith(Promise.resolve(right(null)))
     expect(result.value).toBeNull()
   })
+
+  it('Should return null if AddProductToCart is a success', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    const addProductToCarSpy = jest.spyOn(addProductToCartStub, 'perform')
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(addProductToCarSpy).toReturnWith(Promise.resolve(right(null)))
+    expect(result.value).toBeNull()
+  })
 })

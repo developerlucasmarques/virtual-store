@@ -1,4 +1,4 @@
-import type { CartManager, AddProductToCartData, CartManagerReponse, CreateCart } from '@/domain/usecases-contracts'
+import type { CartManager, AddProductToCartData, CartManagerReponse, CreateCart, AddProductToCart } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
@@ -6,7 +6,8 @@ import { left, right } from '@/shared/either'
 export class CartManagerUseCase implements CartManager {
   constructor (
     private readonly loadCartByUserIdRepo: LoadCartByUserIdRepo,
-    private readonly createCart: CreateCart
+    private readonly createCart: CreateCart,
+    private readonly addProductToCart: AddProductToCart
   ) {}
 
   async perform (data: AddProductToCartData): Promise<CartManagerReponse> {
@@ -17,6 +18,7 @@ export class CartManagerUseCase implements CartManager {
     if (!cart) {
       await this.createCart.perform(data)
     }
+    await this.addProductToCart.perform(data)
     return right(null)
   }
 }

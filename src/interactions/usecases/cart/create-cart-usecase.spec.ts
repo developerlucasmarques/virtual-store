@@ -38,4 +38,13 @@ describe('CreateCart UseCase', () => {
     await sut.perform(makeFakeAddProductToCartData())
     expect(buildSpy).toHaveBeenCalled()
   })
+
+  it('Should throw if IdBuilder throws', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    jest.spyOn(idBuilderStub, 'build').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
 })

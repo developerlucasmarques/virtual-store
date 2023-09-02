@@ -1,8 +1,8 @@
 import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse, CreateCart, CreateCartReponse } from '@/domain/usecases-contracts'
-import { InvalidProductQuantityError } from '@/domain/usecases-contracts/errors'
+import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadCartByUserIdRepoResponse } from '@/interactions/contracts'
 import { CartManagerUseCase } from './cart-manager-usecase'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 
 const makeFakeAddProductToCartData = (): AddProductToCartData => ({
   userId: 'any_user_id',
@@ -89,6 +89,18 @@ describe('CartManager UseCase', () => {
     const performSpy = jest.spyOn(createCartStub, 'perform')
     await sut.perform(makeFakeAddProductToCartData())
     expect(performSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
+  })
+
+  it('Should return ProductNotFoundError if CreateCart returns this same error', async () => {
+    const { sut, loadCartByUserIdRepoStub, createCartStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    jest.spyOn(createCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new ProductNotFoundError('any_product_id')))
+    )
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
 
   it('Should call AddProductToCart with correct values if LoadCartByUserIdRepo returns an cart', async () => {

@@ -139,4 +139,16 @@ describe('CartManager UseCase', () => {
     const promise = sut.perform(makeFakeAddProductToCartData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should not call AddProductToCart if call CreateCart', async () => {
+    const { sut, createCartStub, addProductToCartStub, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const createCartSpy = jest.spyOn(createCartStub, 'perform')
+    const addProductToCartSpy = jest.spyOn(addProductToCartStub, 'perform')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(createCartSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
+    expect(addProductToCartSpy).not.toHaveBeenCalled()
+  })
 })

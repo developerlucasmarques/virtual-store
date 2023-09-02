@@ -16,7 +16,10 @@ export class CartManagerUseCase implements CartManager {
     }
     const cart = await this.loadCartByUserIdRepo.loadByUserId(data.userId)
     if (!cart) {
-      await this.createCart.perform(data)
+      const createCartResult = await this.createCart.perform(data)
+      if (createCartResult.isLeft()) {
+        return left(createCartResult.value)
+      }
     }
     await this.addProductToCart.perform(data)
     return right(null)

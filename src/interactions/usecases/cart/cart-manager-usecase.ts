@@ -21,7 +21,10 @@ export class CartManagerUseCase implements CartManager {
         return left(createCartResult.value)
       }
     }
-    await this.addProductToCart.perform(data)
+    const addProductToCartResult = await this.addProductToCart.perform(data)
+    if (addProductToCartResult.isLeft()) {
+      return left(addProductToCartResult.value)
+    }
     return right(null)
   }
 }

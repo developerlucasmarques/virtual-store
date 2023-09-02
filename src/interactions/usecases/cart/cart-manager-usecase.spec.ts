@@ -148,7 +148,16 @@ describe('CartManager UseCase', () => {
     const createCartSpy = jest.spyOn(createCartStub, 'perform')
     const addProductToCartSpy = jest.spyOn(addProductToCartStub, 'perform')
     await sut.perform(makeFakeAddProductToCartData())
-    expect(createCartSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
     expect(addProductToCartSpy).not.toHaveBeenCalled()
+    expect(createCartSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
+  })
+
+  it('Should not call CreateCart if call AddProductToCart', async () => {
+    const { sut, createCartStub, addProductToCartStub } = makeSut()
+    const createCartSpy = jest.spyOn(createCartStub, 'perform')
+    const addProductToCartSpy = jest.spyOn(addProductToCartStub, 'perform')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(createCartSpy).not.toHaveBeenCalled()
+    expect(addProductToCartSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
   })
 })

@@ -26,7 +26,6 @@ export class CartManagerUseCase implements CartManager {
         return left(addProductToCartResult.value)
       }
     }
-
     return right(null)
   }
 }

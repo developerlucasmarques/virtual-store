@@ -73,4 +73,13 @@ describe('CreateCart UseCase', () => {
     await sut.perform(makeFakeAddProductToCartData())
     expect(createSpy).toHaveBeenCalledWith(makeFakeCreateCartRepoData())
   })
+
+  it('Should throw if CreateCartRepo throws', async () => {
+    const { sut, createCartRepoStub } = makeSut()
+    jest.spyOn(createCartRepoStub, 'create').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
 })

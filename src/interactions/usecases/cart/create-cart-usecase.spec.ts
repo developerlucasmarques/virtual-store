@@ -88,6 +88,15 @@ describe('CreateCart UseCase', () => {
     expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
 
+  it('Should throw if LoadProductByIdRepo throws', async () => {
+    const { sut, loadProductByIdRepoStub } = makeSut()
+    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call IdBuilder', async () => {
     const { sut, idBuilderStub } = makeSut()
     const buildSpy = jest.spyOn(idBuilderStub, 'build')

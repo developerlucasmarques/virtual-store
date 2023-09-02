@@ -1,4 +1,4 @@
-import type { AddProductToCartData, CreateCart, CreateCartReponse } from '@/domain/usecases-contracts'
+import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse, CreateCart, CreateCartReponse } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadCartByUserIdRepoResponse } from '@/interactions/contracts'
 import { CartManagerUseCase } from './cart-manager-usecase'
@@ -34,20 +34,32 @@ const makeCreateCart = (): CreateCart => {
   return new CreateCartStub()
 }
 
+const makeAddProductToCart = (): AddProductToCart => {
+  class AddProductToCartStub implements AddProductToCart {
+    async perform (data: AddProductToCartData): Promise<AddProductToCartResponse> {
+      return await Promise.resolve(right(null))
+    }
+  }
+  return new AddProductToCartStub()
+}
+
 type SutTypes = {
   sut: CartManagerUseCase
   loadCartByUserIdRepoStub: LoadCartByUserIdRepo
   createCartStub: CreateCart
+  addProductToCartStub: AddProductToCart
 }
 
 const makeSut = (): SutTypes => {
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
   const createCartStub = makeCreateCart()
-  const sut = new CartManagerUseCase(loadCartByUserIdRepoStub, createCartStub)
+  const addProductToCartStub = makeAddProductToCart()
+  const sut = new CartManagerUseCase(loadCartByUserIdRepoStub, createCartStub, addProductToCartStub)
   return {
     sut,
     loadCartByUserIdRepoStub,
-    createCartStub
+    createCartStub,
+    addProductToCartStub
   }
 }
 
@@ -75,6 +87,13 @@ describe('CartManager UseCase', () => {
       Promise.resolve(null)
     )
     const performSpy = jest.spyOn(createCartStub, 'perform')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(performSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
+  })
+
+  it('Should call AddProductToCart with correct values if LoadCartByUserIdRepo returns an cart', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    const performSpy = jest.spyOn(addProductToCartStub, 'perform')
     await sut.perform(makeFakeAddProductToCartData())
     expect(performSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
   })

@@ -130,4 +130,13 @@ describe('CartManager UseCase', () => {
     const result = await sut.perform(makeFakeAddProductToCartData())
     expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
+
+  it('Should throw if AddProductToCart throws', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    jest.spyOn(addProductToCartStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
 })

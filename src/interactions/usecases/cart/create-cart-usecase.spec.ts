@@ -1,11 +1,19 @@
 import type { AddProductToCartData, CreateCart } from '@/domain/usecases-contracts'
-import type { CreateCartRepo, CreateCartRepoData, Id, IdBuilder } from '@/interactions/contracts'
+import type { CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadProductByIdRepo } from '@/interactions/contracts'
 import { CreateCartUseCase } from './create-cart-usecase'
+import { type ProductModel } from '@/domain/models'
 
 const makeFakeAddProductToCartData = (): AddProductToCartData => ({
   userId: 'any_user_id',
   productId: 'any_product_id',
   productQty: 2
+})
+
+const makeFakeProductModel = (): ProductModel => ({
+  id: 'any_id',
+  name: 'any name',
+  amount: 10.90,
+  description: 'any description'
 })
 
 const makeFakeCreateCartRepoData = (): CreateCartRepoData => ({
@@ -15,13 +23,13 @@ const makeFakeCreateCartRepoData = (): CreateCartRepoData => ({
   productQty: 2
 })
 
-const makeCreateCartRepo = (): CreateCartRepo => {
-  class CreateCartRepoStub implements CreateCartRepo {
-    async create (data: CreateCartRepoData): Promise<void> {
-      await Promise.resolve()
+const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
+  class LoadProductByIdRepoStub implements LoadProductByIdRepo {
+    async loadById (id: string): Promise<null | ProductModel> {
+      return await Promise.resolve(makeFakeProductModel())
     }
   }
-  return new CreateCartRepoStub()
+  return new LoadProductByIdRepoStub()
 }
 
 const makeIdBuilder = (): IdBuilder => {
@@ -33,24 +41,43 @@ const makeIdBuilder = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
+const makeCreateCartRepo = (): CreateCartRepo => {
+  class CreateCartRepoStub implements CreateCartRepo {
+    async create (data: CreateCartRepoData): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new CreateCartRepoStub()
+}
+
 type SutTypes = {
   sut: CreateCart
   idBuilderStub: IdBuilder
+  loadProductByIdRepoStub: LoadProductByIdRepo
   createCartRepoStub: CreateCartRepo
 }
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
+  const loadProductByIdRepoStub = makeLoadProductByIdRepo()
   const createCartRepoStub = makeCreateCartRepo()
-  const sut = new CreateCartUseCase(idBuilderStub, createCartRepoStub)
+  const sut = new CreateCartUseCase(loadProductByIdRepoStub, idBuilderStub, createCartRepoStub)
   return {
     sut,
+    loadProductByIdRepoStub,
     idBuilderStub,
     createCartRepoStub
   }
 }
 
 describe('CreateCart UseCase', () => {
+  it('Should call LoadProductByIdRepo with correct product id', async () => {
+    const { sut, loadProductByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadProductByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(loadByIdSpy).toHaveBeenCalledWith('any_product_id')
+  })
+
   it('Should call IdBuilder', async () => {
     const { sut, idBuilderStub } = makeSut()
     const buildSpy = jest.spyOn(idBuilderStub, 'build')

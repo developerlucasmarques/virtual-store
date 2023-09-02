@@ -128,4 +128,10 @@ describe('CreateCart UseCase', () => {
     const promise = sut.perform(makeFakeAddProductToCartData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if CreateCartRepo is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toBeNull()
+  })
 })

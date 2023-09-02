@@ -121,4 +121,13 @@ describe('CartManager UseCase', () => {
     await sut.perform(makeFakeAddProductToCartData())
     expect(performSpy).toHaveBeenCalledWith(makeFakeAddProductToCartData())
   })
+
+  it('Should return ProductNotFoundError if AddProductToCart returns this same error', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    jest.spyOn(addProductToCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new ProductNotFoundError('any_product_id')))
+    )
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
+  })
 })

@@ -2,6 +2,7 @@ import type { AddProductToCartData, CreateCart } from '@/domain/usecases-contrac
 import type { CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadProductByIdRepo } from '@/interactions/contracts'
 import { CreateCartUseCase } from './create-cart-usecase'
 import { type ProductModel } from '@/domain/models'
+import { ProductNotFoundError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeAddProductToCartData = (): AddProductToCartData => ({
   userId: 'any_user_id',
@@ -76,6 +77,15 @@ describe('CreateCart UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadProductByIdRepoStub, 'loadById')
     await sut.perform(makeFakeAddProductToCartData())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_product_id')
+  })
+
+  it('Should return ProductNotFoundError if LoadProductByIdRepo returns null', async () => {
+    const { sut, loadProductByIdRepoStub } = makeSut()
+    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
 
   it('Should call IdBuilder', async () => {

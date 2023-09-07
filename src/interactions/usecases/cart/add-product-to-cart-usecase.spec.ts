@@ -239,6 +239,32 @@ describe('CartManager UseCase', () => {
     expect(result.value).toBeNull()
   })
 
+  it('Should increase the quantity of the product if the product is already in the cart', async () => {
+    const { sut, loadCartByUserIdRepoStub, addProductToCartRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve({
+        id: 'any_id',
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id_2',
+          quantity: 1
+        }, {
+          id: 'any_product_id',
+          quantity: 2
+        }]
+      })
+    )
+    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(addProductSpy).toHaveBeenCalledWith({
+      id: 'any_id',
+      product: {
+        id: 'any_product_id',
+        quantity: 4
+      }
+    })
+  })
+
   it('Should call AddProductToCartRepo with correct values', async () => {
     const { sut, addProductToCartRepoStub } = makeSut()
     const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')

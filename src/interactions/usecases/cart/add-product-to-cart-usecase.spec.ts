@@ -239,6 +239,13 @@ describe('CartManager UseCase', () => {
     expect(result.value).toBeNull()
   })
 
+  it('Should call AddProductToCartRepo with correct values', async () => {
+    const { sut, addProductToCartRepoStub } = makeSut()
+    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
+  })
+
   it('Should increase the quantity of the product if the product is already in the cart', async () => {
     const { sut, loadCartByUserIdRepoStub, addProductToCartRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
@@ -265,10 +272,10 @@ describe('CartManager UseCase', () => {
     })
   })
 
-  it('Should call AddProductToCartRepo with correct values', async () => {
+  it('Should call AddProductToCartRepo only once', async () => {
     const { sut, addProductToCartRepoStub } = makeSut()
     const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
     await sut.perform(makeFakeAddProductToCartData())
-    expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
+    expect(addProductSpy).toHaveBeenCalledTimes(1)
   })
 })

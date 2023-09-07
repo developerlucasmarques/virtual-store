@@ -1,6 +1,6 @@
 import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { CreateCartRepo, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo } from '@/interactions/contracts'
+import type { AddProductToCartRepo, CreateCartRepo, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class AddProductToCartUseCase implements AddProductToCart {
@@ -8,7 +8,8 @@ export class AddProductToCartUseCase implements AddProductToCart {
     private readonly loadProductByIdRepo: LoadProductByIdRepo,
     private readonly loadCartByUserIdRepo: LoadCartByUserIdRepo,
     private readonly idBuilder: IdBuilder,
-    private readonly createCartRepo: CreateCartRepo
+    private readonly createCartRepo: CreateCartRepo,
+    private readonly addProductToCartRepo: AddProductToCartRepo
   ) {}
 
   async perform (data: AddProductToCartData): Promise<AddProductToCartResponse> {
@@ -26,7 +27,11 @@ export class AddProductToCartUseCase implements AddProductToCart {
       await this.createCartRepo.create({
         id, userId, product: { id: productId, quantity: productQty }
       })
+      return right(null)
     }
+    await this.addProductToCartRepo.addProduct({
+      id: cart?.id, product: { id: productId, quantity: productQty }
+    })
     return right(null)
   }
 }

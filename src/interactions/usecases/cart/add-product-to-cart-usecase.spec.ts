@@ -199,4 +199,13 @@ describe('CartManager UseCase', () => {
     const promise = sut.perform(makeFakeAddProductToCartData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if CreateCartRepo is a success', async () => {
+    const { sut, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toBeNull()
+  })
 })

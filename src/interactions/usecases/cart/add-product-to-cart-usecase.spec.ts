@@ -1,8 +1,8 @@
 import type { AddProductToCartData } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadCartByUserIdRepoResponse, LoadProductByIdRepo } from '@/interactions/contracts'
+import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo } from '@/interactions/contracts'
 import { AddProductToCartUseCase } from './add-product-to-cart-usecase'
-import type { ProductModel } from '@/domain/models'
+import type { CartModel, ProductModel } from '@/domain/models'
 
 const makeFakeAddProductToCartData = (): AddProductToCartData => ({
   userId: 'any_user_id',
@@ -17,10 +17,16 @@ const makeFakeProductModel = (): ProductModel => ({
   description: 'any description'
 })
 
-const makeFakeLoadCartByUserIdRepoResponse = (): LoadCartByUserIdRepoResponse => ({
+const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
   userId: 'any_user_id',
-  productIds: ['any_product_id_1', 'any_product_id_2']
+  products: [{
+    id: 'any_product_id_1',
+    quantity: 1
+  }, {
+    id: 'any_product_id_2',
+    quantity: 2
+  }]
 })
 
 const makeFakeCreateCartRepoData = (): CreateCartRepoData => ({
@@ -51,8 +57,8 @@ const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
 
 const makeLoadCartByUserIdRepo = (): LoadCartByUserIdRepo => {
   class LoadCartByUserIdRepoStub implements LoadCartByUserIdRepo {
-    async loadByUserId (userId: string): Promise<null | LoadCartByUserIdRepoResponse> {
-      return await Promise.resolve(makeFakeLoadCartByUserIdRepoResponse())
+    async loadByUserId (userId: string): Promise<null | CartModel> {
+      return await Promise.resolve(makeFakeCartModel())
     }
   }
   return new LoadCartByUserIdRepoStub()

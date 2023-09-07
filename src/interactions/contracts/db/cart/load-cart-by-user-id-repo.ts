@@ -1,9 +1,5 @@
-export type LoadCartByUserIdRepoResponse = {
-  id: string
-  userId: string
-  productIds: string[]
-}
+import type { CartModel } from '@/domain/models'
 
 export interface LoadCartByUserIdRepo {
-  loadByUserId: (userId: string) => Promise<null | LoadCartByUserIdRepoResponse>
+  loadByUserId: (userId: string) => Promise<null | CartModel>
 }

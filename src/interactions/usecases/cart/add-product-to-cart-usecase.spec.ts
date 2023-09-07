@@ -146,6 +146,16 @@ describe('CartManager UseCase', () => {
     expect(buildSpy).toHaveBeenCalled()
   })
 
+  it('Should call IdBuilder only once', async () => {
+    const { sut, idBuilderStub, loadCartByUserIdRepoStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(buildSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should throw if IdBuilder throws', async () => {
     const { sut, idBuilderStub, loadCartByUserIdRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(

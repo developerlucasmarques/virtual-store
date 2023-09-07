@@ -1,8 +1,12 @@
+export type ProductCartRepoData = {
+  id: string
+  quantity: number
+}
+
 export type CreateCartRepoData = {
   id: string
   userId: string
-  productId: string
-  productQty: number
+  product: ProductCartRepoData
 }
 
 export interface CreateCartRepo {

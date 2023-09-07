@@ -278,4 +278,10 @@ describe('CartManager UseCase', () => {
     await sut.perform(makeFakeAddProductToCartData())
     expect(addProductSpy).toHaveBeenCalledTimes(1)
   })
+
+  it('Should return null if AddProductToCartRepo is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeAddProductToCartData())
+    expect(result.value).toBeNull()
+  })
 })

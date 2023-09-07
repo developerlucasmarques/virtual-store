@@ -1,6 +1,6 @@
 import type { AddProductToCartData } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadCartByUserIdRepoResponse, LoadProductByIdRepo } from '@/interactions/contracts'
+import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadCartByUserIdRepoResponse, LoadProductByIdRepo } from '@/interactions/contracts'
 import { AddProductToCartUseCase } from './add-product-to-cart-usecase'
 import type { ProductModel } from '@/domain/models'
 
@@ -26,6 +26,14 @@ const makeFakeLoadCartByUserIdRepoResponse = (): LoadCartByUserIdRepoResponse =>
 const makeFakeCreateCartRepoData = (): CreateCartRepoData => ({
   id: 'any_id',
   userId: 'any_user_id',
+  product: {
+    id: 'any_product_id',
+    quantity: 2
+  }
+})
+
+const makeFakeAddProductToCartRepoData = (): AddProductToCartRepoData => ({
+  id: 'any_id',
   product: {
     id: 'any_product_id',
     quantity: 2
@@ -68,12 +76,22 @@ const makeCreateCartRepo = (): CreateCartRepo => {
   return new CreateCartRepoStub()
 }
 
+const makeAddProductToCartRepo = (): AddProductToCartRepo => {
+  class AddProductToCartRepoStub implements AddProductToCartRepo {
+    async addProduct (data: AddProductToCartRepoData): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new AddProductToCartRepoStub()
+}
+
 type SutTypes = {
   sut: AddProductToCartUseCase
   loadCartByUserIdRepoStub: LoadCartByUserIdRepo
   loadProductByIdRepoStub: LoadProductByIdRepo
   idBuilderStub: IdBuilder
   createCartRepoStub: CreateCartRepo
+  addProductToCartRepoStub: AddProductToCartRepo
 }
 
 const makeSut = (): SutTypes => {
@@ -81,15 +99,21 @@ const makeSut = (): SutTypes => {
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
   const idBuilderStub = makeIdBuilder()
   const createCartRepoStub = makeCreateCartRepo()
+  const addProductToCartRepoStub = makeAddProductToCartRepo()
   const sut = new AddProductToCartUseCase(
-    loadProductByIdRepoStub, loadCartByUserIdRepoStub, idBuilderStub, createCartRepoStub
+    loadProductByIdRepoStub,
+    loadCartByUserIdRepoStub,
+    idBuilderStub,
+    createCartRepoStub,
+    addProductToCartRepoStub
   )
   return {
     sut,
     loadProductByIdRepoStub,
     loadCartByUserIdRepoStub,
     idBuilderStub,
-    createCartRepoStub
+    createCartRepoStub,
+    addProductToCartRepoStub
   }
 }
 
@@ -207,5 +231,12 @@ describe('CartManager UseCase', () => {
     )
     const result = await sut.perform(makeFakeAddProductToCartData())
     expect(result.value).toBeNull()
+  })
+
+  it('Should call AddProductToCartRepo with correct values', async () => {
+    const { sut, addProductToCartRepoStub } = makeSut()
+    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
   })
 })

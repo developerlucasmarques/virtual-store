@@ -36,7 +36,7 @@ export class AddProductToCartUseCase implements AddProductToCart {
       }
     }
     await this.addProductToCartRepo.addProduct({
-      id: cart?.id, product: { id: productId, quantity }
+      id: cart.id, product: { id: productId, quantity }
     })
     return right(null)
   }

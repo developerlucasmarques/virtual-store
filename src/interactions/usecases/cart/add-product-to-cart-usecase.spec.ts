@@ -210,12 +210,12 @@ describe('CartManager UseCase', () => {
 
   it('Should call CreateCartRepo only once', async () => {
     const { sut, createCartRepoStub, loadCartByUserIdRepoStub } = makeSut()
-    const buildSpy = jest.spyOn(createCartRepoStub, 'create')
+    const createSpy = jest.spyOn(createCartRepoStub, 'create')
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
       Promise.resolve(null)
     )
     await sut.perform(makeFakeAddProductToCartData())
-    expect(buildSpy).toHaveBeenCalledTimes(1)
+    expect(createSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should throw if CreateCartRepo throws', async () => {

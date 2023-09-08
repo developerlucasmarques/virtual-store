@@ -1,6 +1,6 @@
 import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { AddProductToCartRepo, CreateCartRepo, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo } from '@/interactions/contracts'
+import type { AddProductToCartRepo, CreateCartRepo, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo, UpdateProductQtyCartRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class AddProductToCartUseCase implements AddProductToCart {
@@ -9,6 +9,7 @@ export class AddProductToCartUseCase implements AddProductToCart {
     private readonly loadCartByUserIdRepo: LoadCartByUserIdRepo,
     private readonly idBuilder: IdBuilder,
     private readonly createCartRepo: CreateCartRepo,
+    private readonly updateProductQtyCartRepo: UpdateProductQtyCartRepo,
     private readonly addProductToCartRepo: AddProductToCartRepo
   ) {}
 
@@ -33,6 +34,9 @@ export class AddProductToCartUseCase implements AddProductToCart {
     for (const product of cart.products) {
       if (productId === product.id) {
         quantity += product.quantity
+        await this.updateProductQtyCartRepo.updateProductQty({
+          id: cart.id, product: { id: productId, quantity }
+        })
       }
     }
     await this.addProductToCartRepo.addProduct({

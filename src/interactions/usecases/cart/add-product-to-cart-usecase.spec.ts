@@ -358,6 +358,15 @@ describe('CartManager UseCase', () => {
     expect(addProductSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('Should throw if AddProductToCartRepo throws', async () => {
+    const { sut, addProductToCartRepoStub } = makeSut()
+    jest.spyOn(addProductToCartRepoStub, 'addProduct').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return null if AddProductToCartRepo is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAddProductToCartData())

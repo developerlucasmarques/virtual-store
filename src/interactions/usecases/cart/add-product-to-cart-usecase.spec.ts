@@ -252,13 +252,6 @@ describe('CartManager UseCase', () => {
     expect(result.value).toBeNull()
   })
 
-  it('Should call AddProductToCartRepo with correct values', async () => {
-    const { sut, addProductToCartRepoStub } = makeSut()
-    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
-    await sut.perform(makeFakeAddProductToCartData())
-    expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
-  })
-
   it('Should call UpdateProductQtyCartRepo if the product already exists in the cart and must increment the quantity', async () => {
     const { sut, loadCartByUserIdRepoStub, updateProductQtyCartRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
@@ -330,6 +323,32 @@ describe('CartManager UseCase', () => {
       }
     })
     expect(result.value).toBeNull()
+  })
+
+  it('Should throw if UpdateProductQtyCartRepo throws', async () => {
+    const { sut, updateProductQtyCartRepoStub, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve({
+        id: 'any_id',
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id',
+          quantity: 2
+        }]
+      })
+    )
+    jest.spyOn(updateProductQtyCartRepoStub, 'updateProductQty').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call AddProductToCartRepo with correct values', async () => {
+    const { sut, addProductToCartRepoStub } = makeSut()
+    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
   })
 
   it('Should call AddProductToCartRepo only once', async () => {

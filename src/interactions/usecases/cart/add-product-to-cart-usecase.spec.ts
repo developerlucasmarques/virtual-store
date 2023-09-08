@@ -1,6 +1,6 @@
 import type { AddProductToCartData } from '@/domain/usecases-contracts'
 import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo } from '@/interactions/contracts'
+import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo, UpdateProductQtyCartRepo, UpdateProductQtyCartRepoData } from '@/interactions/contracts'
 import { AddProductToCartUseCase } from './add-product-to-cart-usecase'
 import type { CartModel, ProductModel } from '@/domain/models'
 
@@ -82,6 +82,15 @@ const makeCreateCartRepo = (): CreateCartRepo => {
   return new CreateCartRepoStub()
 }
 
+const makeUpdateProductQtyCartRepo = (): UpdateProductQtyCartRepo => {
+  class UpdateProductQtyCartRepoStub implements UpdateProductQtyCartRepo {
+    async updateProductQty (data: UpdateProductQtyCartRepoData): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new UpdateProductQtyCartRepoStub()
+}
+
 const makeAddProductToCartRepo = (): AddProductToCartRepo => {
   class AddProductToCartRepoStub implements AddProductToCartRepo {
     async addProduct (data: AddProductToCartRepoData): Promise<void> {
@@ -97,6 +106,7 @@ type SutTypes = {
   loadProductByIdRepoStub: LoadProductByIdRepo
   idBuilderStub: IdBuilder
   createCartRepoStub: CreateCartRepo
+  updateProductQtyCartRepoStub: UpdateProductQtyCartRepo
   addProductToCartRepoStub: AddProductToCartRepo
 }
 
@@ -105,12 +115,14 @@ const makeSut = (): SutTypes => {
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
   const idBuilderStub = makeIdBuilder()
   const createCartRepoStub = makeCreateCartRepo()
+  const updateProductQtyCartRepoStub = makeUpdateProductQtyCartRepo()
   const addProductToCartRepoStub = makeAddProductToCartRepo()
   const sut = new AddProductToCartUseCase(
     loadProductByIdRepoStub,
     loadCartByUserIdRepoStub,
     idBuilderStub,
     createCartRepoStub,
+    updateProductQtyCartRepoStub,
     addProductToCartRepoStub
   )
   return {
@@ -119,6 +131,7 @@ const makeSut = (): SutTypes => {
     loadCartByUserIdRepoStub,
     idBuilderStub,
     createCartRepoStub,
+    updateProductQtyCartRepoStub,
     addProductToCartRepoStub
   }
 }
@@ -246,8 +259,8 @@ describe('CartManager UseCase', () => {
     expect(addProductSpy).toHaveBeenLastCalledWith(makeFakeAddProductToCartRepoData())
   })
 
-  it('Should increase the quantity of the product if the product is already in the cart', async () => {
-    const { sut, loadCartByUserIdRepoStub, addProductToCartRepoStub } = makeSut()
+  it('Should call UpdateProductQtyCartRepo if the product already exists in the cart and must increment the quantity', async () => {
+    const { sut, loadCartByUserIdRepoStub, updateProductQtyCartRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
       Promise.resolve({
         id: 'any_id',
@@ -261,7 +274,7 @@ describe('CartManager UseCase', () => {
         }]
       })
     )
-    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    const addProductSpy = jest.spyOn(updateProductQtyCartRepoStub, 'updateProductQty')
     await sut.perform(makeFakeAddProductToCartData())
     expect(addProductSpy).toHaveBeenCalledWith({
       id: 'any_id',

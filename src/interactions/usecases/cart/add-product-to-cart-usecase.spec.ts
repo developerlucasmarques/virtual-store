@@ -392,6 +392,27 @@ describe('CartManager UseCase', () => {
     expect(updateProductQtySpy).not.toHaveBeenCalled()
   })
 
+  it('Should call UpdateProductQtyCartRepo and not call CreateCartRepo and AddProductToCartRepo', async () => {
+    const { sut, loadCartByUserIdRepoStub, createCartRepoStub, updateProductQtyCartRepoStub, addProductToCartRepoStub } = makeSut()
+    const createSpy = jest.spyOn(createCartRepoStub, 'create')
+    const updateProductQtySpy = jest.spyOn(updateProductQtyCartRepoStub, 'updateProductQty')
+    const addProductSpy = jest.spyOn(addProductToCartRepoStub, 'addProduct')
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve({
+        id: 'any_id',
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id',
+          quantity: 2
+        }]
+      })
+    )
+    await sut.perform(makeFakeAddProductToCartData())
+    expect(updateProductQtySpy).toHaveBeenCalled()
+    expect(createSpy).not.toHaveBeenCalled()
+    expect(addProductSpy).not.toHaveBeenCalled()
+  })
+
   it('Should return null if AddProductToCartRepo is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAddProductToCartData())

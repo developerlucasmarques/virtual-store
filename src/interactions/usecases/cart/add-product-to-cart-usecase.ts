@@ -37,6 +37,7 @@ export class AddProductToCartUseCase implements AddProductToCart {
         await this.updateProductQtyCartRepo.updateProductQty({
           id: cart.id, product: { id: productId, quantity }
         })
+        break
       }
     }
     await this.addProductToCartRepo.addProduct({

@@ -2,7 +2,7 @@ import type { Validation } from '@/presentation/contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { AddProductToCartController } from './add-product-to-cart-controller'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import { ServerError } from '@/presentation/errors'
 import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse } from '@/domain/usecases-contracts'
 
@@ -106,5 +106,11 @@ describe('AddProductToCart Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should return 204 if AddProductToCart is a success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(noContent())
   })
 })

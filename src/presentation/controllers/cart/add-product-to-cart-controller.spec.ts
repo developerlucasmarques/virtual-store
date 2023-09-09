@@ -2,7 +2,8 @@ import type { Validation } from '@/presentation/contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type Either, right, left } from '@/shared/either'
 import { AddProductToCartController } from './add-product-to-cart-controller'
-import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { ServerError } from '@/presentation/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
@@ -49,5 +50,15 @@ describe('AddProductToCart Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should return 500 if ValidationComposite throws', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    jest.spyOn(validationCompositeStub, 'validate').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    const error = new Error()
+    expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
   })
 })

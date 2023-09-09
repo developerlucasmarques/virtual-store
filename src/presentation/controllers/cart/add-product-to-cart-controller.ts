@@ -16,11 +16,14 @@ export class AddProductToCartController implements Controller {
         return badRequest(validations.value)
       }
       const { productId, productQty } = httpRequest.body
-      await this.addProductToCart.perform({
+      const addProductToCartResult = await this.addProductToCart.perform({
         userId: httpRequest.headers.userId,
         productId,
         productQty
       })
+      if (addProductToCartResult.isLeft()) {
+        return badRequest(addProductToCartResult.value)
+      }
       return { statusCode: 0, body: '' }
     } catch (error: any) {
       return serverError(error)

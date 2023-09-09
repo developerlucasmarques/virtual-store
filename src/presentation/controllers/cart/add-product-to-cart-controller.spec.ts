@@ -4,11 +4,15 @@ import { type Either, right, left } from '@/shared/either'
 import { AddProductToCartController } from './add-product-to-cart-controller'
 import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
 import { ServerError } from '@/presentation/errors'
+import type { AddProductToCart, AddProductToCartData, AddProductToCartResponse } from '@/domain/usecases-contracts'
 
 const makeFakeRequest = (): HttpRequest => ({
   body: {
     productId: 'any_product_id',
     productQty: 2
+  },
+  headers: {
+    userId: 'any_user_id'
   }
 })
 
@@ -21,17 +25,29 @@ const makeValidationComposite = (): Validation => {
   return new ValidationCompositeStub()
 }
 
+const makeAddProductToCart = (): AddProductToCart => {
+  class AddProductToCartStub implements AddProductToCart {
+    async perform (data: AddProductToCartData): Promise<AddProductToCartResponse> {
+      return await Promise.resolve(right(null))
+    }
+  }
+  return new AddProductToCartStub()
+}
+
 type SutTypes = {
   sut: AddProductToCartController
   validationCompositeStub: Validation
+  addProductToCartStub: AddProductToCart
 }
 
 const makeSut = (): SutTypes => {
   const validationCompositeStub = makeValidationComposite()
-  const sut = new AddProductToCartController(validationCompositeStub)
+  const addProductToCartStub = makeAddProductToCart()
+  const sut = new AddProductToCartController(validationCompositeStub, addProductToCartStub)
   return {
     sut,
-    validationCompositeStub
+    validationCompositeStub,
+    addProductToCartStub
   }
 }
 
@@ -60,5 +76,16 @@ describe('AddProductToCart Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     const error = new Error()
     expect(httpResponse).toEqual(serverError(new ServerError(error.stack)))
+  })
+
+  it('Should call AddProductToCart with correct values', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    const performSpy = jest.spyOn(addProductToCartStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenLastCalledWith({
+      userId: 'any_user_id',
+      productId: 'any_product_id',
+      productQty: 2
+    })
   })
 })

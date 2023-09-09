@@ -88,4 +88,13 @@ describe('AddProductToCart Controller', () => {
       productQty: 2
     })
   })
+
+  it('Should return 400 if AddProductToCart fails', async () => {
+    const { sut, addProductToCartStub } = makeSut()
+    jest.spyOn(addProductToCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
 })

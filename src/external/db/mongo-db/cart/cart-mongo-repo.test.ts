@@ -103,5 +103,11 @@ describe('CartMongo Repository', () => {
         }]
       })
     })
+
+    it('Should return null if loadByUserId fails', async () => {
+      const sut = makeSut()
+      const cart = await sut.loadByUserId('any_user_id')
+      expect(cart).toBeNull()
+    })
   })
 })

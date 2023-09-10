@@ -49,8 +49,14 @@ describe('CartMongo Repository', () => {
       const sut = makeSut()
       await sut.create(makeFakeCreateCartRepoData())
       const cart = await cartCollection.findOne({ _id: objectId })
-      const cartWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeCreateCartRepoData())
-      expect(cart).toEqual(cartWithMongoId)
+      expect(cart).toEqual({
+        _id: objectId,
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id',
+          quantity: 1
+        }]
+      })
     })
   })
 

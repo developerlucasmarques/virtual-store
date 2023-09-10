@@ -52,5 +52,21 @@ describe('Cart Routes', () => {
         })
         .expect(204)
     })
+
+    it('Should return 401 if user does not have an access token', async () => {
+      await productCollection.insertOne({
+        _id: productObjectId,
+        name: 'any_product_name',
+        amount: 20.99,
+        description: 'any_description'
+      })
+      await request(app)
+        .post('/api/cart')
+        .send({
+          productId: productIdString,
+          productQty: 2
+        })
+        .expect(401)
+    })
   })
 })

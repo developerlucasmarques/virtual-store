@@ -1,8 +1,9 @@
-import type { AddProductToCartData } from '@/domain/usecases-contracts'
-import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, LoadProductByIdRepo, UpdateProductQtyCartRepo, UpdateProductQtyCartRepoData } from '@/interactions/contracts'
-import { AddProductToCartUseCase } from './add-product-to-cart-usecase'
 import type { CartModel, ProductModel } from '@/domain/models'
+import type { AddProductToCartData, LoadProductById, LoadProductByIdResponse } from '@/domain/usecases-contracts'
+import { InvalidProductQuantityError, ProductNotFoundError } from '@/domain/usecases-contracts/errors'
+import type { AddProductToCartRepo, AddProductToCartRepoData, CreateCartRepo, CreateCartRepoData, Id, IdBuilder, LoadCartByUserIdRepo, UpdateProductQtyCartRepo, UpdateProductQtyCartRepoData } from '@/interactions/contracts'
+import { left, right } from '@/shared/either'
+import { AddProductToCartUseCase } from './add-product-to-cart-usecase'
 
 const makeFakeAddProductToCartData = (): AddProductToCartData => ({
   userId: 'any_user_id',
@@ -46,13 +47,13 @@ const makeFakeAddProductToCartRepoData = (): AddProductToCartRepoData => ({
   }
 })
 
-const makeLoadProductByIdRepo = (): LoadProductByIdRepo => {
-  class LoadProductByIdRepoStub implements LoadProductByIdRepo {
-    async loadById (id: string): Promise<null | ProductModel> {
-      return await Promise.resolve(makeFakeProductModel())
+const makeLoadProductById = (): LoadProductById => {
+  class LoadProductByIdStub implements LoadProductById {
+    async perform (peoductId: string): Promise<LoadProductByIdResponse> {
+      return await Promise.resolve(right(makeFakeProductModel()))
     }
   }
-  return new LoadProductByIdRepoStub()
+  return new LoadProductByIdStub()
 }
 
 const makeLoadCartByUserIdRepo = (): LoadCartByUserIdRepo => {
@@ -102,8 +103,8 @@ const makeAddProductToCartRepo = (): AddProductToCartRepo => {
 
 type SutTypes = {
   sut: AddProductToCartUseCase
+  loadProductByIdStub: LoadProductById
   loadCartByUserIdRepoStub: LoadCartByUserIdRepo
-  loadProductByIdRepoStub: LoadProductByIdRepo
   idBuilderStub: IdBuilder
   createCartRepoStub: CreateCartRepo
   updateProductQtyCartRepoStub: UpdateProductQtyCartRepo
@@ -111,14 +112,14 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const loadProductByIdRepoStub = makeLoadProductByIdRepo()
+  const loadProductByIdStub = makeLoadProductById()
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
   const idBuilderStub = makeIdBuilder()
   const createCartRepoStub = makeCreateCartRepo()
   const updateProductQtyCartRepoStub = makeUpdateProductQtyCartRepo()
   const addProductToCartRepoStub = makeAddProductToCartRepo()
   const sut = new AddProductToCartUseCase(
-    loadProductByIdRepoStub,
+    loadProductByIdStub,
     loadCartByUserIdRepoStub,
     idBuilderStub,
     createCartRepoStub,
@@ -127,7 +128,7 @@ const makeSut = (): SutTypes => {
   )
   return {
     sut,
-    loadProductByIdRepoStub,
+    loadProductByIdStub,
     loadCartByUserIdRepoStub,
     idBuilderStub,
     createCartRepoStub,
@@ -147,25 +148,25 @@ describe('CartManager UseCase', () => {
     expect(result.value).toEqual(new InvalidProductQuantityError())
   })
 
-  it('Should call LoadProductByIdRepo with correct product id', async () => {
-    const { sut, loadProductByIdRepoStub } = makeSut()
-    const loadByIdSpy = jest.spyOn(loadProductByIdRepoStub, 'loadById')
+  it('Should call LoadProductById with correct product id', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    const loadProductSpy = jest.spyOn(loadProductByIdStub, 'perform')
     await sut.perform(makeFakeAddProductToCartData())
-    expect(loadByIdSpy).toHaveBeenCalledWith('any_product_id')
+    expect(loadProductSpy).toHaveBeenCalledWith('any_product_id')
   })
 
-  it('Should return ProductNotFoundError if LoadProductByIdRepo returns null', async () => {
-    const { sut, loadProductByIdRepoStub } = makeSut()
-    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockReturnValueOnce(
-      Promise.resolve(null)
+  it('Should return ProductNotFoundError if LoadProductById returns ProductNotFoundError', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    jest.spyOn(loadProductByIdStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new ProductNotFoundError('any_product_id')))
     )
     const result = await sut.perform(makeFakeAddProductToCartData())
     expect(result.value).toEqual(new ProductNotFoundError('any_product_id'))
   })
 
-  it('Should throw if LoadProductByIdRepo throws', async () => {
-    const { sut, loadProductByIdRepoStub } = makeSut()
-    jest.spyOn(loadProductByIdRepoStub, 'loadById').mockImplementation(() => {
+  it('Should throw if LoadProductById throws', async () => {
+    const { sut, loadProductByIdStub } = makeSut()
+    jest.spyOn(loadProductByIdStub, 'perform').mockImplementation(() => {
       throw new Error()
     })
     const promise = sut.perform(makeFakeAddProductToCartData())

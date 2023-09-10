@@ -1,4 +1,4 @@
-import type { AddProductToCartRepoData, CreateCartRepoData } from '@/interactions/contracts'
+import type { AddProductToCartRepoData, CreateCartRepoData, UpdateProductQtyCartRepoData } from '@/interactions/contracts'
 import { ObjectId, type Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { CartMongoRepo } from './cart-mongo-repo'
@@ -30,6 +30,14 @@ const mongoCartWithAProduct = (): any => ({
     id: 'any_product_id_1',
     quantity: 1
   }]
+})
+
+const makeFakeUpdateProductQtyCartRepoData = (): UpdateProductQtyCartRepoData => ({
+  id: idString,
+  product: {
+    id: 'any_product_id_1',
+    quantity: 2
+  }
 })
 
 let cartCollection: Collection
@@ -108,6 +116,23 @@ describe('CartMongo Repository', () => {
       const sut = makeSut()
       const cart = await sut.loadByUserId('any_user_id')
       expect(cart).toBeNull()
+    })
+  })
+
+  describe('updateProductQty()', () => {
+    it('Should update the quantity of a product in the cart if updateProductQty is a success', async () => {
+      const sut = makeSut()
+      await cartCollection.insertOne(mongoCartWithAProduct())
+      await sut.updateProductQty(makeFakeUpdateProductQtyCartRepoData())
+      const cart = await cartCollection.findOne({ _id: objectId })
+      expect(cart).toEqual({
+        _id: objectId,
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id_1',
+          quantity: 3
+        }]
+      })
     })
   })
 })

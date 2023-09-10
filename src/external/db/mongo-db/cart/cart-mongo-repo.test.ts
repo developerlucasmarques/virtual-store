@@ -1,4 +1,4 @@
-import type { CreateCartRepoData } from '@/interactions/contracts'
+import type { AddProductToCartRepoData, CreateCartRepoData } from '@/interactions/contracts'
 import { ObjectId, type Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { CartMongoRepo } from './cart-mongo-repo'
@@ -12,6 +12,14 @@ const makeFakeCreateCartRepoData = (): CreateCartRepoData => ({
   product: {
     id: 'any_product_id',
     quantity: 1
+  }
+})
+
+const makeFakeAddProductToCartRepoData = (): AddProductToCartRepoData => ({
+  id: idString,
+  product: {
+    id: 'any_product_id',
+    quantity: 2
   }
 })
 
@@ -42,5 +50,31 @@ describe('CartMongo Repository', () => {
     const cart = await cartCollection.findOne({ _id: objectId })
     const cartWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeCreateCartRepoData())
     expect(cart).toEqual(cartWithMongoId)
+  })
+
+  it('Should add product to Cart if addProduct is a success', async () => {
+    const sut = makeSut()
+    await cartCollection.insertOne({
+      _id: objectId,
+      userId: 'any_user_id',
+      products: [{
+        id: 'another_product_id',
+        quantity: 1
+      }]
+    })
+    await sut.addProduct(makeFakeAddProductToCartRepoData())
+    const cart = await cartCollection.findOne({ _id: objectId })
+    console.log(cart)
+    expect(cart).toEqual({
+      _id: objectId,
+      userId: 'any_user_id',
+      products: [{
+        id: 'another_product_id',
+        quantity: 1
+      }, {
+        id: 'any_product_id',
+        quantity: 2
+      }]
+    })
   })
 })

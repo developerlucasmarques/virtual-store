@@ -23,6 +23,15 @@ const makeFakeAddProductToCartRepoData = (): AddProductToCartRepoData => ({
   }
 })
 
+const mongoCartWithAProduct = (): any => ({
+  _id: objectId,
+  userId: 'any_user_id',
+  products: [{
+    id: 'any_product_id_1',
+    quantity: 1
+  }]
+})
+
 let cartCollection: Collection
 
 const makeSut = (): CartMongoRepo => {
@@ -63,25 +72,34 @@ describe('CartMongo Repository', () => {
   describe('addProduct()', () => {
     it('Should add product to Cart if addProduct is a success', async () => {
       const sut = makeSut()
-      await cartCollection.insertOne({
-        _id: objectId,
-        userId: 'any_user_id',
-        products: [{
-          id: 'another_product_id',
-          quantity: 1
-        }]
-      })
+      await cartCollection.insertOne(mongoCartWithAProduct())
       await sut.addProduct(makeFakeAddProductToCartRepoData())
       const cart = await cartCollection.findOne({ _id: objectId })
       expect(cart).toEqual({
         _id: objectId,
         userId: 'any_user_id',
         products: [{
-          id: 'another_product_id',
+          id: 'any_product_id_1',
           quantity: 1
         }, {
           id: 'any_product_id',
           quantity: 2
+        }]
+      })
+    })
+  })
+
+  describe('loadByUserId()', () => {
+    it('Should load cart if loadByUserId is a success', async () => {
+      const sut = makeSut()
+      await cartCollection.insertOne(mongoCartWithAProduct())
+      const cart = await sut.loadByUserId('any_user_id')
+      expect(cart).toEqual({
+        id: idString,
+        userId: 'any_user_id',
+        products: [{
+          id: 'any_product_id_1',
+          quantity: 1
         }]
       })
     })

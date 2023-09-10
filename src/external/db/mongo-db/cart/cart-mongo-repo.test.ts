@@ -44,37 +44,40 @@ describe('CartMongo Repository', () => {
     await cartCollection.deleteMany({})
   })
 
-  it('Should create a Cart if create is a success', async () => {
-    const sut = makeSut()
-    await sut.create(makeFakeCreateCartRepoData())
-    const cart = await cartCollection.findOne({ _id: objectId })
-    const cartWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeCreateCartRepoData())
-    expect(cart).toEqual(cartWithMongoId)
+  describe('create()', () => {
+    it('Should create a Cart if create is a success', async () => {
+      const sut = makeSut()
+      await sut.create(makeFakeCreateCartRepoData())
+      const cart = await cartCollection.findOne({ _id: objectId })
+      const cartWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeCreateCartRepoData())
+      expect(cart).toEqual(cartWithMongoId)
+    })
   })
 
-  it('Should add product to Cart if addProduct is a success', async () => {
-    const sut = makeSut()
-    await cartCollection.insertOne({
-      _id: objectId,
-      userId: 'any_user_id',
-      products: [{
-        id: 'another_product_id',
-        quantity: 1
-      }]
-    })
-    await sut.addProduct(makeFakeAddProductToCartRepoData())
-    const cart = await cartCollection.findOne({ _id: objectId })
-    console.log(cart)
-    expect(cart).toEqual({
-      _id: objectId,
-      userId: 'any_user_id',
-      products: [{
-        id: 'another_product_id',
-        quantity: 1
-      }, {
-        id: 'any_product_id',
-        quantity: 2
-      }]
+  describe('addProduct()', () => {
+    it('Should add product to Cart if addProduct is a success', async () => {
+      const sut = makeSut()
+      await cartCollection.insertOne({
+        _id: objectId,
+        userId: 'any_user_id',
+        products: [{
+          id: 'another_product_id',
+          quantity: 1
+        }]
+      })
+      await sut.addProduct(makeFakeAddProductToCartRepoData())
+      const cart = await cartCollection.findOne({ _id: objectId })
+      expect(cart).toEqual({
+        _id: objectId,
+        userId: 'any_user_id',
+        products: [{
+          id: 'another_product_id',
+          quantity: 1
+        }, {
+          id: 'any_product_id',
+          quantity: 2
+        }]
+      })
     })
   })
 })

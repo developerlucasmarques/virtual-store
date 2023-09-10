@@ -130,7 +130,7 @@ describe('CartMongo Repository', () => {
         userId: 'any_user_id',
         products: [{
           id: 'any_product_id_1',
-          quantity: 3
+          quantity: 2
         }]
       })
     })

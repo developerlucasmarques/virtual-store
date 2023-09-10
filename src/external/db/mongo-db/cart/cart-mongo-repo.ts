@@ -28,7 +28,7 @@ export class CartMongoRepo implements CreateCartRepo, AddProductToCartRepo, Load
     const cartCollection = await MongoHelper.getCollection('cart')
     await cartCollection.updateOne(
       { _id: objectId, 'products.id': data.product.id },
-      { $inc: { 'products.$.quantity': data.product.quantity } }
+      { $set: { 'products.$.quantity': data.product.quantity } }
     )
   }
 }

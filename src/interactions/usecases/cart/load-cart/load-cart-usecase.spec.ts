@@ -1,7 +1,7 @@
 import type { CartModel, ProductModel } from '@/domain/models'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { LoadCartUseCase } from './load-cart-usecase'
-import { EmptyCartError } from '@/domain/usecases-contracts/errors'
+import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
@@ -93,5 +93,14 @@ describe('LoadCart UseCase', () => {
     const loadByUserIdSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
     await sut.perform('any_user_id')
     expect(loadByUserIdSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2'])
+  })
+
+  it('Should return ProductNotAvailableError if LoadProductsByIdsRepo returns empty', async () => {
+    const { sut, loadProductsByIdsRepoStub } = makeSut()
+    jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds').mockReturnValueOnce(
+      Promise.resolve([])
+    )
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_1'))
   })
 })

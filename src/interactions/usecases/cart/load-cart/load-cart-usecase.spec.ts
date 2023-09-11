@@ -1,5 +1,5 @@
-import type { CartModel } from '@/domain/models'
-import type { LoadCartByUserIdRepo } from '@/interactions/contracts'
+import type { CartModel, ProductModel } from '@/domain/models'
+import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { LoadCartUseCase } from './load-cart-usecase'
 import { EmptyCartError } from '@/domain/usecases-contracts/errors'
 
@@ -15,6 +15,18 @@ const makeFakeCartModel = (): CartModel => ({
   }]
 })
 
+const makeFakeProducts = (): ProductModel[] => [{
+  id: 'any_product_id_1',
+  name: 'any name',
+  amount: 10.90,
+  description: 'any description'
+}, {
+  id: 'any_product_id_2',
+  name: 'another name',
+  amount: 20.90,
+  description: 'another description'
+}]
+
 const makeLoadCartByUserIdRepo = (): LoadCartByUserIdRepo => {
   class LoadCartByUserIdRepoStub implements LoadCartByUserIdRepo {
     async loadByUserId (userId: string): Promise<null | CartModel> {
@@ -24,17 +36,29 @@ const makeLoadCartByUserIdRepo = (): LoadCartByUserIdRepo => {
   return new LoadCartByUserIdRepoStub()
 }
 
+const makeLoadProductsByIdsRepo = (): LoadProductsByIdsRepo => {
+  class LoadProductsByIdsRepoStub implements LoadProductsByIdsRepo {
+    async loadProductsByIds (productIds: string[]): Promise<ProductModel[]> {
+      return await Promise.resolve(makeFakeProducts())
+    }
+  }
+  return new LoadProductsByIdsRepoStub()
+}
+
 type SutTypes = {
   sut: LoadCartUseCase
   loadCartByUserIdRepoStub: LoadCartByUserIdRepo
+  loadProductsByIdsRepoStub: LoadProductsByIdsRepo
 }
 
 const makeSut = (): SutTypes => {
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
-  const sut = new LoadCartUseCase(loadCartByUserIdRepoStub)
+  const loadProductsByIdsRepoStub = makeLoadProductsByIdsRepo()
+  const sut = new LoadCartUseCase(loadCartByUserIdRepoStub, loadProductsByIdsRepoStub)
   return {
     sut,
-    loadCartByUserIdRepoStub
+    loadCartByUserIdRepoStub,
+    loadProductsByIdsRepoStub
   }
 }
 
@@ -62,5 +86,12 @@ describe('LoadCart UseCase', () => {
     })
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call LoadProductsByIdsRepo with correct product ids', async () => {
+    const { sut, loadProductsByIdsRepoStub } = makeSut()
+    const loadByUserIdSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
+    await sut.perform('any_user_id')
+    expect(loadByUserIdSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2'])
   })
 })

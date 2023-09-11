@@ -12,6 +12,9 @@ const makeFakeCartModel = (): CartModel => ({
   }, {
     id: 'any_product_id_2',
     quantity: 2
+  }, {
+    id: 'any_product_id_3',
+    quantity: 3
   }]
 })
 
@@ -22,8 +25,13 @@ const makeFakeProducts = (): ProductModel[] => [{
   description: 'any description'
 }, {
   id: 'any_product_id_2',
-  name: 'another name',
+  name: 'any name 2',
   amount: 20.90,
+  description: 'another description'
+}, {
+  id: 'any_product_id_3',
+  name: 'any name 3',
+  amount: 32.99,
   description: 'another description'
 }]
 
@@ -92,7 +100,7 @@ describe('LoadCart UseCase', () => {
     const { sut, loadProductsByIdsRepoStub } = makeSut()
     const loadByUserIdSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
     await sut.perform('any_user_id')
-    expect(loadByUserIdSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2'])
+    expect(loadByUserIdSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2', 'any_product_id_3'])
   })
 
   it('Should return ProductNotAvailableError if LoadProductsByIdsRepo returns empty', async () => {
@@ -102,5 +110,24 @@ describe('LoadCart UseCase', () => {
     )
     const result = await sut.perform('any_user_id')
     expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_1'))
+  })
+
+  it('Should return ProductNotAvailableError if LoadProductsByIdsRepo can\'t find one of the products', async () => {
+    const { sut, loadProductsByIdsRepoStub } = makeSut()
+    jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds').mockReturnValueOnce(
+      Promise.resolve([{
+        id: 'any_product_id_1',
+        name: 'any name',
+        amount: 10.90,
+        description: 'any description'
+      }, {
+        id: 'any_product_id_3',
+        name: 'any name 3',
+        amount: 32.99,
+        description: 'another description'
+      }])
+    )
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_2'))
   })
 })

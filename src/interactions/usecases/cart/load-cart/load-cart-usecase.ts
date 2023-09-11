@@ -1,5 +1,5 @@
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
-import { EmptyCartError } from '@/domain/usecases-contracts/errors'
+import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -15,7 +15,10 @@ export class LoadCartUseCase implements LoadCart {
       return left(new EmptyCartError())
     }
     const productIds = cart.products.map((product) => (product.id))
-    await this.loadProductsByIdsRepo.loadProductsByIds(productIds)
+    const products = await this.loadProductsByIdsRepo.loadProductsByIds(productIds)
+    if (products.length === 0) {
+      return left(new ProductNotAvailableError(productIds[0]))
+    }
     return right({
       id: '',
       userId: '',

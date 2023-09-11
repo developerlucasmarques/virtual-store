@@ -143,4 +143,13 @@ describe('LoadCart UseCase', () => {
     const result = await sut.perform('any_user_id')
     expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_2'))
   })
+
+  it('Should throw if LoadProductsByIdsRepo throws', async () => {
+    const { sut, loadProductsByIdsRepoStub } = makeSut()
+    jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
 })

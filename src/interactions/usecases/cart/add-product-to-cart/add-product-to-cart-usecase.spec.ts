@@ -180,6 +180,15 @@ describe('CartManager UseCase', () => {
     expect(loadByUserIdSpy).toHaveBeenCalledWith('any_user_id')
   })
 
+  it('Should throw if LoadCartByUserIdRepo throws', async () => {
+    const { sut, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform(makeFakeAddProductToCartData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call IdBuilder if LoadCartByUserIdRepo returns null', async () => {
     const { sut, idBuilderStub, loadCartByUserIdRepoStub } = makeSut()
     const buildSpy = jest.spyOn(idBuilderStub, 'build')

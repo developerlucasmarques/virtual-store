@@ -16,8 +16,11 @@ export class LoadCartUseCase implements LoadCart {
     }
     const productIds = cart.products.map((product) => (product.id))
     const products = await this.loadProductsByIdsRepo.loadProductsByIds(productIds)
-    if (products.length === 0) {
-      return left(new ProductNotAvailableError(productIds[0]))
+    for (const productId of productIds) {
+      const product = products.find((product) => (product.id === productId))
+      if (!product) {
+        return left(new ProductNotAvailableError(productId))
+      }
     }
     return right({
       id: '',

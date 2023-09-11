@@ -16,5 +16,6 @@
 ## Exceções
 
 - ❌ Retorna erro 404 se a API não existir
+- ❌ Retorna erro 401 se o client não informar o token ou se for inválido
 - ❌ Retorna erro 500 se der erro ao tentar decriptar token do usuário
 - ❌ Retorna erro 500 se der erro ao tentar buscar o carrinho do usuário

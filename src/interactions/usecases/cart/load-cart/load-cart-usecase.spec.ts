@@ -2,7 +2,7 @@ import type { CartModel, ProductModel } from '@/domain/models'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { LoadCartUseCase } from './load-cart-usecase'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
-import { type CartWithTotalModel } from '@/domain/models/cart-with-total'
+import type { CompleteCartModel } from '@/domain/models/complete-cart'
 
 const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
@@ -36,7 +36,7 @@ const makeFakeProducts = (): ProductModel[] => [{
   description: 'another description'
 }]
 
-const makeFakeCartWithTotalModel = (): CartWithTotalModel => ({
+const makeFakeCartWithTotalModel = (): CompleteCartModel => ({
   total: 151.67,
   products: [{
     id: 'any_product_id_1',

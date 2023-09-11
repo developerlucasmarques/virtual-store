@@ -5,7 +5,7 @@ export type ProductCartData = {
   quantity: number
 }
 
-export type CartWithTotalModel = {
+export type CompleteCartModel = {
   total: number
   products: ProductCartData[]
 }

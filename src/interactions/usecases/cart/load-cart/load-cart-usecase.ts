@@ -1,4 +1,4 @@
-import type { CartWithTotalModel, ProductCartData } from '@/domain/models'
+import type { CompleteCartModel, ProductCartData } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
@@ -39,7 +39,7 @@ export class LoadCartUseCase implements LoadCart {
         }
       }
     }
-    const cartWithTotal: CartWithTotalModel = {
+    const cartWithTotal: CompleteCartModel = {
       total: 0,
       products: cartProducts
     }

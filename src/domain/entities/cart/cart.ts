@@ -1,8 +1,8 @@
-import type { ProductCartData } from '@/domain/models'
-import type { CalculateCartData, CalculattionCartTotal, Total } from './contracts/calculation-cart-total'
+import type { CompleteCartModel, ProductCartData } from '@/domain/models'
+import type { CreationCart, CreateCartData } from '.'
 
-export class CalculateCartTotal implements CalculattionCartTotal {
-  execute (data: CalculateCartData): Total {
+export class Cart implements CreationCart {
+  execute (data: CreateCartData): CompleteCartModel {
     const { cartModel, products } = data
     const productsCart: ProductCartData[] = products.map(
       ({ description, ...rest }) => ({ ...rest, quantity: 0 })
@@ -16,6 +16,6 @@ export class CalculateCartTotal implements CalculattionCartTotal {
     }
     let total = 0
     productsCart.forEach((product) => { total += product.amount * product.quantity })
-    return { total }
+    return { total, products: productsCart }
   }
 }

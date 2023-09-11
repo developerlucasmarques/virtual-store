@@ -87,6 +87,19 @@ describe('LoadCart UseCase', () => {
     expect(result.value).toEqual(new EmptyCartError())
   })
 
+  it('Should return EmptyCartError if LoadCartByUserIdRepo returns an empty product list', async () => {
+    const { sut, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(
+      Promise.resolve({
+        id: 'any_id',
+        userId: 'any_user_id',
+        products: []
+      })
+    )
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(new EmptyCartError())
+  })
+
   it('Should throw if LoadCartByUserIdRepo throws', async () => {
     const { sut, loadCartByUserIdRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockImplementation(() => {

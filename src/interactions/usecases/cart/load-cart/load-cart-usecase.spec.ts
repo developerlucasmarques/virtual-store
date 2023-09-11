@@ -54,4 +54,13 @@ describe('LoadCart UseCase', () => {
     const result = await sut.perform('any_user_id')
     expect(result.value).toEqual(new EmptyCartError())
   })
+
+  it('Should throw if LoadCartByUserIdRepo throws', async () => {
+    const { sut, loadCartByUserIdRepoStub } = makeSut()
+    jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
 })

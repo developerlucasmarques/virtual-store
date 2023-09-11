@@ -11,7 +11,7 @@ export class LoadCartUseCase implements LoadCart {
 
   async perform (userId: string): Promise<LoadCartResponse> {
     const cart = await this.loadCartByUserIdRepo.loadByUserId(userId)
-    if (!cart) {
+    if (!cart || cart.products.length === 0) {
       return left(new EmptyCartError())
     }
     const productIds = cart.products.map((product) => (product.id))

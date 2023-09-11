@@ -2,6 +2,7 @@ import type { CartModel, ProductModel } from '@/domain/models'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { LoadCartUseCase } from './load-cart-usecase'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { type CartWithTotalModel } from '@/domain/models/cart-with-total'
 
 const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
@@ -34,6 +35,26 @@ const makeFakeProducts = (): ProductModel[] => [{
   amount: 32.99,
   description: 'another description'
 }]
+
+const makeFakeCartWithTotalModel = (): CartWithTotalModel => ({
+  total: 151.67,
+  products: [{
+    id: 'any_product_id_1',
+    name: 'any name',
+    amount: 10.90,
+    quantity: 1
+  }, {
+    id: 'any_product_id_2',
+    name: 'any name 2',
+    amount: 20.90,
+    quantity: 2
+  }, {
+    id: 'any_product_id_3',
+    name: 'any name 3',
+    amount: 32.99,
+    quantity: 3
+  }]
+})
 
 const makeLoadCartByUserIdRepo = (): LoadCartByUserIdRepo => {
   class LoadCartByUserIdRepoStub implements LoadCartByUserIdRepo {
@@ -151,5 +172,11 @@ describe('LoadCart UseCase', () => {
     })
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should return CartWithTotalModel if LoadProductsByIdsRepo is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(makeFakeCartWithTotalModel())
   })
 })

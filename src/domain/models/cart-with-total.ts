@@ -6,8 +6,6 @@ export type ProductCartData = {
 }
 
 export type CartWithTotalModel = {
-  id: string
-  userId: string
   total: number
   products: ProductCartData[]
 }

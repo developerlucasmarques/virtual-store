@@ -1,3 +1,4 @@
+import type { CartWithTotalModel, ProductCartData } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
@@ -22,16 +23,29 @@ export class LoadCartUseCase implements LoadCart {
         return left(new ProductNotAvailableError(productId))
       }
     }
-    return right({
-      id: '',
-      userId: '',
-      total: 0,
-      products: [{
-        id: '',
-        name: '',
-        amount: 0,
+    const cartProducts: ProductCartData[] = []
+    for (const product of products) {
+      cartProducts.push({
+        id: product.id,
+        name: product.name,
+        amount: product.amount,
         quantity: 0
-      }]
-    })
+      })
+    }
+    for (let i = 0; i < cartProducts.length; i++) {
+      for (const product of cart.products) {
+        if (product.id === cartProducts[i].id) {
+          cartProducts[i].quantity = product.quantity
+        }
+      }
+    }
+    const cartWithTotal: CartWithTotalModel = {
+      total: 0,
+      products: cartProducts
+    }
+    for (const product of cartWithTotal.products) {
+      cartWithTotal.total += product.quantity * product.amount
+    }
+    return right(cartWithTotal)
   }
 }

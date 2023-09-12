@@ -152,9 +152,16 @@ describe('LoadCart UseCase', () => {
 
   it('Should call LoadProductsByIdsRepo with correct product ids', async () => {
     const { sut, loadProductsByIdsRepoStub } = makeSut()
-    const loadByUserIdSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
+    const loadProductsByIdsSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
     await sut.perform('any_user_id')
-    expect(loadByUserIdSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2', 'any_product_id_3'])
+    expect(loadProductsByIdsSpy).toHaveBeenCalledWith(['any_product_id_1', 'any_product_id_2', 'any_product_id_3'])
+  })
+
+  it('Should call LoadProductsByIdsRepo only once', async () => {
+    const { sut, loadProductsByIdsRepoStub } = makeSut()
+    const loadProductsByIdsSpy = jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds')
+    await sut.perform('any_user_id')
+    expect(loadProductsByIdsSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should return ProductNotAvailableError if LoadProductsByIdsRepo returns empty', async () => {

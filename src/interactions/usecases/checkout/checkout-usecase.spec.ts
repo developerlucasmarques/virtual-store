@@ -62,4 +62,11 @@ describe('Checkout UseCase', () => {
     const result = await sut.perform('any_user_id')
     expect(result.value).toEqual(new Error('any_message'))
   })
+
+  it('Should call LoadCart only once', async () => {
+    const { sut, loadCartStub } = makeSut()
+    const performSpy = jest.spyOn(loadCartStub, 'perform')
+    await sut.perform('any_user_id')
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
 })

@@ -1,3 +1,4 @@
+import type { CreateCart } from '@/domain/entities/contracts'
 import type { CompleteCartModel, ProductCartData } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
@@ -7,7 +8,8 @@ import { left, right } from '@/shared/either'
 export class LoadCartUseCase implements LoadCart {
   constructor (
     private readonly loadCartByUserIdRepo: LoadCartByUserIdRepo,
-    private readonly loadProductsByIdsRepo: LoadProductsByIdsRepo
+    private readonly loadProductsByIdsRepo: LoadProductsByIdsRepo,
+    private readonly createCart: CreateCart
   ) {}
 
   async perform (userId: string): Promise<LoadCartResponse> {
@@ -23,6 +25,7 @@ export class LoadCartUseCase implements LoadCart {
         return left(new ProductNotAvailableError(productId))
       }
     }
+    this.createCart.create({ cartModel: cart, products })
     const cartProducts: ProductCartData[] = []
     for (const product of products) {
       cartProducts.push({

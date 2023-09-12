@@ -112,6 +112,13 @@ describe('LoadCart UseCase', () => {
     expect(loadByUserIdSpy).toHaveBeenCalledWith('any_user_id')
   })
 
+  it('Should call LoadCartByUserIdRepo only once', async () => {
+    const { sut, loadCartByUserIdRepoStub } = makeSut()
+    const loadByUserIdSpy = jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId')
+    await sut.perform('any_user_id')
+    expect(loadByUserIdSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return EmptyCartError if LoadCartByUserIdRepo returns null', async () => {
     const { sut, loadCartByUserIdRepoStub } = makeSut()
     jest.spyOn(loadCartByUserIdRepoStub, 'loadByUserId').mockReturnValueOnce(

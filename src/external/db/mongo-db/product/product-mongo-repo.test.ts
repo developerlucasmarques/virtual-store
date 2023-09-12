@@ -83,4 +83,23 @@ describe('ProductMongo Repository', () => {
       expect(product).toBeNull()
     })
   })
+
+  describe('loadProductsByIds()', () => {
+    it('Should load many products by ids on success', async () => {
+      const sut = makeSut()
+      const anotherObjectId = new ObjectId()
+      const anotherStringId = anotherObjectId.toHexString()
+      const anyProduct = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const anotherProduct = {
+        _id: anotherObjectId,
+        name: 'another name',
+        amount: 11.90,
+        description: 'any description'
+      }
+      await productCollection.insertMany([anyProduct, anotherProduct])
+      const products = await sut.loadProductsByIds([idString, anotherStringId])
+      expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
+      expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+    })
+  })
 })

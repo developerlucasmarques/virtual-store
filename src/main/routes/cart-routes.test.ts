@@ -7,10 +7,26 @@ import env from '../config/env'
 
 let productCollection: Collection
 let userCollection: Collection
+let cartCollection: Collection
 
 const productObjectId = new ObjectId()
 const productIdString = productObjectId.toHexString()
 const userObjectId = new ObjectId()
+const userIdString = userObjectId.toHexString()
+const cartObjectId = new ObjectId()
+
+const makeAccessToken = async (): Promise<string> => {
+  const accessToken = sign({ id: userObjectId }, env.jwtSecretKey)
+  userCollection = await MongoHelper.getCollection('user')
+  await userCollection.insertOne({
+    _id: userObjectId,
+    name: 'any name',
+    email: 'any_email@mail.com',
+    password: 'any_password',
+    accessToken
+  })
+  return accessToken
+}
 
 describe('Cart Routes', () => {
   beforeAll(async () => {
@@ -24,19 +40,14 @@ describe('Cart Routes', () => {
   beforeEach(async () => {
     productCollection = await MongoHelper.getCollection('product')
     userCollection = await MongoHelper.getCollection('user')
+    cartCollection = await MongoHelper.getCollection('cart')
     await productCollection.deleteMany({})
     await userCollection.deleteMany({})
+    await cartCollection.deleteMany({})
   })
 
-  describe('/cart', () => {
+  describe('POST /cart', () => {
     it('Should return 204 on cart', async () => {
-      const accessToken = sign({ id: userObjectId }, env.jwtSecretKey)
-      await userCollection.insertOne({
-        _id: userObjectId,
-        name: 'any name',
-        email: 'any_email@mail.com',
-        password: 'any_password'
-      })
       await productCollection.insertOne({
         _id: productObjectId,
         name: 'any_product_name',
@@ -45,7 +56,7 @@ describe('Cart Routes', () => {
       })
       await request(app)
         .post('/api/cart')
-        .set('x-access-token', accessToken)
+        .set('x-access-token', await makeAccessToken())
         .send({
           productId: productIdString,
           productQty: 2
@@ -67,6 +78,30 @@ describe('Cart Routes', () => {
           productQty: 2
         })
         .expect(401)
+    })
+  })
+
+  describe('GET /cart', () => {
+    it('Should return 200 on load cart', async () => {
+      const accessToken = await makeAccessToken()
+      await productCollection.insertOne({
+        _id: productObjectId,
+        name: 'any_product_name',
+        amount: 20.99,
+        description: 'any_description'
+      })
+      await cartCollection.insertOne({
+        _id: cartObjectId,
+        userId: userIdString,
+        products: [{
+          id: productIdString,
+          quantity: 2
+        }]
+      })
+      await request(app)
+        .get('/api/cart')
+        .set('x-access-token', accessToken)
+        .expect(200)
     })
   })
 })

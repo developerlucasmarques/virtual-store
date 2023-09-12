@@ -18,8 +18,6 @@ export class CheckoutUseCase implements Checkout {
     if (!checkoutResult) {
       return left(new CheckoutFailureError())
     }
-    return right({
-      value: ''
-    })
+    return right(checkoutResult)
   }
 }

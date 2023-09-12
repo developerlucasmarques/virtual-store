@@ -1,7 +1,8 @@
 import type { CompleteCartModel } from '@/domain/models'
-import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { left, right } from '@/shared/either'
 import { CheckoutUseCase } from './checkout-usecase'
+import { type CheckoutGateway } from '@/interactions/contracts'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   total: 151.67,
@@ -32,17 +33,29 @@ const makeLoadCartStub = (): LoadCart => {
   return new LoadCartStub()
 }
 
+const makeCheckoutGatewayStub = (): CheckoutGateway => {
+  class CheckoutGatewayStub implements CheckoutGateway {
+    async payment (data: CompleteCartModel): Promise<CheckoutResponseValue> {
+      return await Promise.resolve({ value: 'any_value' })
+    }
+  }
+  return new CheckoutGatewayStub()
+}
+
 type SutTypes = {
   sut: CheckoutUseCase
   loadCartStub: LoadCart
+  checkoutGatewayStub: CheckoutGateway
 }
 
 const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
-  const sut = new CheckoutUseCase(loadCartStub)
+  const checkoutGatewayStub = makeCheckoutGatewayStub()
+  const sut = new CheckoutUseCase(loadCartStub, checkoutGatewayStub)
   return {
     sut,
-    loadCartStub
+    loadCartStub,
+    checkoutGatewayStub
   }
 }
 
@@ -68,5 +81,12 @@ describe('Checkout UseCase', () => {
     const performSpy = jest.spyOn(loadCartStub, 'perform')
     await sut.perform('any_user_id')
     expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should call CheckoutGateway with correct values', async () => {
+    const { sut, checkoutGatewayStub } = makeSut()
+    const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')
+    await sut.perform('any_user_id')
+    expect(paymentSpy).toHaveBeenCalledWith(makeFakeCompleteCartModel())
   })
 })

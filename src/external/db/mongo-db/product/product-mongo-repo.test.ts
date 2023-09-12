@@ -120,5 +120,13 @@ describe('ProductMongo Repository', () => {
       expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
       expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
     })
+
+    it('Should load empty list if no product was found', async () => {
+      const sut = makeSut()
+      const stringId1 = new ObjectId().toHexString()
+      const stringId2 = new ObjectId().toHexString()
+      const products = await sut.loadProductsByIds([stringId1, stringId2])
+      expect(products.length).toBe(0)
+    })
   })
 })

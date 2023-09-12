@@ -210,6 +210,12 @@ describe('LoadCart UseCase', () => {
       products: makeFakeProducts()
     })
   })
+  it('Should call CreateCart only once', async () => {
+    const { sut, createCartStub } = makeSut()
+    const createSpy = jest.spyOn(createCartStub, 'create')
+    await sut.perform('any_user_id')
+    expect(createSpy).toHaveBeenCalledTimes(1)
+  })
 
   it('Should throw if CreateCart throws', async () => {
     const { sut, createCartStub } = makeSut()

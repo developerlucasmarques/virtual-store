@@ -3,6 +3,7 @@ import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain
 import { left, right } from '@/shared/either'
 import { CheckoutUseCase } from './checkout-usecase'
 import { type CheckoutGateway } from '@/interactions/contracts'
+import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   total: 151.67,
@@ -88,5 +89,14 @@ describe('Checkout UseCase', () => {
     const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')
     await sut.perform('any_user_id')
     expect(paymentSpy).toHaveBeenCalledWith(makeFakeCompleteCartModel())
+  })
+
+  it('Should return CheckoutFailureError if CheckoutGateway returns null', async () => {
+    const { sut, checkoutGatewayStub } = makeSut()
+    jest.spyOn(checkoutGatewayStub, 'payment').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(new CheckoutFailureError())
   })
 })

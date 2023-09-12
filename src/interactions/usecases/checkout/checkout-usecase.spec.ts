@@ -120,6 +120,15 @@ describe('Checkout UseCase', () => {
     expect(result.value).toEqual(new CheckoutFailureError())
   })
 
+  it('Should throw if CheckoutGateway throws', async () => {
+    const { sut, checkoutGatewayStub } = makeSut()
+    jest.spyOn(checkoutGatewayStub, 'payment').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return CheckoutResponseValue if CheckoutGateway is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform('any_user_id')

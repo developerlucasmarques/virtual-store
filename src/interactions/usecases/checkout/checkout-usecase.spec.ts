@@ -95,6 +95,13 @@ describe('Checkout UseCase', () => {
     expect(paymentSpy).toHaveBeenCalledWith(makeFakeCompleteCartModel())
   })
 
+  it('Should call CheckoutGateway only once', async () => {
+    const { sut, checkoutGatewayStub } = makeSut()
+    const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')
+    await sut.perform('any_user_id')
+    expect(paymentSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return CheckoutFailureError if CheckoutGateway returns null', async () => {
     const { sut, checkoutGatewayStub } = makeSut()
     jest.spyOn(checkoutGatewayStub, 'payment').mockReturnValueOnce(

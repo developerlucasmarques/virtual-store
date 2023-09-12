@@ -1,9 +1,10 @@
 import type { CompleteCartModel } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import { ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { LoadCartController } from './load-cart-controller'
-import { badRequest, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -59,13 +60,13 @@ describe('LoadCart Controller', () => {
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return 400 if LoadCart returns an error', async () => {
+  it('Should return 404 if LoadCart returns ProductNotAvailableError', async () => {
     const { sut, loadCartStub } = makeSut()
     jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new Error('any_message')))
+      Promise.resolve(left(new ProductNotAvailableError('any_product_id')))
     )
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+    expect(httpResponse).toEqual(notFound(new ProductNotAvailableError('any_product_id')))
   })
 
   it('Should return 500 if LoadCart throws', async () => {

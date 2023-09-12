@@ -6,5 +6,5 @@ export type CheckoutGatewayResponse = {
 }
 
 export interface CheckoutGateway {
-  payment: (data: CompleteCartModel) => Promise<CheckoutResponseValue>
+  payment: (data: CompleteCartModel) => Promise<null | CheckoutResponseValue>
 }

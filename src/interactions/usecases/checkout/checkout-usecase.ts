@@ -1,4 +1,5 @@
 import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
+import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -13,7 +14,10 @@ export class CheckoutUseCase implements Checkout {
     if (loadCartResult.isLeft()) {
       return left(loadCartResult.value)
     }
-    await this.checkoutGateway.payment(loadCartResult.value)
+    const checkoutResult = await this.checkoutGateway.payment(loadCartResult.value)
+    if (!checkoutResult) {
+      return left(new CheckoutFailureError())
+    }
     return right({
       value: ''
     })

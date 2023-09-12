@@ -1,5 +1,4 @@
 import type { CreateCart } from '@/domain/entities/contracts'
-import type { CompleteCartModel, ProductCartData } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
@@ -25,30 +24,7 @@ export class LoadCartUseCase implements LoadCart {
         return left(new ProductNotAvailableError(productId))
       }
     }
-    this.createCart.create({ cartModel: cart, products })
-    const cartProducts: ProductCartData[] = []
-    for (const product of products) {
-      cartProducts.push({
-        id: product.id,
-        name: product.name,
-        amount: product.amount,
-        quantity: 0
-      })
-    }
-    for (let i = 0; i < cartProducts.length; i++) {
-      for (const product of cart.products) {
-        if (product.id === cartProducts[i].id) {
-          cartProducts[i].quantity = product.quantity
-        }
-      }
-    }
-    const cartWithTotal: CompleteCartModel = {
-      total: 0,
-      products: cartProducts
-    }
-    for (const product of cartWithTotal.products) {
-      cartWithTotal.total += product.quantity * product.amount
-    }
-    return right(cartWithTotal)
+    const completeCart = this.createCart.create({ cartModel: cart, products })
+    return right(completeCart)
   }
 }

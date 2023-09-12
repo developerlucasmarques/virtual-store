@@ -1,5 +1,5 @@
 import type { CartModel, CompleteCartModel, ProductModel } from '@/domain/models'
-import type { CreateCartData } from '../contracts/creation-cart'
+import type { CreateCartData } from '../contracts/create-cart'
 import { Cart } from './cart'
 
 const makeFakeCartModel = (): CartModel => ({
@@ -62,7 +62,7 @@ const makeFakeCreateCartData = (): CreateCartData => ({
 describe('Cart Entity', () => {
   it('Should return CompleteCartModel on success', async () => {
     const sut = new Cart()
-    const result = sut.execute(makeFakeCreateCartData())
+    const result = sut.create(makeFakeCreateCartData())
     expect(result).toEqual(makeFakeCartWithTotalModel())
   })
 })

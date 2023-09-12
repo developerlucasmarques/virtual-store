@@ -5,6 +5,6 @@ export type CreateCartData = {
   products: ProductModel[]
 }
 
-export interface CreationCart {
-  execute: (data: CreateCartData) => CompleteCartModel
+export interface CreateCart {
+  create: (data: CreateCartData) => CompleteCartModel
 }

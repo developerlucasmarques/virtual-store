@@ -1,8 +1,8 @@
 import type { CompleteCartModel, ProductCartData } from '@/domain/models'
-import type { CreationCart, CreateCartData } from '../contracts'
+import type { CreateCart, CreateCartData } from '../contracts'
 
-export class Cart implements CreationCart {
-  execute (data: CreateCartData): CompleteCartModel {
+export class Cart implements CreateCart {
+  create (data: CreateCartData): CompleteCartModel {
     const { cartModel, products } = data
     const productsCart: ProductCartData[] = products.map(
       ({ description, ...rest }) => ({ ...rest, quantity: 0 })

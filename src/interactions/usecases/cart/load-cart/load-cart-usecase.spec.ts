@@ -3,6 +3,7 @@ import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions
 import { LoadCartUseCase } from './load-cart-usecase'
 import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
 import type { CompleteCartModel } from '@/domain/models/complete-cart'
+import { type CreateCartData, type CreateCart } from '@/domain/entities/contracts'
 
 const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
@@ -74,20 +75,32 @@ const makeLoadProductsByIdsRepo = (): LoadProductsByIdsRepo => {
   return new LoadProductsByIdsRepoStub()
 }
 
+const makeCreateCartStub = (): CreateCart => {
+  class CreateCartStub implements CreateCart {
+    create (data: CreateCartData): CompleteCartModel {
+      return makeFakeCartWithTotalModel()
+    }
+  }
+  return new CreateCartStub()
+}
+
 type SutTypes = {
   sut: LoadCartUseCase
   loadCartByUserIdRepoStub: LoadCartByUserIdRepo
   loadProductsByIdsRepoStub: LoadProductsByIdsRepo
+  createCartStub: CreateCart
 }
 
 const makeSut = (): SutTypes => {
   const loadCartByUserIdRepoStub = makeLoadCartByUserIdRepo()
   const loadProductsByIdsRepoStub = makeLoadProductsByIdsRepo()
-  const sut = new LoadCartUseCase(loadCartByUserIdRepoStub, loadProductsByIdsRepoStub)
+  const createCartStub = makeCreateCartStub()
+  const sut = new LoadCartUseCase(loadCartByUserIdRepoStub, loadProductsByIdsRepoStub, createCartStub)
   return {
     sut,
     loadCartByUserIdRepoStub,
-    loadProductsByIdsRepoStub
+    loadProductsByIdsRepoStub,
+    createCartStub
   }
 }
 
@@ -172,6 +185,16 @@ describe('LoadCart UseCase', () => {
     })
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call CreateCart with correct values', async () => {
+    const { sut, createCartStub } = makeSut()
+    const createSpy = jest.spyOn(createCartStub, 'create')
+    await sut.perform('any_user_id')
+    expect(createSpy).toHaveBeenCalledWith({
+      cartModel: makeFakeCartModel(),
+      products: makeFakeProducts()
+    })
   })
 
   it('Should return CartWithTotalModel if LoadProductsByIdsRepo is a success', async () => {

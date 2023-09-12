@@ -88,6 +88,15 @@ describe('Checkout UseCase', () => {
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('Should throw if LoadCart throws', async () => {
+    const { sut, loadCartStub } = makeSut()
+    jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call CheckoutGateway with correct values', async () => {
     const { sut, checkoutGatewayStub } = makeSut()
     const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')

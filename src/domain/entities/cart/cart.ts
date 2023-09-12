@@ -1,5 +1,5 @@
 import type { CompleteCartModel, ProductCartData } from '@/domain/models'
-import type { CreationCart, CreateCartData } from '.'
+import type { CreationCart, CreateCartData } from '../contracts'
 
 export class Cart implements CreationCart {
   execute (data: CreateCartData): CompleteCartModel {

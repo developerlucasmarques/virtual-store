@@ -1,5 +1,5 @@
 import type { CartModel, CompleteCartModel, ProductModel } from '@/domain/models'
-import type { CreateCartData } from './contracts/creation-cart'
+import type { CreateCartData } from '../contracts/creation-cart'
 import { Cart } from './cart'
 
 const makeFakeCartModel = (): CartModel => ({

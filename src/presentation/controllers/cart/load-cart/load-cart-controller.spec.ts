@@ -52,6 +52,13 @@ describe('LoadCart Controller', () => {
     expect(performSpy).toHaveBeenCalledWith('any_user_id')
   })
 
+  it('Should call LoadCart only once', async () => {
+    const { sut, loadCartStub } = makeSut()
+    const performSpy = jest.spyOn(loadCartStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return 400 if LoadCart returns an error', async () => {
     const { sut, loadCartStub } = makeSut()
     jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(

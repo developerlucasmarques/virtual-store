@@ -128,5 +128,11 @@ describe('ProductMongo Repository', () => {
       const products = await sut.loadProductsByIds([stringId1, stringId2])
       expect(products.length).toBe(0)
     })
+
+    it('Should load empty list if no Id provided', async () => {
+      const sut = makeSut()
+      const products = await sut.loadProductsByIds([])
+      expect(products.length).toBe(0)
+    })
   })
 })

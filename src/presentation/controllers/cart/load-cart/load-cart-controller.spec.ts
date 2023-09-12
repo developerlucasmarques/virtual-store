@@ -1,7 +1,7 @@
 import type { CompleteCartModel } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
-import { ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
-import { notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
+import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { noContent, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { LoadCartController } from './load-cart-controller'
@@ -67,6 +67,15 @@ describe('LoadCart Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(notFound(new ProductNotAvailableError('any_product_id')))
+  })
+
+  it('Should return 204 if LoadCart returns EmptyCartError', async () => {
+    const { sut, loadCartStub } = makeSut()
+    jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new EmptyCartError()))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(noContent())
   })
 
   it('Should return 500 if LoadCart throws', async () => {

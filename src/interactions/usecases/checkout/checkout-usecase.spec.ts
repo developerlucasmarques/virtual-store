@@ -1,6 +1,6 @@
 import type { CompleteCartModel } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 import { CheckoutUseCase } from './checkout-usecase'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
@@ -52,5 +52,14 @@ describe('Checkout UseCase', () => {
     const performSpy = jest.spyOn(loadCartStub, 'perform')
     await sut.perform('any_user_id')
     expect(performSpy).toHaveBeenCalledWith('any_user_id')
+  })
+
+  it('Should return an error if LoadCart returns an error', async () => {
+    const { sut, loadCartStub } = makeSut()
+    jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(new Error('any_message'))
   })
 })

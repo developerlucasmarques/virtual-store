@@ -20,7 +20,7 @@ describe('Access Routes', () => {
     await userCollection.deleteMany({})
   })
 
-  describe('/signup', () => {
+  describe('POST /signup', () => {
     it('Should return 201 on signup', async () => {
       await request(app)
         .post('/api/signup')
@@ -34,7 +34,7 @@ describe('Access Routes', () => {
     })
   })
 
-  describe('/login', () => {
+  describe('POST /login', () => {
     it('Should return 200 on login', async () => {
       const encryptedPassword = await hash('abcd1234', 12)
       await userCollection.insertOne({

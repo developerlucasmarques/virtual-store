@@ -197,6 +197,15 @@ describe('LoadCart UseCase', () => {
     })
   })
 
+  it('Should throw if CreateCart throws', async () => {
+    const { sut, createCartStub } = makeSut()
+    jest.spyOn(createCartStub, 'create').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return CartWithTotalModel if LoadProductsByIdsRepo is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform('any_user_id')

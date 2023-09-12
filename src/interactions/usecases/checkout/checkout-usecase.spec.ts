@@ -25,6 +25,10 @@ const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   }]
 })
 
+const makeCheckoutResponseValue = (): CheckoutResponseValue => ({
+  value: 'any_value'
+})
+
 const makeLoadCartStub = (): LoadCart => {
   class LoadCartStub implements LoadCart {
     async perform (userId: string): Promise<LoadCartResponse> {
@@ -37,7 +41,7 @@ const makeLoadCartStub = (): LoadCart => {
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
   class CheckoutGatewayStub implements CheckoutGateway {
     async payment (data: CompleteCartModel): Promise<CheckoutResponseValue> {
-      return await Promise.resolve({ value: 'any_value' })
+      return await Promise.resolve(makeCheckoutResponseValue())
     }
   }
   return new CheckoutGatewayStub()
@@ -98,5 +102,11 @@ describe('Checkout UseCase', () => {
     )
     const result = await sut.perform('any_user_id')
     expect(result.value).toEqual(new CheckoutFailureError())
+  })
+
+  it('Should return CheckoutResponseValue if CheckoutGateway is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform('any_user_id')
+    expect(result.value).toEqual(makeCheckoutResponseValue())
   })
 })

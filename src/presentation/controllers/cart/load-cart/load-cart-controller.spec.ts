@@ -3,7 +3,7 @@ import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { LoadCartController } from './load-cart-controller'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -75,5 +75,11 @@ describe('LoadCart Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new Error()))
+  })
+
+  it('Should return 200 if LoadCart is a success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(ok(makeFakeCompleteCartModel()))
   })
 })

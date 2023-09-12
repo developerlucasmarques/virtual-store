@@ -37,7 +37,7 @@ const makeFakeProducts = (): ProductModel[] => [{
   description: 'another description'
 }]
 
-const makeFakeCartWithTotalModel = (): CompleteCartModel => ({
+const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   total: 151.67,
   products: [{
     id: 'any_product_id_1',
@@ -78,7 +78,7 @@ const makeLoadProductsByIdsRepo = (): LoadProductsByIdsRepo => {
 const makeCreateCartStub = (): CreateCart => {
   class CreateCartStub implements CreateCart {
     create (data: CreateCartData): CompleteCartModel {
-      return makeFakeCartWithTotalModel()
+      return makeFakeCompleteCartModel()
     }
   }
   return new CreateCartStub()
@@ -206,9 +206,9 @@ describe('LoadCart UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return CartWithTotalModel if LoadProductsByIdsRepo is a success', async () => {
+  it('Should return CompleteCartModel if CreateCart is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform('any_user_id')
-    expect(result.value).toEqual(makeFakeCartWithTotalModel())
+    expect(result.value).toEqual(makeFakeCompleteCartModel())
   })
 })

@@ -3,7 +3,7 @@ import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { LoadCartController } from './load-cart-controller'
-import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -66,5 +66,14 @@ describe('LoadCart Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
+  it('Should return 500 if LoadCart throws', async () => {
+    const { sut, loadCartStub } = makeSut()
+    jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
 })

@@ -1,8 +1,9 @@
 import type { CompleteCartModel } from '@/domain/models'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 import { LoadCartController } from './load-cart-controller'
+import { badRequest } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -49,5 +50,14 @@ describe('LoadCart Controller', () => {
     const performSpy = jest.spyOn(loadCartStub, 'perform')
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledWith('any_user_id')
+  })
+
+  it('Should return 400 if LoadCart returns an error', async () => {
+    const { sut, loadCartStub } = makeSut()
+    jest.spyOn(loadCartStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 })

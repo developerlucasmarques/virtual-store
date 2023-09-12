@@ -16,6 +16,6 @@ export class Cart implements CreateCart {
     }
     let total = 0
     productsCart.forEach((product) => { total += product.amount * product.quantity })
-    return { total, products: productsCart }
+    return { total: Number(total.toFixed(2)), products: productsCart }
   }
 }

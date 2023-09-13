@@ -1,6 +1,8 @@
+import env from '@/main/config/env'
 import Stripe from 'stripe'
 import { StripeHelper as sut } from './stripe-helper'
-import env from '@/main/config/env'
+
+jest.mock('stripe')
 
 describe('Stripe Helper', () => {
   beforeEach(() => {
@@ -12,6 +14,11 @@ describe('Stripe Helper', () => {
     expect(sut.client).toBeInstanceOf(Stripe)
   })
 
+  it('Should call Stripe', async () => {
+    await sut.connect(env.stripeKey)
+    expect(Stripe).toBeCalled()
+  })
+
   it('Should reconnect if key not provided in connection', async () => {
     await sut.connect('')
     expect(sut.client).toBeInstanceOf(Stripe)
@@ -21,5 +28,11 @@ describe('Stripe Helper', () => {
     await sut.connect(env.stripeKey)
     const instance = await sut.getInstance()
     expect(instance).toBeInstanceOf(Stripe)
+  })
+
+  it('Should disconnect', async () => {
+    await sut.connect('')
+    sut.disconnect()
+    expect(sut.client).toBeNull()
   })
 })

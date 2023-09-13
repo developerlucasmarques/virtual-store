@@ -2,7 +2,7 @@ import type { CompleteCartModel } from '@/domain/models'
 import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { left, right } from '@/shared/either'
 import { CheckoutUseCase } from './checkout-usecase'
-import { type CheckoutGateway } from '@/interactions/contracts'
+import { type CheckoutGatewayResponse, type CheckoutGateway } from '@/interactions/contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
@@ -26,7 +26,7 @@ const makeFakeCompleteCartModel = (): CompleteCartModel => ({
 })
 
 const makeCheckoutResponseValue = (): CheckoutResponseValue => ({
-  value: 'any_value'
+  url: 'any_url'
 })
 
 const makeLoadCartStub = (): LoadCart => {
@@ -40,7 +40,7 @@ const makeLoadCartStub = (): LoadCart => {
 
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
   class CheckoutGatewayStub implements CheckoutGateway {
-    async payment (data: CompleteCartModel): Promise<CheckoutResponseValue> {
+    async payment (data: CompleteCartModel): Promise<CheckoutGatewayResponse> {
       return await Promise.resolve(makeCheckoutResponseValue())
     }
   }

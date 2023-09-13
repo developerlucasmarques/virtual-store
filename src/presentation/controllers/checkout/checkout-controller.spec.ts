@@ -12,7 +12,7 @@ const makeFakeRequest = (): HttpRequest => ({
 })
 
 const makeFakeCheckoutResponseValue = (): CheckoutResponseValue => ({
-  value: 'any_value'
+  url: 'any_url'
 })
 
 const makeCheckout = (): Checkout => {

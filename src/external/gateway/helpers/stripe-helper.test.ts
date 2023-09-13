@@ -12,4 +12,10 @@ describe('Stripe Helper', () => {
     const promise = sut.connect('')
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return Stripe instance if getInstance is a success', async () => {
+    await sut.connect(env.stripeKey)
+    const instance = sut.getInstance()
+    expect(instance).toBeInstanceOf(Stripe)
+  })
 })

@@ -43,4 +43,11 @@ describe('Checkout Controller', () => {
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledWith('any_user_id')
   })
+
+  it('Should call Checkout only once', async () => {
+    const { sut, checkoutStub } = makeSut()
+    const performSpy = jest.spyOn(checkoutStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
 })

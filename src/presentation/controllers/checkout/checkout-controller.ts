@@ -1,7 +1,7 @@
 import type { Checkout } from '@/domain/usecases-contracts'
 import { CheckoutFailureError, EmptyCartError } from '@/domain/usecases-contracts/errors'
 import type { Controller } from '@/presentation/contracts'
-import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class CheckoutController implements Controller {
@@ -19,7 +19,7 @@ export class CheckoutController implements Controller {
         }
         return notFound(checkoutResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return ok(checkoutResult.value)
     } catch (error: any) {
       return serverError(error)
     }

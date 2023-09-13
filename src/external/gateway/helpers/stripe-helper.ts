@@ -7,9 +7,6 @@ export const StripeHelper = {
   async connect (key: string | undefined): Promise<void> {
     if (!key) {
       this.client = new Stripe(env.stripeKey, { apiVersion: '2023-08-16' })
-      if (!(this.client instanceof Stripe)) {
-        throw new Error('Stripe key is required')
-      }
       return
     }
     this.client = new Stripe(key, { apiVersion: '2023-08-16' })

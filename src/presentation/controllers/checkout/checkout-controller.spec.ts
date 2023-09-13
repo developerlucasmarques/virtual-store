@@ -3,7 +3,7 @@ import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { CheckoutController } from './checkout-controller'
 import { CheckoutFailureError, EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
-import { badRequest, notFound, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, notFound, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -87,5 +87,11 @@ describe('Checkout Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new Error()))
+  })
+
+  it('Should return 200 if Checkout is a success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(ok(makeFakeCheckoutResponseValue()))
   })
 })

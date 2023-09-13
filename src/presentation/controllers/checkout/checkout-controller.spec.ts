@@ -2,8 +2,8 @@ import type { Checkout, CheckoutResponse, CheckoutResponseValue } from '@/domain
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { CheckoutController } from './checkout-controller'
-import { ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
-import { notFound } from '@/presentation/helpers/http/http-helpers'
+import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { badRequest, notFound } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -60,5 +60,14 @@ describe('Checkout Controller', () => {
     )
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(notFound(new ProductNotAvailableError('any_product_id')))
+  })
+
+  it('Should return 400 if Checkout returns EmptyCartError', async () => {
+    const { sut, checkoutStub } = makeSut()
+    jest.spyOn(checkoutStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new EmptyCartError()))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(badRequest(new EmptyCartError()))
   })
 })

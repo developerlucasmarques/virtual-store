@@ -1,7 +1,9 @@
 import type { Checkout, CheckoutResponse, CheckoutResponseValue } from '@/domain/usecases-contracts'
 import type { HttpRequest } from '@/presentation/http-types/http'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 import { CheckoutController } from './checkout-controller'
+import { ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { notFound } from '@/presentation/helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -49,5 +51,14 @@ describe('Checkout Controller', () => {
     const performSpy = jest.spyOn(checkoutStub, 'perform')
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return 404 if Checkout returns ProductNotAvailableError', async () => {
+    const { sut, checkoutStub } = makeSut()
+    jest.spyOn(checkoutStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new ProductNotAvailableError('any_product_id')))
+    )
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(notFound(new ProductNotAvailableError('any_product_id')))
   })
 })

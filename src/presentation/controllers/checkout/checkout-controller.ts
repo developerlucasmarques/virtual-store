@@ -8,16 +8,20 @@ export class CheckoutController implements Controller {
   constructor (private readonly checkout: Checkout) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const checkoutResult = await this.checkout.perform(httpRequest.headers.userId)
-    if (checkoutResult.isLeft()) {
-      if (checkoutResult.value instanceof EmptyCartError) {
-        return badRequest(checkoutResult.value)
+    try {
+      const checkoutResult = await this.checkout.perform(httpRequest.headers.userId)
+      if (checkoutResult.isLeft()) {
+        if (checkoutResult.value instanceof EmptyCartError) {
+          return badRequest(checkoutResult.value)
+        }
+        if (checkoutResult.value instanceof CheckoutFailureError) {
+          return serverError(checkoutResult.value)
+        }
+        return notFound(checkoutResult.value)
       }
-      if (checkoutResult.value instanceof CheckoutFailureError) {
-        return serverError(checkoutResult.value)
-      }
-      return notFound(checkoutResult.value)
+      return { statusCode: 0, body: '' }
+    } catch (error: any) {
+      return serverError(error)
     }
-    return { statusCode: 0, body: '' }
   }
 }

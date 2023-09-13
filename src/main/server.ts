@@ -1,7 +1,7 @@
 import 'module-alias/register'
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
 import env from './config/env'
-import { StripeHelper } from '@/external/gateway/helpers/stripe-helper'
+import { StripeHelper } from '@/external/gateway/stripe/helpers/stripe-helper'
 
 MongoHelper.connect(env.mongoUrl)
   .then(async () => {

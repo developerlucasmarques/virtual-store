@@ -4,7 +4,7 @@ import { makeCustomerMiddleware } from '../middlewares'
 import { makeCheckoutController } from '../factories/controllers/checkout'
 
 export default async (router: Router): Promise<void> => {
-  router.post(
+  router.get(
     '/checkout',
     adaptMiddleware(makeCustomerMiddleware()),
     adaptRoute(makeCheckoutController())

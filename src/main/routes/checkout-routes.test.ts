@@ -63,7 +63,7 @@ describe('Checkout Routes', () => {
     })
 
     await request(app)
-      .post('/api/checkout')
+      .get('/api/checkout')
       .set('x-access-token', await makeAccessToken())
       .expect(200)
   })

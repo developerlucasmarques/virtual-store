@@ -3,6 +3,8 @@ import type { CheckoutResponseValue } from '@/domain/usecases-contracts'
 
 export type CheckoutGatewayResponse = CheckoutResponseValue
 
+export type CheckoutGatewayData = CompleteCartModel & { email: string }
+
 export interface CheckoutGateway {
-  payment: (data: CompleteCartModel) => Promise<null | CheckoutResponseValue>
+  payment: (data: CheckoutGatewayData) => Promise<null | CheckoutResponseValue>
 }

@@ -1,3 +1,4 @@
+import type { UserModel } from '@/domain/models'
 import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway, LoadUserByIdRepo } from '@/interactions/contracts'
@@ -15,8 +16,11 @@ export class CheckoutUseCase implements Checkout {
     if (loadCartResult.isLeft()) {
       return left(loadCartResult.value)
     }
-    await this.loadUserByIdRepo.loadById(userId)
-    const checkoutResult = await this.checkoutGateway.payment(loadCartResult.value)
+    const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
+    const checkoutResult = await this.checkoutGateway.payment({
+      ...loadCartResult.value,
+      email: user.email
+    })
     if (!checkoutResult) {
       return left(new CheckoutFailureError())
     }

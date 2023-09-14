@@ -32,7 +32,10 @@ export class StripeAdapter implements CheckoutGateway {
       mode: 'payment',
       customer: customer.id,
       success_url: env.clientStripeSuccessUrl,
-      cancel_url: env.clientStripeCancelUrl
+      cancel_url: env.clientStripeCancelUrl,
+      phone_number_collection: {
+        enabled: true
+      }
     })
     return session.url ? { url: session.url } : null
   }

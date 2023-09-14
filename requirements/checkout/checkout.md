@@ -8,9 +8,9 @@
 - ✅ Recebe uma requisição do tipo POST na rota /api/checkout
 - ✅ Valida se a requisição foi feita por um usuário
 - ✅ Busca carrinho do usuário a partir do userId que estiver no token
-- ❌ Busca o email usuário a partir do userId que estiver no token
+- ✅ Busca o email usuário a partir do userId que estiver no token
 - ✅ Calcula o valor total dos produtos no carrinho
-- ❌ Envia os dados do carrinho e o email do usuário para criar uma seção de pagamento no Stripe
+- ✅ Envia os dados do carrinho e o email do usuário para criar uma seção de pagamento no Stripe
 - ✅ Valida o retorno da Api Stripe
 - ✅ Retorna 200 com a url da seção de pagamento
 

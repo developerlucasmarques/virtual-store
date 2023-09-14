@@ -125,6 +125,15 @@ describe('Checkout UseCase', () => {
     expect(loadByIdSpy).toBeCalledWith('any_user_id')
   })
 
+  it('Should throw if LoadUsertById throws', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call CheckoutGateway with correct values', async () => {
     const { sut, checkoutGatewayStub } = makeSut()
     const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')

@@ -2,6 +2,7 @@ import type { CompleteCartModel } from '@/domain/models'
 import type { CheckoutResponseValue } from '@/domain/usecases-contracts'
 import type { CheckoutGateway } from '@/interactions/contracts'
 import { StripeHelper } from './helpers/stripe-helper'
+import env from '@/main/config/env'
 
 export class StripeAdapter implements CheckoutGateway {
   async payment (data: CompleteCartModel): Promise<null | CheckoutResponseValue> {
@@ -19,8 +20,8 @@ export class StripeAdapter implements CheckoutGateway {
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: 'payment',
-      success_url: 'https://any.com',
-      cancel_url: 'https://any-any.com'
+      success_url: env.clientStripeSuccessUrl,
+      cancel_url: env.clientStripeCancelUrl
     })
     return session.url ? { url: session.url } : null
   }

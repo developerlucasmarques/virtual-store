@@ -1,4 +1,4 @@
-import type { CompleteCartModel } from '@/domain/models'
+import type { CheckoutGatewayData } from '@/interactions/contracts'
 import { StripeAdapter } from './stripe-adapter'
 
 jest.mock('stripe', () => {
@@ -18,7 +18,8 @@ jest.mock('stripe', () => {
   }
 })
 
-const makeFakeCompleteCartModel = (): CompleteCartModel => ({
+const makeFakeCheckoutGatewayData = (): CheckoutGatewayData => ({
+  email: 'any_email@mail.com',
   total: 10.90,
   products: [{
     id: 'any_product_id_1',
@@ -35,7 +36,7 @@ const makeSut = (): StripeAdapter => {
 describe('Stripe Adapter', () => {
   it('Should returns session url on success', async () => {
     const sut = makeSut()
-    const result = await sut.payment(makeFakeCompleteCartModel())
+    const result = await sut.payment(makeFakeCheckoutGatewayData())
     expect(result).toEqual({ url: 'https://checkout.stripe.com/c/pay/cs_test_any_token' })
   })
 })

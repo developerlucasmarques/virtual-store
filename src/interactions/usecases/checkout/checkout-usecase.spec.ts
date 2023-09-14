@@ -1,9 +1,9 @@
-import type { CompleteCartModel } from '@/domain/models'
+import type { CompleteCartModel, UserModel } from '@/domain/models'
 import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
+import type { CheckoutGateway, CheckoutGatewayResponse, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 import { CheckoutUseCase } from './checkout-usecase'
-import { type CheckoutGatewayResponse, type CheckoutGateway } from '@/interactions/contracts'
-import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   total: 151.67,
@@ -25,6 +25,15 @@ const makeFakeCompleteCartModel = (): CompleteCartModel => ({
   }]
 })
 
+const makeFakeUserModel = (): UserModel => ({
+  id: 'any_id',
+  name: 'any name',
+  email: 'any_email@mail.com',
+  password: 'hashed_password',
+  role: 'customer',
+  accessToken: 'any_token'
+})
+
 const makeCheckoutResponseValue = (): CheckoutResponseValue => ({
   url: 'any_url'
 })
@@ -36,6 +45,15 @@ const makeLoadCartStub = (): LoadCart => {
     }
   }
   return new LoadCartStub()
+}
+
+const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
+  class LoadUserByIdRepoStub implements LoadUserByIdRepo {
+    async loadById (id: string): Promise<null | UserModel> {
+      return await Promise.resolve(makeFakeUserModel())
+    }
+  }
+  return new LoadUserByIdRepoStub()
 }
 
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
@@ -50,16 +68,19 @@ const makeCheckoutGatewayStub = (): CheckoutGateway => {
 type SutTypes = {
   sut: CheckoutUseCase
   loadCartStub: LoadCart
+  loadUserByIdRepoStub: LoadUserByIdRepo
   checkoutGatewayStub: CheckoutGateway
 }
 
 const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
   const checkoutGatewayStub = makeCheckoutGatewayStub()
-  const sut = new CheckoutUseCase(loadCartStub, checkoutGatewayStub)
+  const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const sut = new CheckoutUseCase(loadCartStub, loadUserByIdRepoStub, checkoutGatewayStub)
   return {
     sut,
     loadCartStub,
+    loadUserByIdRepoStub,
     checkoutGatewayStub
   }
 }
@@ -95,6 +116,13 @@ describe('Checkout UseCase', () => {
     )
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call LoadUsertById with correct user id', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
+    await sut.perform('any_user_id')
+    expect(loadByIdSpy).toBeCalledWith('any_user_id')
   })
 
   it('Should call CheckoutGateway with correct values', async () => {

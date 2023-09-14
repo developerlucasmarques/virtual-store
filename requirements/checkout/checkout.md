@@ -10,9 +10,9 @@
 - ✅ Busca carrinho do usuário a partir do userId que estiver no token
 - ✅ Busca o email usuário a partir do userId que estiver no token
 - ✅ Calcula o valor total dos produtos no carrinho
-- ✅ Envia os dados do carrinho e o email do usuário para criar uma seção de pagamento no Stripe
+- ✅ Envia os dados do carrinho e o email do usuário para criar uma sessão de pagamento no Stripe
 - ✅ Valida o retorno da Api Stripe
-- ✅ Retorna 200 com a url da seção de pagamento
+- ✅ Retorna 200 com a url da sessão de pagamento
 
 
 ## Exceções

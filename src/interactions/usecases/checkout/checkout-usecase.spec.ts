@@ -145,7 +145,10 @@ describe('Checkout UseCase', () => {
     const { sut, checkoutGatewayStub } = makeSut()
     const paymentSpy = jest.spyOn(checkoutGatewayStub, 'payment')
     await sut.perform('any_user_id')
-    expect(paymentSpy).toHaveBeenCalledWith(makeFakeCompleteCartModel())
+    expect(paymentSpy).toHaveBeenCalledWith({
+      ...makeFakeCompleteCartModel(),
+      email: 'any_email@mail.com'
+    })
   })
 
   it('Should call CheckoutGateway only once', async () => {

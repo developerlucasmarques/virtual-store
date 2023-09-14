@@ -125,6 +125,13 @@ describe('Checkout UseCase', () => {
     expect(loadByIdSpy).toBeCalledWith('any_user_id')
   })
 
+  it('Should call LoadUsertById only once', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    const performSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
+    await sut.perform('any_user_id')
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should throw if LoadUsertById throws', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(

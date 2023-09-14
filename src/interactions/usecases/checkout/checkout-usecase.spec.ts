@@ -26,7 +26,7 @@ const makeFakeCompleteCartModel = (): CompleteCartModel => ({
 })
 
 const makeFakeUserModel = (): UserModel => ({
-  id: 'any_id',
+  id: 'any_user_id',
   name: 'any name',
   email: 'any_email@mail.com',
   password: 'hashed_password',
@@ -147,7 +147,8 @@ describe('Checkout UseCase', () => {
     await sut.perform('any_user_id')
     expect(paymentSpy).toHaveBeenCalledWith({
       ...makeFakeCompleteCartModel(),
-      email: 'any_email@mail.com'
+      userEmail: 'any_email@mail.com',
+      userId: 'any_user_id'
     })
   })
 

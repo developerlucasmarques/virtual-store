@@ -18,8 +18,7 @@ export class CheckoutUseCase implements Checkout {
     }
     const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
     const checkoutResult = await this.checkoutGateway.payment({
-      ...loadCartResult.value,
-      email: user.email
+      ...loadCartResult.value, userEmail: user.email, userId
     })
     if (!checkoutResult) {
       return left(new CheckoutFailureError())

@@ -6,6 +6,18 @@ jest.mock('stripe', () => {
     __esModule: true,
     default: jest.fn().mockImplementation(() => {
       return {
+        customers: {
+          retrieve: jest.fn(async () => await Promise.resolve({
+            id: 'cust_123'
+          })),
+          create: jest.fn(async () => await Promise.resolve({
+            id: 'cust_123',
+            email: 'user_email@mail.com',
+            metadata: {
+              userId: 'any_user_id'
+            }
+          }))
+        },
         checkout: {
           sessions: {
             create: jest.fn(async () => await Promise.resolve({
@@ -19,7 +31,8 @@ jest.mock('stripe', () => {
 })
 
 const makeFakeCheckoutGatewayData = (): CheckoutGatewayData => ({
-  email: 'any_email@mail.com',
+  userEmail: 'any_email@mail.com',
+  userId: 'any_user_id',
   total: 10.90,
   products: [{
     id: 'any_product_id_1',

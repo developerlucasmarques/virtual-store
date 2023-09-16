@@ -8,10 +8,10 @@ jest.mock('stripe', () => {
       return {
         customers: {
           retrieve: jest.fn(async () => await Promise.resolve({
-            id: 'cust_123'
+            id: 'any_customer_id'
           })),
           create: jest.fn(async () => await Promise.resolve({
-            id: 'cust_123',
+            id: 'any_customer_id',
             email: 'user_email@mail.com',
             metadata: {
               userId: 'any_user_id'
@@ -47,9 +47,12 @@ const makeSut = (): StripeAdapter => {
 }
 
 describe('Stripe Adapter', () => {
-  it('Should returns session url on success', async () => {
+  it('Should return CheckoutGatewayResponse on success', async () => {
     const sut = makeSut()
     const result = await sut.payment(makeFakeCheckoutGatewayData())
-    expect(result).toEqual({ url: 'https://checkout.stripe.com/c/pay/cs_test_any_token' })
+    expect(result).toEqual({
+      url: 'https://checkout.stripe.com/c/pay/cs_test_any_token',
+      gatewayCustomerId: 'any_customer_id'
+    })
   })
 })

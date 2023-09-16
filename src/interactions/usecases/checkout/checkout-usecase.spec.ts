@@ -46,6 +46,7 @@ const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   gatewayCustomerId: 'any_gateway_customer_id',
   createdAt: new Date(),
   updateDat: new Date(),
+  status: 'pending',
   products: makeFakeCompleteCartModel().products.map(
     ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
   )

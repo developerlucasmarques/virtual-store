@@ -31,6 +31,7 @@ export class CheckoutUseCase implements Checkout {
       gatewayCustomerId: checkoutResult.gatewayCustomerId,
       createdAt: new Date(),
       updateDat: new Date(),
+      status: 'pending',
       products: loadCartResult.value.products.map(
         ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
       )

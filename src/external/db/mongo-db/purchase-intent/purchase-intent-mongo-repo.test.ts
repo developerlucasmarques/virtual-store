@@ -15,6 +15,7 @@ const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   gatewayCustomerId: 'any_gateway_customer_id',
   createdAt: new Date(),
   updateDat: new Date(),
+  status: 'pending',
   products: [{
     id: 'any_product_id',
     name: 'any name',

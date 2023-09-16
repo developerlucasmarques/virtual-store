@@ -1,7 +1,9 @@
 import type { CompleteCartModel } from '@/domain/models'
-import type { CheckoutResponseValue } from '@/domain/usecases-contracts'
 
-export type CheckoutGatewayResponse = CheckoutResponseValue
+export type CheckoutGatewayResponse = {
+  url: string
+  gatewayCustomerId: string
+}
 
 export type CheckoutGatewayData = CompleteCartModel & {
   userEmail: string
@@ -9,5 +11,5 @@ export type CheckoutGatewayData = CompleteCartModel & {
 }
 
 export interface CheckoutGateway {
-  payment: (data: CheckoutGatewayData) => Promise<null | CheckoutResponseValue>
+  payment: (data: CheckoutGatewayData) => Promise<null | CheckoutGatewayResponse>
 }

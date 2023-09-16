@@ -1,11 +1,10 @@
-import type { CheckoutResponseValue } from '@/domain/usecases-contracts'
-import type { CheckoutGateway, CheckoutGatewayData } from '@/interactions/contracts'
+import type { CheckoutGateway, CheckoutGatewayData, CheckoutGatewayResponse } from '@/interactions/contracts'
 import env from '@/main/config/env'
-import { StripeHelper } from './helpers/stripe-helper'
 import type Stripe from 'stripe'
+import { StripeHelper } from './helpers/stripe-helper'
 
 export class StripeAdapter implements CheckoutGateway {
-  async payment (data: CheckoutGatewayData): Promise<null | CheckoutResponseValue> {
+  async payment (data: CheckoutGatewayData): Promise<null | CheckoutGatewayResponse> {
     const stripe = await StripeHelper.getInstance()
     const customer = await stripe.customers.create({
       email: data.userEmail,
@@ -37,6 +36,9 @@ export class StripeAdapter implements CheckoutGateway {
         enabled: true
       }
     })
-    return session.url ? { url: session.url } : null
+    if (session.url && customer.id) {
+      return { url: session.url, gatewayCustomerId: customer.id }
+    }
+    return null
   }
 }

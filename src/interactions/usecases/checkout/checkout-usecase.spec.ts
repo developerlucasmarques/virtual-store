@@ -1,8 +1,9 @@
-import type { CompleteCartModel, UserModel } from '@/domain/models'
-import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import type { CompleteCartModel, PurchaseIntentModel, UserModel } from '@/domain/models'
+import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { CheckoutGateway, CheckoutGatewayResponse, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, Id, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
+import MockDate from 'mockdate'
 import { CheckoutUseCase } from './checkout-usecase'
 
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
@@ -34,8 +35,21 @@ const makeFakeUserModel = (): UserModel => ({
   accessToken: 'any_token'
 })
 
-const makeCheckoutResponseValue = (): CheckoutResponseValue => ({
-  url: 'any_url'
+const makeCheckoutGatewayResponse = (): CheckoutGatewayResponse => ({
+  url: 'any_url',
+  gatewayCustomerId: 'any_gateway_customer_id'
+})
+
+const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
+  id: 'any_purchase_intent_id',
+  userId: 'any_user_id',
+  gatewayCustomerId: 'any_gateway_customer_id',
+  createdAt: new Date(),
+  updateDat: new Date(),
+  status: 'pending',
+  products: makeFakeCompleteCartModel().products.map(
+    ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
+  )
 })
 
 const makeLoadCartStub = (): LoadCart => {
@@ -59,10 +73,28 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
   class CheckoutGatewayStub implements CheckoutGateway {
     async payment (data: CompleteCartModel): Promise<CheckoutGatewayResponse> {
-      return await Promise.resolve(makeCheckoutResponseValue())
+      return await Promise.resolve(makeCheckoutGatewayResponse())
     }
   }
   return new CheckoutGatewayStub()
+}
+
+const makeIdBuilder = (): IdBuilder => {
+  class IdBuilderStub implements IdBuilder {
+    build (): Id {
+      return { id: 'any_purchase_intent_id' }
+    }
+  }
+  return new IdBuilderStub()
+}
+
+const makeAddPurchaseIntentRepo = (): AddPurchaseIntentRepo => {
+  class AddPurchaseIntentRepoStub implements AddPurchaseIntentRepo {
+    async add (data: PurchaseIntentModel): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new AddPurchaseIntentRepoStub()
 }
 
 type SutTypes = {
@@ -70,22 +102,42 @@ type SutTypes = {
   loadCartStub: LoadCart
   loadUserByIdRepoStub: LoadUserByIdRepo
   checkoutGatewayStub: CheckoutGateway
+  idBuilderStub: IdBuilder
+  addPurchaseIntentRepoStub: AddPurchaseIntentRepo
 }
 
 const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
   const checkoutGatewayStub = makeCheckoutGatewayStub()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
-  const sut = new CheckoutUseCase(loadCartStub, loadUserByIdRepoStub, checkoutGatewayStub)
+  const idBuilderStub = makeIdBuilder()
+  const addPurchaseIntentRepoStub = makeAddPurchaseIntentRepo()
+  const sut = new CheckoutUseCase(
+    loadCartStub,
+    loadUserByIdRepoStub,
+    checkoutGatewayStub,
+    idBuilderStub,
+    addPurchaseIntentRepoStub
+  )
   return {
     sut,
     loadCartStub,
     loadUserByIdRepoStub,
-    checkoutGatewayStub
+    checkoutGatewayStub,
+    idBuilderStub,
+    addPurchaseIntentRepoStub
   }
 }
 
 describe('Checkout UseCase', () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+
   it('Should call LoadCart with correct user id', async () => {
     const { sut, loadCartStub } = makeSut()
     const performSpy = jest.spyOn(loadCartStub, 'perform')
@@ -177,9 +229,48 @@ describe('Checkout UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
+  it('Should call IdBuilder only once', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    await sut.perform('any_user_id')
+    expect(buildSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should throw if IdBuilder throws', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    jest.spyOn(idBuilderStub, 'build').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call AddPurchaseIntentRepo with correct values', async () => {
+    const { sut, addPurchaseIntentRepoStub } = makeSut()
+    const addSpy = jest.spyOn(addPurchaseIntentRepoStub, 'add')
+    await sut.perform('any_user_id')
+    expect(addSpy).toHaveBeenCalledWith(makeFakePurchaseIntentModel())
+  })
+
+  it('Should call AddPurchaseIntentRepo only once', async () => {
+    const { sut, addPurchaseIntentRepoStub } = makeSut()
+    const addSpy = jest.spyOn(addPurchaseIntentRepoStub, 'add')
+    await sut.perform('any_user_id')
+    expect(addSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should throw if AddPurchaseIntentRepo throws', async () => {
+    const { sut, addPurchaseIntentRepoStub } = makeSut()
+    jest.spyOn(addPurchaseIntentRepoStub, 'add').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should return CheckoutResponseValue if CheckoutGateway is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform('any_user_id')
-    expect(result.value).toEqual(makeCheckoutResponseValue())
+    expect(result.value).toEqual({ url: 'any_url' })
   })
 })

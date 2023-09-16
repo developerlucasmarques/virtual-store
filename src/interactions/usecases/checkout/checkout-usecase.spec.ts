@@ -235,6 +235,15 @@ describe('Checkout UseCase', () => {
     expect(buildSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('Should throw if IdBuilder throws', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    jest.spyOn(idBuilderStub, 'build').mockImplementation(() => {
+      throw new Error()
+    })
+    const promise = sut.perform('any_user_id')
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call AddPurchaseIntentRepo with correct values', async () => {
     const { sut, addPurchaseIntentRepoStub } = makeSut()
     const addSpy = jest.spyOn(addPurchaseIntentRepoStub, 'add')

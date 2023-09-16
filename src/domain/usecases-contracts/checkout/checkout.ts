@@ -3,6 +3,7 @@ import type { CheckoutFailureError, EmptyCartError, ProductNotAvailableError } f
 
 export type CheckoutResponseValue = {
   url: string
+  gatewayCustomerId: string
 }
 
 export type CheckoutResponse = Either<EmptyCartError | ProductNotAvailableError | CheckoutFailureError, CheckoutResponseValue>

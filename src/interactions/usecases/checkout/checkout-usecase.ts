@@ -25,9 +25,8 @@ export class CheckoutUseCase implements Checkout {
     if (!checkoutResult) {
       return left(new CheckoutFailureError())
     }
-    const { id } = this.idBuilder.build()
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
-      id,
+      id: this.idBuilder.build().id,
       userId,
       gatewayCustomerId: checkoutResult.gatewayCustomerId,
       createdAt: new Date(),

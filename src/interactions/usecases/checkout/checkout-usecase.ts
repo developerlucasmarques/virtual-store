@@ -36,6 +36,6 @@ export class CheckoutUseCase implements Checkout {
       )
     }
     await this.addPurchaseIntentRepo.add(addPurchaseIntentRepoData)
-    return right(checkoutResult)
+    return right({ url: checkoutResult.url })
   }
 }

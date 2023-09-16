@@ -1,5 +1,5 @@
 import type { CompleteCartModel, PurchaseIntentModel, UserModel } from '@/domain/models'
-import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, Id, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
@@ -35,7 +35,7 @@ const makeFakeUserModel = (): UserModel => ({
   accessToken: 'any_token'
 })
 
-const makeCheckoutResponseValue = (): CheckoutResponseValue => ({
+const makeCheckoutGatewayResponse = (): CheckoutGatewayResponse => ({
   url: 'any_url',
   gatewayCustomerId: 'any_gateway_customer_id'
 })
@@ -72,7 +72,7 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
   class CheckoutGatewayStub implements CheckoutGateway {
     async payment (data: CompleteCartModel): Promise<CheckoutGatewayResponse> {
-      return await Promise.resolve(makeCheckoutResponseValue())
+      return await Promise.resolve(makeCheckoutGatewayResponse())
     }
   }
   return new CheckoutGatewayStub()
@@ -251,6 +251,13 @@ describe('Checkout UseCase', () => {
     expect(addSpy).toHaveBeenCalledWith(makeFakeAddPurchaseIntentRepoData())
   })
 
+  it('Should call AddPurchaseIntentRepo only once', async () => {
+    const { sut, addPurchaseIntentRepoStub } = makeSut()
+    const addSpy = jest.spyOn(addPurchaseIntentRepoStub, 'add')
+    await sut.perform('any_user_id')
+    expect(addSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should throw if AddPurchaseIntentRepo throws', async () => {
     const { sut, addPurchaseIntentRepoStub } = makeSut()
     jest.spyOn(addPurchaseIntentRepoStub, 'add').mockReturnValueOnce(
@@ -263,6 +270,6 @@ describe('Checkout UseCase', () => {
   it('Should return CheckoutResponseValue if CheckoutGateway is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform('any_user_id')
-    expect(result.value).toEqual(makeCheckoutResponseValue())
+    expect(result.value).toEqual({ url: 'any_url' })
   })
 })

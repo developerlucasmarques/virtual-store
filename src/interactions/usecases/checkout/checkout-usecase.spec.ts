@@ -40,7 +40,7 @@ const makeCheckoutGatewayResponse = (): CheckoutGatewayResponse => ({
   gatewayCustomerId: 'any_gateway_customer_id'
 })
 
-const makeFakeAddPurchaseIntentRepoData = (): PurchaseIntentModel => ({
+const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   id: 'any_purchase_intent_id',
   userId: 'any_user_id',
   gatewayCustomerId: 'any_gateway_customer_id',
@@ -248,7 +248,7 @@ describe('Checkout UseCase', () => {
     const { sut, addPurchaseIntentRepoStub } = makeSut()
     const addSpy = jest.spyOn(addPurchaseIntentRepoStub, 'add')
     await sut.perform('any_user_id')
-    expect(addSpy).toHaveBeenCalledWith(makeFakeAddPurchaseIntentRepoData())
+    expect(addSpy).toHaveBeenCalledWith(makeFakePurchaseIntentModel())
   })
 
   it('Should call AddPurchaseIntentRepo only once', async () => {

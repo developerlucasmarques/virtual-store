@@ -1,7 +1,7 @@
 import type { CompleteCartModel, PurchaseIntentModel, UserModel } from '@/domain/models'
 import type { CheckoutResponseValue, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, Id, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 import MockDate from 'mockdate'
 import { CheckoutUseCase } from './checkout-usecase'
@@ -78,6 +78,15 @@ const makeCheckoutGatewayStub = (): CheckoutGateway => {
   return new CheckoutGatewayStub()
 }
 
+const makeIdBuilder = (): IdBuilder => {
+  class IdBuilderStub implements IdBuilder {
+    build (): Id {
+      return { id: 'any_purchase_intent_id' }
+    }
+  }
+  return new IdBuilderStub()
+}
+
 const makeAddPurchaseIntentRepo = (): AddPurchaseIntentRepo => {
   class AddPurchaseIntentRepoStub implements AddPurchaseIntentRepo {
     async add (data: PurchaseIntentModel): Promise<void> {
@@ -92,6 +101,7 @@ type SutTypes = {
   loadCartStub: LoadCart
   loadUserByIdRepoStub: LoadUserByIdRepo
   checkoutGatewayStub: CheckoutGateway
+  idBuilderStub: IdBuilder
   addPurchaseIntentRepoStub: AddPurchaseIntentRepo
 }
 
@@ -99,15 +109,21 @@ const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
   const checkoutGatewayStub = makeCheckoutGatewayStub()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const idBuilderStub = makeIdBuilder()
   const addPurchaseIntentRepoStub = makeAddPurchaseIntentRepo()
   const sut = new CheckoutUseCase(
-    loadCartStub, loadUserByIdRepoStub, checkoutGatewayStub, addPurchaseIntentRepoStub
+    loadCartStub,
+    loadUserByIdRepoStub,
+    checkoutGatewayStub,
+    idBuilderStub,
+    addPurchaseIntentRepoStub
   )
   return {
     sut,
     loadCartStub,
     loadUserByIdRepoStub,
     checkoutGatewayStub,
+    idBuilderStub,
     addPurchaseIntentRepoStub
   }
 }
@@ -210,6 +226,13 @@ describe('Checkout UseCase', () => {
     )
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call IdBuilder only once', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    await sut.perform('any_user_id')
+    expect(buildSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should call AddPurchaseIntentRepo with correct values', async () => {

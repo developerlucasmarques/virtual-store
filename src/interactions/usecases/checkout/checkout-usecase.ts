@@ -1,7 +1,7 @@
 import type { PurchaseIntentModel, UserModel } from '@/domain/models'
 import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { AddPurchaseIntentRepo, CheckoutGateway, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { AddPurchaseIntentRepo, CheckoutGateway, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class CheckoutUseCase implements Checkout {
@@ -9,6 +9,7 @@ export class CheckoutUseCase implements Checkout {
     private readonly loadCart: LoadCart,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
     private readonly checkoutGateway: CheckoutGateway,
+    private readonly idBuilder: IdBuilder,
     private readonly addPurchaseIntentRepo: AddPurchaseIntentRepo
   ) {}
 
@@ -24,8 +25,9 @@ export class CheckoutUseCase implements Checkout {
     if (!checkoutResult) {
       return left(new CheckoutFailureError())
     }
+    const { id } = this.idBuilder.build()
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
-      id: 'any_purchase_intent_id',
+      id,
       userId,
       gatewayCustomerId: checkoutResult.gatewayCustomerId,
       createdAt: new Date(),

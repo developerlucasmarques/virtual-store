@@ -1,4 +1,4 @@
-# Checkout
+# Payment Event Manager
 
 ## Request Headers
 * stripe-signature
@@ -8,7 +8,7 @@
 
 ## Caso de Sucesso
 
-- ❌ Intercepta a requisição
+- ❌ Recebe uma requisição do tipo POST na rota /api/stripe/webhook
 - ❌ Valida se a requisição foi feita pelo Stripe
 - ❌ Repassa a requisição para o controller
 
@@ -19,6 +19,3 @@
 - ❌ Retorna erro 400 o client não informar o body
 - ❌ Retorna erro 400 se a requisição não foi feita pelo Stripe
 - ❌ Retorna erro 500 se der erro ao tentar validar se a requisição foi feita pelo Stripe
-
-
-

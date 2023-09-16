@@ -12,6 +12,7 @@
 - ✅ Calcula o valor total dos produtos no carrinho
 - ✅ Envia os dados do carrinho e o email do usuário para criar uma sessão de pagamento no Stripe
 - ✅ Valida o retorno da Api Stripe
+- ❌ Salva os dados do carrinho no DB junto com o customer id que o stripe retorna como uma intenção de compra
 - ✅ Retorna 200 com a url da sessão de pagamento
 
 
@@ -24,6 +25,5 @@
 - ✅ Retorna erro 500 se der erro ao tentar decriptar token do usuário
 - ✅ Retorna erro 500 se der erro ao tentar buscar o carrinho do usuário
 - ✅ Retorna erro 500 se der erro ao tentar conectar com a Api Stripe
-
-
+- ❌ Retorna erro 500 se der erro ao tentar salvar os dados como uma intenção de compra
 

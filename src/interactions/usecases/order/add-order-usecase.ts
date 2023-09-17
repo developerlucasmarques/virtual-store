@@ -1,9 +1,9 @@
-import type { AddOrder, AddOrderData, AddOrderResponse } from '@/domain/usecases-contracts'
+import type { AddOrder, AddOrderData, AddOrderResponse, Event } from '@/domain/usecases-contracts'
 import { PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { AddOrderRepo, IdBuilder, LoadPurchaseIntentByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
-export class AddOrderUseCase implements AddOrder {
+export class AddOrderUseCase implements AddOrder, Event {
   constructor (
     private readonly loadPurchaseIntentByIdRepo: LoadPurchaseIntentByIdRepo,
     private readonly idBuilder: IdBuilder,

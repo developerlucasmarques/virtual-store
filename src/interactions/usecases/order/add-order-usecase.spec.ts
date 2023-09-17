@@ -68,4 +68,13 @@ describe('AddOrder UseCase', () => {
     const result = await sut.perform(makeFakeAddOrderData())
     expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
+
+  it('Should throw if LoadPurchaseIntentRepo throws', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAddOrderData())
+    await expect(promise).rejects.toThrow()
+  })
 })

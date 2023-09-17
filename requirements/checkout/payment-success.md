@@ -1,4 +1,4 @@
-# Checkout
+# Payment Success
 
 ## Request Headers
 * stripe-signature
@@ -9,18 +9,18 @@
 ## Caso de Sucesso
 
 - ❌ Recebe uma requisição do tipo POST na rota /api/stripe/webhook
-- ❌ Busca os dados 
+- ❌ Valida se a requisição foi feita pelo Stripe
+- ❌ Busca as informações da intenção de compra pelo id que está no evento do Stripe
+- ❌ Cria um pedido no DB
+- ❌ Envia uma notificação para o usuário
+- ❌ Retorna 200 com success true
 
 
 ## Exceções
 
-- ✅ Retorna erro 404 se o endpoint não existir
-- ✅ Retorna erro 404 se a algum produto do carrinho não estiver disponível
-- ✅ Retorna erro 401 se o client não informar o token ou se for inválido
-- ✅ Retorna erro 400 se não tiver nenhum produto no carrinho
-- ✅ Retorna erro 500 se der erro ao tentar decriptar token do usuário
-- ✅ Retorna erro 500 se der erro ao tentar buscar o carrinho do usuário
-- ✅ Retorna erro 500 se der erro ao tentar conectar com a Api Stripe
-
-
-
+- ❌ Retorna erro 404 se o endpoint não existir
+- ❌ Retorna erro 400 se o client não informar o stripe-signature ou se for inválido
+- ❌ Retorna erro 500 se der erro ao tentar validar se a requisição foi feita pelo Stripe
+- ❌ Retorna erro 500 se der erro ao tentar buscar as informações da intenção de compra
+- ❌ Retorna erro 500 se der erro ao tentar criar um pedido no DB
+- ❌ Retorna erro 500 se der erro ao tentar envir uma notificação para o usuário

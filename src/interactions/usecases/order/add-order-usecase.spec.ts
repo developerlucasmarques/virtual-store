@@ -124,7 +124,7 @@ describe('AddOrder UseCase', () => {
   it('Should throw if IdBuilder throws', async () => {
     const { sut, idBuilderStub } = makeSut()
     jest.spyOn(idBuilderStub, 'build').mockImplementationOnce(() => {
-      throw new Error('any_message')
+      throw new Error()
     })
     const promise = sut.perform(makeFakeAddOrderData())
     await expect(promise).rejects.toThrow()
@@ -142,5 +142,14 @@ describe('AddOrder UseCase', () => {
     const addSpy = jest.spyOn(addOrderRepoStub, 'add')
     await sut.perform(makeFakeAddOrderData())
     expect(addSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should throw if AddOrderRepo throws', async () => {
+    const { sut, addOrderRepoStub } = makeSut()
+    jest.spyOn(addOrderRepoStub, 'add').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAddOrderData())
+    await expect(promise).rejects.toThrow()
   })
 })

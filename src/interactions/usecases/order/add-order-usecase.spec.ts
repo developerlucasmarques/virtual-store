@@ -2,6 +2,7 @@ import type { PurchaseIntentModel } from '@/domain/models'
 import type { LoadPurchaseIntentByIdRepo } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
 import type { AddOrderData } from '@/domain/usecases-contracts'
+import { PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeAddOrderData = (): AddOrderData => ({
   purchaseIntentId: 'any_purchase_intent_id'
@@ -50,5 +51,14 @@ describe('AddOrder UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById')
     await sut.perform(makeFakeAddOrderData())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_purchase_intent_id')
+  })
+
+  it('Should return PurchaseIntentNotFoundError if LoadPurchaseIntentRepo returns null', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeAddOrderData())
+    expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
 })

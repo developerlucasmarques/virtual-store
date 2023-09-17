@@ -33,6 +33,7 @@ jest.mock('stripe', () => {
 const makeFakeCheckoutGatewayData = (): CheckoutGatewayData => ({
   userEmail: 'any_email@mail.com',
   userId: 'any_user_id',
+  purchaseIntentId: 'any_purchase_intent_id',
   total: 10.90,
   products: [{
     id: 'any_product_id_1',
@@ -51,8 +52,7 @@ describe('Stripe Adapter', () => {
     const sut = makeSut()
     const result = await sut.payment(makeFakeCheckoutGatewayData())
     expect(result).toEqual({
-      url: 'https://checkout.stripe.com/c/pay/cs_test_any_token',
-      gatewayCustomerId: 'any_customer_id'
+      url: 'https://checkout.stripe.com/c/pay/cs_test_any_token'
     })
   })
 })

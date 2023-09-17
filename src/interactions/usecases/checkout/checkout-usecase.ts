@@ -19,16 +19,10 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
-    const checkoutResult = await this.checkoutGateway.payment({
-      ...loadCartResult.value, userEmail: user.email, userId
-    })
-    if (!checkoutResult) {
-      return left(new CheckoutFailureError())
-    }
+    const { id: purchaseIntentId } = this.idBuilder.build()
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
-      id: this.idBuilder.build().id,
+      id: purchaseIntentId,
       userId,
-      gatewayCustomerId: checkoutResult.gatewayCustomerId,
       createdAt: new Date(),
       updateDat: new Date(),
       status: 'pending',
@@ -37,6 +31,15 @@ export class CheckoutUseCase implements Checkout {
       )
     }
     await this.addPurchaseIntentRepo.add(addPurchaseIntentRepoData)
+    const checkoutResult = await this.checkoutGateway.payment({
+      ...loadCartResult.value,
+      userEmail: user.email,
+      userId,
+      purchaseIntentId
+    })
+    if (!checkoutResult) {
+      return left(new CheckoutFailureError())
+    }
     return right({ url: checkoutResult.url })
   }
 }

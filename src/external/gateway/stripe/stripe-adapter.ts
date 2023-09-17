@@ -9,7 +9,8 @@ export class StripeAdapter implements CheckoutGateway {
     const customer = await stripe.customers.create({
       email: data.userEmail,
       metadata: {
-        userId: data.userId
+        userId: data.userId,
+        purchaseIntentId: data.purchaseIntentId
       }
     })
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = data.products.map(
@@ -36,8 +37,8 @@ export class StripeAdapter implements CheckoutGateway {
         enabled: true
       }
     })
-    if (session.url && customer.id) {
-      return { url: session.url, gatewayCustomerId: customer.id }
+    if (session.url) {
+      return { url: session.url }
     }
     return null
   }

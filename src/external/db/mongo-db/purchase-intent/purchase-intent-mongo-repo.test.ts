@@ -12,7 +12,6 @@ const objectId = new ObjectId(idString)
 const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   id: idString,
   userId: 'any_user_id',
-  gatewayCustomerId: 'any_gateway_customer_id',
   createdAt: new Date(),
   updateDat: new Date(),
   status: 'pending',

@@ -36,14 +36,12 @@ const makeFakeUserModel = (): UserModel => ({
 })
 
 const makeCheckoutGatewayResponse = (): CheckoutGatewayResponse => ({
-  url: 'any_url',
-  gatewayCustomerId: 'any_gateway_customer_id'
+  url: 'any_url'
 })
 
 const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   id: 'any_purchase_intent_id',
   userId: 'any_user_id',
-  gatewayCustomerId: 'any_gateway_customer_id',
   createdAt: new Date(),
   updateDat: new Date(),
   status: 'pending',
@@ -200,7 +198,8 @@ describe('Checkout UseCase', () => {
     expect(paymentSpy).toHaveBeenCalledWith({
       ...makeFakeCompleteCartModel(),
       userEmail: 'any_email@mail.com',
-      userId: 'any_user_id'
+      userId: 'any_user_id',
+      purchaseIntentId: 'any_purchase_intent_id'
     })
   })
 

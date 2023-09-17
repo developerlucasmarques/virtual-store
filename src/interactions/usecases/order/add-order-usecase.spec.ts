@@ -1,5 +1,5 @@
 import type { PurchaseIntentModel } from '@/domain/models'
-import type { LoadPurchaseIntentByIdRepo } from '@/interactions/contracts'
+import type { Id, IdBuilder, LoadPurchaseIntentByIdRepo } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
 import type { AddOrderData } from '@/domain/usecases-contracts'
 import { PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
@@ -31,17 +31,29 @@ const makeLoadPurchaseIntentByIdRepo = (): LoadPurchaseIntentByIdRepo => {
   return new LoadPurchaseIntentByIdRepoStub()
 }
 
+const makeIdBuilder = (): IdBuilder => {
+  class IdBuilderStub implements IdBuilder {
+    build (): Id {
+      return { id: 'any_order_id' }
+    }
+  }
+  return new IdBuilderStub()
+}
+
 type SutTypes = {
   sut: AddOrderUseCase
   loadPurchaseIntentByIdRepoStub: LoadPurchaseIntentByIdRepo
+  idBuilderStub: IdBuilder
 }
 
 const makeSut = (): SutTypes => {
   const loadPurchaseIntentByIdRepoStub = makeLoadPurchaseIntentByIdRepo()
-  const sut = new AddOrderUseCase(loadPurchaseIntentByIdRepoStub)
+  const idBuilderStub = makeIdBuilder()
+  const sut = new AddOrderUseCase(loadPurchaseIntentByIdRepoStub, idBuilderStub)
   return {
     sut,
-    loadPurchaseIntentByIdRepoStub
+    loadPurchaseIntentByIdRepoStub,
+    idBuilderStub
   }
 }
 
@@ -76,5 +88,12 @@ describe('AddOrder UseCase', () => {
     )
     const promise = sut.perform(makeFakeAddOrderData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call IdBuilder only once', async () => {
+    const { sut, idBuilderStub } = makeSut()
+    const buildSpy = jest.spyOn(idBuilderStub, 'build')
+    await sut.perform(makeFakeAddOrderData())
+    expect(buildSpy).toHaveBeenCalledTimes(1)
   })
 })

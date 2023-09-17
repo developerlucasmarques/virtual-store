@@ -53,6 +53,13 @@ describe('AddOrder UseCase', () => {
     expect(loadByIdSpy).toHaveBeenCalledWith('any_purchase_intent_id')
   })
 
+  it('Should call LoadPurchaseIntentRepo only once', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    const performSpy = jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeAddOrderData())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return PurchaseIntentNotFoundError if LoadPurchaseIntentRepo returns null', async () => {
     const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
     jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById').mockReturnValueOnce(

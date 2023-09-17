@@ -3,6 +3,7 @@ import type { PurchaseIntentNotFoundError } from '../errors'
 
 export type AddOrderData = {
   purchaseIntentId: string
+  userId: string
 }
 
 export type AddOrderResponse = Either<PurchaseIntentNotFoundError, null>

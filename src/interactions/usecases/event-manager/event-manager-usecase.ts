@@ -41,7 +41,7 @@ export class EventManagerUseCase implements EventManager {
 
   async handle (data: EventManagerData): Promise<Either<Error, null>> {
     const handlers = this.handlers.get(data.eventName)
-    if (handlers) {
+    if (handlers && handlers.length !== 0) {
       for (const handler of handlers) {
         const eventDataSubset = this.filterEventData(data.eventData, handler)
         const result = await handler.event.perform(eventDataSubset)

@@ -173,4 +173,13 @@ describe('TransactionManager UseCase', () => {
     const result = await sut.perform(makeFakeTransactionManagerData())
     expect(result.value).toEqual(new Error('any_message'))
   })
+
+  it('Should throw if EventManager throws', async () => {
+    const { sut, eventManagerStub } = makeSut()
+    jest.spyOn(eventManagerStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeTransactionManagerData())
+    await expect(promise).rejects.toThrow()
+  })
 })

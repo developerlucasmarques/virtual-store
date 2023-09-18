@@ -70,4 +70,13 @@ describe('TransactionManager Controller', () => {
     const httpResonse = await sut.handle(makeFakeRequest())
     expect(httpResonse).toEqual(serverError(new Error('any_message')))
   })
+
+  it('Should return 500 if TransactionManager throws', async () => {
+    const { sut, transactionManagerStub } = makeSut()
+    jest.spyOn(transactionManagerStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error('any_message'))
+    )
+    const httpResonse = await sut.handle(makeFakeRequest())
+    expect(httpResonse).toEqual(serverError(new Error('any_message')))
+  })
 })

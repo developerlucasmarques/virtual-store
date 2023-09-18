@@ -63,4 +63,13 @@ describe('EventManager UseCase', () => {
     const result = await sut.handle(makeFakeEventManagerData())
     expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
+
+  it('Should throw if AddOrder throws', async () => {
+    const { sut, addOrderStub } = makeSut()
+    jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.handle(makeFakeEventManagerData())
+    await expect(promise).rejects.toThrow()
+  })
 })

@@ -1,8 +1,9 @@
-import type { TransactionManagerData } from '@/domain/usecases-contracts'
+import type { EventManager, EventManagerData, TransactionManagerData } from '@/domain/usecases-contracts'
 import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 import { GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 import type { UserModel } from '@/domain/models'
+import { type Either, right } from '@/shared/either'
 
 const makeFakeTransactionManagerData = (): TransactionManagerData => ({
   payload: {
@@ -12,12 +13,22 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
 })
 
 const makeFakeUserModel = (): UserModel => ({
-  id: 'any_id',
+  id: 'any_user_id',
   name: 'any name',
   email: 'any_email@mail.com',
   password: 'hashed_password',
   role: 'admin',
   accessToken: 'any_token'
+})
+
+const makeFakeEventManagerData = (): EventManagerData => ({
+  eventName: 'PaymentSuccess',
+  eventData: {
+    purchaseIntentId: 'any_purchase_intent_id',
+    userId: 'any_user_id',
+    userName: 'any name',
+    userEmail: 'any_email@mail.com'
+  }
 })
 
 const makeTransactionListenerGateway = (): TransactionListenerGateway => {
@@ -40,20 +51,34 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
   return new LoadUserByIdRepoStub()
 }
 
+const makeEventManager = (): EventManager => {
+  class EventManagerStub implements EventManager {
+    async perform (data: EventManagerData): Promise<Either<Error, null>> {
+      return await Promise.resolve(right(null))
+    }
+  }
+  return new EventManagerStub()
+}
+
 type SutTypes = {
   sut: TransactionManagerUseCase
   transactionListenerGatewayStub: TransactionListenerGateway
   loadUserByIdRepoStub: LoadUserByIdRepo
+  eventManagerStub: EventManager
 }
 
 const makeSut = (): SutTypes => {
   const transactionListenerGatewayStub = makeTransactionListenerGateway()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
-  const sut = new TransactionManagerUseCase(transactionListenerGatewayStub, loadUserByIdRepoStub)
+  const eventManagerStub = makeEventManager()
+  const sut = new TransactionManagerUseCase(
+    transactionListenerGatewayStub, loadUserByIdRepoStub, eventManagerStub
+  )
   return {
     sut,
     transactionListenerGatewayStub,
-    loadUserByIdRepoStub
+    loadUserByIdRepoStub,
+    eventManagerStub
   }
 }
 
@@ -111,5 +136,12 @@ describe('TransactionManager UseCase', () => {
     )
     const promise = sut.perform(makeFakeTransactionManagerData())
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call EventManager with correct values', async () => {
+    const { sut, eventManagerStub } = makeSut()
+    const performSpy = jest.spyOn(eventManagerStub, 'perform')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(performSpy).toHaveBeenCalledWith(makeFakeEventManagerData())
   })
 })

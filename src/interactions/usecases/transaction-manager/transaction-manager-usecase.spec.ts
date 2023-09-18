@@ -41,4 +41,11 @@ describe('TransactionManager UseCase', () => {
     await sut.perform(makeFakeTransactionManagerData())
     expect(listenerSpy).toHaveBeenCalledWith(makeFakeTransactionManagerData())
   })
+
+  it('Should call TransactionListenerGateway only once', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    const listenerSpy = jest.spyOn(transactionListenerGatewayStub, 'listener')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(listenerSpy).toHaveBeenCalledTimes(1)
+  })
 })

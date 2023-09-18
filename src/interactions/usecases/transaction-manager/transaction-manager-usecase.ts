@@ -1,12 +1,16 @@
 import type { TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
+import { GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 import type { TransactionListenerGateway } from '@/interactions/contracts'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 
 export class TransactionManagerUseCase implements TransactionManager {
   constructor (private readonly transactionListenerGateway: TransactionListenerGateway) {}
 
   async perform (data: TransactionManagerData): Promise<TransactionManagerResponse> {
-    await this.transactionListenerGateway.listener(data)
-    return right({ success: true })
+    const listenerResult = await this.transactionListenerGateway.listener(data)
+    if (!listenerResult) {
+      return left(new GatewayIncompatibilityError())
+    }
+    return right(null)
   }
 }

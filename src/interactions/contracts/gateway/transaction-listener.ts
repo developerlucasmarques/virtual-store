@@ -9,5 +9,5 @@ export type TransactionListenerGatewayResponse = {
 }
 
 export interface TransactionListenerGateway {
-  listener: (data: TransactionListenerGatewayData) => Promise<TransactionListenerGatewayResponse>
+  listener: (data: TransactionListenerGatewayData) => Promise<null | TransactionListenerGatewayResponse>
 }

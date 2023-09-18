@@ -6,7 +6,7 @@ export type TransactionManagerData = {
   payload: any
 }
 
-export type TransactionManagerResponse = Either<GatewayIncompatibilityError, { success: boolean }>
+export type TransactionManagerResponse = Either<GatewayIncompatibilityError, null>
 
 export interface TransactionManager {
   perform: (data: TransactionManagerData) => Promise<TransactionManagerResponse>

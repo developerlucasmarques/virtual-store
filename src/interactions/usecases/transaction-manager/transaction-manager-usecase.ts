@@ -1,6 +1,5 @@
-import { type UserModel } from '@/domain/models'
 import type { EventManager, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
+import { GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -16,7 +15,10 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (!listenerResult) {
       return left(new GatewayIncompatibilityError())
     }
-    const user = await this.loadUserByIdRepo.loadById(listenerResult.userId) as UserModel
+    const user = await this.loadUserByIdRepo.loadById(listenerResult.userId)
+    if (!user) {
+      return left(new UserNotFoundError())
+    }
     await this.eventManager.perform({
       eventName: listenerResult.eventName,
       eventData: {

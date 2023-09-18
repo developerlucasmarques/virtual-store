@@ -41,7 +41,7 @@ describe('EventManager UseCase', () => {
   it('Should call AddOrder with correct values', async () => {
     const { sut, addOrderStub } = makeSut()
     const performSpy = jest.spyOn(addOrderStub, 'perform')
-    await sut.handle(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
       purchaseIntentId: 'any_purchase_intent_id'
@@ -51,7 +51,7 @@ describe('EventManager UseCase', () => {
   it('Should call AddOrder only once', async () => {
     const { sut, addOrderStub } = makeSut()
     const performSpy = jest.spyOn(addOrderStub, 'perform')
-    await sut.handle(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -60,13 +60,13 @@ describe('EventManager UseCase', () => {
     jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new PurchaseIntentNotFoundError('any_purchase_intent_id')))
     )
-    const result = await sut.handle(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
 
   it('Should return EventNotFoundError if there is no event of the same type', async () => {
     const { sut } = makeSut()
-    const result = await sut.handle({
+    const result = await sut.perform({
       eventName: 'PaymentFailure',
       eventData: makeFakeEventManagerData().eventData
     })
@@ -78,13 +78,13 @@ describe('EventManager UseCase', () => {
     jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
-    const promise = sut.handle(makeFakeEventManagerData())
+    const promise = sut.perform(makeFakeEventManagerData())
     await expect(promise).rejects.toThrow()
   })
 
   it('Should return null if AddOrder is a success', async () => {
     const { sut } = makeSut()
-    const result = await sut.handle(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toBeNull()
   })
 })

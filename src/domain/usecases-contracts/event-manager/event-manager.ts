@@ -15,5 +15,5 @@ export type EventManagerData = {
 }
 
 export interface EventManager {
-  handle: (data: EventManagerData) => Promise<Either<Error, null>>
+  perform: (data: EventManagerData) => Promise<Either<Error, null>>
 }

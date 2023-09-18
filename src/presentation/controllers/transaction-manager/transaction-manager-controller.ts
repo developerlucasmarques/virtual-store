@@ -1,7 +1,7 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
 import type { Controller } from '@/presentation/contracts'
 import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
-import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
@@ -16,7 +16,10 @@ export class TransactionManagerController implements Controller {
     if (!payload) {
       return badRequest(new PayloadNotInformedError())
     }
-    await this.transactionManager.perform({ signature, payload })
+    const transactionResult = await this.transactionManager.perform({ signature, payload })
+    if (transactionResult.isLeft()) {
+      return serverError(transactionResult.value)
+    }
     return { statusCode: 0, body: '' }
   }
 }

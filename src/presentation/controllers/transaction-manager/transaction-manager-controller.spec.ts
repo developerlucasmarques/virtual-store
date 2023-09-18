@@ -1,9 +1,9 @@
 import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
-import { badRequest } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
 import { TransactionManagerController } from './transaction-manager-controller'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { type TransactionManager, type TransactionManagerData, type TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -60,5 +60,14 @@ describe('TransactionManager Controller', () => {
       signature: 'any_signature',
       payload: 'any_payload'
     })
+  })
+
+  it('Should return 500 if TransactionManager returns an error', async () => {
+    const { sut, transactionManagerStub } = makeSut()
+    jest.spyOn(transactionManagerStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const httpResonse = await sut.handle(makeFakeRequest())
+    expect(httpResonse).toEqual(serverError(new Error('any_message')))
   })
 })

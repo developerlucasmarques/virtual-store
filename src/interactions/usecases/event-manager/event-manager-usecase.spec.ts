@@ -1,7 +1,7 @@
 import type { EventManager, Event, AddOrder, AddOrderData, AddOrderResponse, EventManagerData } from '@/domain/usecases-contracts'
 import { EventManagerUseCase } from './event-manager-usecase'
 import { left, right } from '@/shared/either'
-import { PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotFoundError, PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeEventManagerData = (): EventManagerData => ({
   eventName: 'PaymentSuccess',
@@ -62,6 +62,15 @@ describe('EventManager UseCase', () => {
     )
     const result = await sut.handle(makeFakeEventManagerData())
     expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
+  })
+
+  it('Should return EventNotFoundError if there is no event of the same type', async () => {
+    const { sut } = makeSut()
+    const result = await sut.handle({
+      eventName: 'PaymentFailure',
+      eventData: makeFakeEventManagerData().eventData
+    })
+    expect(result.value).toEqual(new EventNotFoundError())
   })
 
   it('Should throw if AddOrder throws', async () => {

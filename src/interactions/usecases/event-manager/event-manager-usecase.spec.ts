@@ -72,4 +72,10 @@ describe('EventManager UseCase', () => {
     const promise = sut.handle(makeFakeEventManagerData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if AddOrder is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.handle(makeFakeEventManagerData())
+    expect(result.value).toBeNull()
+  })
 })

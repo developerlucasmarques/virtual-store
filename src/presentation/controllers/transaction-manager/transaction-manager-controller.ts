@@ -8,18 +8,22 @@ export class TransactionManagerController implements Controller {
   constructor (private readonly transactionManager: TransactionManager) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const signature = httpRequest.headers?.signature
-    if (!signature) {
-      return badRequest(new SignatureNotInformedError())
+    try {
+      const signature = httpRequest.headers?.signature
+      if (!signature) {
+        return badRequest(new SignatureNotInformedError())
+      }
+      const payload = httpRequest.body?.payload
+      if (!payload) {
+        return badRequest(new PayloadNotInformedError())
+      }
+      const transactionResult = await this.transactionManager.perform({ signature, payload })
+      if (transactionResult.isLeft()) {
+        return serverError(transactionResult.value)
+      }
+      return { statusCode: 0, body: '' }
+    } catch (error: any) {
+      return serverError(error)
     }
-    const payload = httpRequest.body?.payload
-    if (!payload) {
-      return badRequest(new PayloadNotInformedError())
-    }
-    const transactionResult = await this.transactionManager.perform({ signature, payload })
-    if (transactionResult.isLeft()) {
-      return serverError(transactionResult.value)
-    }
-    return { statusCode: 0, body: '' }
   }
 }

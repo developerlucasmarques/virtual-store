@@ -12,6 +12,12 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
   signature: 'any_signature'
 })
 
+const makeFakeTransactionListenerGatewayResponse = (): TransactionListenerGatewayResponse => ({
+  purchaseIntentId: 'any_purchase_intent_id',
+  userId: 'any_user_id',
+  eventName: 'PaymentSuccess'
+})
+
 const makeFakeUserModel = (): UserModel => ({
   id: 'any_user_id',
   name: 'any name',
@@ -34,9 +40,7 @@ const makeFakeEventManagerData = (): EventManagerData => ({
 const makeTransactionListenerGateway = (): TransactionListenerGateway => {
   class TransactionListenerGatewayStub implements TransactionListenerGateway {
     async listener (data: TransactionListenerGatewayData): Promise<TransactionListenerGatewayResponse> {
-      return await Promise.resolve({
-        purchaseIntentId: 'any_purchase_intent_id', userId: 'any_user_id'
-      })
+      return await Promise.resolve(makeFakeTransactionListenerGatewayResponse())
     }
   }
   return new TransactionListenerGatewayStub()

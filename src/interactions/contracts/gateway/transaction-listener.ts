@@ -5,7 +5,7 @@ export type TransactionListenerGatewayData = {
 
 export type TransactionListenerGatewayResponse = {
   userId: string
-  customerId: string
+  purchaseIntentId: string
 }
 
 export interface TransactionListenerGateway {

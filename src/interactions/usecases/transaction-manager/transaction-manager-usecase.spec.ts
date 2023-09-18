@@ -1,6 +1,7 @@
 import type { TransactionManagerData } from '@/domain/usecases-contracts'
 import type { TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
+import { GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeTransactionManagerData = (): TransactionManagerData => ({
   payload: {
@@ -47,5 +48,14 @@ describe('TransactionManager UseCase', () => {
     const listenerSpy = jest.spyOn(transactionListenerGatewayStub, 'listener')
     await sut.perform(makeFakeTransactionManagerData())
     expect(listenerSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return GatewayIncompatibilityError if TransactionListenerGateway returns null', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new GatewayIncompatibilityError())
   })
 })

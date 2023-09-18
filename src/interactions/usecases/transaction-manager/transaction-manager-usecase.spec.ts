@@ -182,4 +182,10 @@ describe('TransactionManager UseCase', () => {
     const promise = sut.perform(makeFakeTransactionManagerData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if EventManager is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toBeNull()
+  })
 })

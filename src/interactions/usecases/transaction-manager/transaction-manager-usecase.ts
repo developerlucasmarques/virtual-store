@@ -18,7 +18,7 @@ export class TransactionManagerUseCase implements TransactionManager {
     }
     const user = await this.loadUserByIdRepo.loadById(listenerResult.userId) as UserModel
     await this.eventManager.perform({
-      eventName: 'PaymentSuccess',
+      eventName: listenerResult.eventName,
       eventData: {
         purchaseIntentId: listenerResult.purchaseIntentId,
         userId: user.id,

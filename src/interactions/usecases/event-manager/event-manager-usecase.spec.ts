@@ -1,6 +1,7 @@
 import type { EventManager, Event, AddOrder, AddOrderData, AddOrderResponse, EventManagerData } from '@/domain/usecases-contracts'
 import { EventManagerUseCase } from './event-manager-usecase'
-import { right } from '@/shared/either'
+import { left, right } from '@/shared/either'
+import { PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeEventManagerData = (): EventManagerData => ({
   eventName: 'PaymentSuccess',
@@ -16,7 +17,6 @@ const makeAddOrder = (): Event<AddOrderData> => {
   class AddOrderStub implements AddOrder, Event<AddOrderData> {
     reqProps: Array<keyof AddOrderData> = ['purchaseIntentId', 'userId']
     async perform (data: AddOrderData): Promise<AddOrderResponse> {
-      console.log(data)
       return right(null)
     }
   }
@@ -46,5 +46,14 @@ describe('EventManager UseCase', () => {
       userId: 'any_user_id',
       purchaseIntentId: 'any_purchase_intent_id'
     })
+  })
+
+  it('Should return PurchaseIntentNotFoundError if AddOrder fails', async () => {
+    const { sut, addOrderStub } = makeSut()
+    jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new PurchaseIntentNotFoundError('any_purchase_intent_id')))
+    )
+    const result = await sut.handle(makeFakeEventManagerData())
+    expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
 })

@@ -3,7 +3,7 @@ import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerG
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 import { GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { UserModel } from '@/domain/models'
-import { type Either, right } from '@/shared/either'
+import { type Either, right, left } from '@/shared/either'
 
 const makeFakeTransactionManagerData = (): TransactionManagerData => ({
   payload: {
@@ -163,5 +163,14 @@ describe('TransactionManager UseCase', () => {
     const performSpy = jest.spyOn(eventManagerStub, 'perform')
     await sut.perform(makeFakeTransactionManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return the same error as EventManager if it returns an error', async () => {
+    const { sut, eventManagerStub } = makeSut()
+    jest.spyOn(eventManagerStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new Error('any_message'))
   })
 })

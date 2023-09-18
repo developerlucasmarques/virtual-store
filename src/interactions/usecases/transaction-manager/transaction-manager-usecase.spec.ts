@@ -96,4 +96,13 @@ describe('TransactionManager UseCase', () => {
     await sut.perform(makeFakeTransactionManagerData())
     expect(loadByIdSpy).toBeCalledWith('any_user_id')
   })
+
+  it('Should throw if LoadUsertById throws', async () => {
+    const { sut, loadUserByIdRepoStub } = makeSut()
+    jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeTransactionManagerData())
+    await expect(promise).rejects.toThrow()
+  })
 })

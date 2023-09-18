@@ -157,4 +157,11 @@ describe('TransactionManager UseCase', () => {
     await sut.perform(makeFakeTransactionManagerData())
     expect(performSpy).toHaveBeenCalledWith(makeFakeEventManagerData())
   })
+
+  test('Should call EventManager only once', async () => {
+    const { sut, eventManagerStub } = makeSut()
+    const performSpy = jest.spyOn(eventManagerStub, 'perform')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
 })

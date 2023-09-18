@@ -1,4 +1,4 @@
-import { SignatureNotInformedError } from '@/presentation/errors'
+import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
 import { badRequest } from '@/presentation/helpers/http/http-helpers'
 import { TransactionManagerController } from './transaction-manager-controller'
 
@@ -18,5 +18,13 @@ describe('TransactionManager Controller', () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(badRequest(new SignatureNotInformedError()))
+  })
+
+  it('Should return 400 if payload is not informed in body', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle({
+      headers: { signature: 'any_signature' }
+    })
+    expect(httpResponse).toEqual(badRequest(new PayloadNotInformedError()))
   })
 })

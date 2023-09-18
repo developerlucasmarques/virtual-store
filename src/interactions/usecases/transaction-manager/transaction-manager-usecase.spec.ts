@@ -58,4 +58,13 @@ describe('TransactionManager UseCase', () => {
     const result = await sut.perform(makeFakeTransactionManagerData())
     expect(result.value).toEqual(new GatewayIncompatibilityError())
   })
+
+  it('Should throw if GatewayIncompatibilityError throws', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeTransactionManagerData())
+    await expect(promise).rejects.toThrow()
+  })
 })

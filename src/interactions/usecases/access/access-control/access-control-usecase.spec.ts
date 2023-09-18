@@ -58,7 +58,7 @@ describe('AccessControl UseCase', () => {
     const { sut, decrypterStub } = makeSut()
     const decryptSpy = jest.spyOn(decrypterStub, 'decrypt')
     await sut.perform(makeFakeAccessControlData())
-    expect(decryptSpy).toBeCalledWith('any_token')
+    expect(decryptSpy).toHaveBeenCalledWith('any_token')
   })
 
   test('Should return InvalidTokenError if Decrypter return null', async () => {
@@ -81,7 +81,7 @@ describe('AccessControl UseCase', () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform(makeFakeAccessControlData())
-    expect(loadByIdSpy).toBeCalledWith('any_id')
+    expect(loadByIdSpy).toHaveBeenCalledWith('any_id')
   })
 
   test('Should return AccessDeniedError if LoadUsertById return null', async () => {

@@ -172,7 +172,7 @@ describe('Checkout UseCase', () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform('any_user_id')
-    expect(loadByIdSpy).toBeCalledWith('any_user_id')
+    expect(loadByIdSpy).toHaveBeenCalledWith('any_user_id')
   })
 
   it('Should call LoadUsertById only once', async () => {

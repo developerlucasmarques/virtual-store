@@ -48,6 +48,13 @@ describe('EventManager UseCase', () => {
     })
   })
 
+  it('Should call AddOrder only once', async () => {
+    const { sut, addOrderStub } = makeSut()
+    const performSpy = jest.spyOn(addOrderStub, 'perform')
+    await sut.handle(makeFakeEventManagerData())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return PurchaseIntentNotFoundError if AddOrder fails', async () => {
     const { sut, addOrderStub } = makeSut()
     jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(

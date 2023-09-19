@@ -1,6 +1,6 @@
-import type { AddOrderResponse, Event, EventManagerData } from '@/domain/usecases-contracts'
+import type { Event, EventManagerData } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
-import { left, right } from '@/shared/either'
+import { left, right, type Either } from '@/shared/either'
 import { EventManagerUseCase } from './event-manager-usecase'
 
 const makeFakeEventManagerData = (): EventManagerData => ({
@@ -21,27 +21,45 @@ type AnyEventData = {
 const makeAnyEvent = (): Event<AnyEventData> => {
   class AnyEventStub implements Event<AnyEventData> {
     reqProps: Array<keyof AnyEventData> = ['userEmail', 'userId']
-    async perform (data: AnyEventData): Promise<AddOrderResponse> {
+    async perform (data: AnyEventData): Promise<Either<Error, null>> {
       return right(null)
     }
   }
   return new AnyEventStub()
 }
 
+type AnotherEventData = {
+  userEmail: string
+  userId: string
+  userName: string
+}
+
+const makeAnotherEvent = (): Event<AnotherEventData> => {
+  class AnotherEventStub implements Event<AnotherEventData> {
+    reqProps: Array<keyof AnotherEventData> = ['userEmail', 'userId', 'userName']
+    async perform (data: AnotherEventData): Promise<Either<Error, null>> {
+      return right(null)
+    }
+  }
+  return new AnotherEventStub()
+}
+
 type SutTypes = {
   sut: EventManagerUseCase
   anyEventStub: Event<AnyEventData>
+  anotherEventStub: Event<AnotherEventData>
 }
 
 const makeSut = (): SutTypes => {
   const anyEventStub = makeAnyEvent()
+  const anotherEventStub = makeAnotherEvent()
   const sut = new EventManagerUseCase([
     {
-      PaymentSuccess: [{ event: anyEventStub }],
+      PaymentSuccess: [{ event: anyEventStub }, { event: anotherEventStub }],
       PaymentFailure: []
     }
   ])
-  return { sut, anyEventStub }
+  return { sut, anyEventStub, anotherEventStub }
 }
 
 describe('EventManager UseCase', () => {
@@ -93,5 +111,16 @@ describe('EventManager UseCase', () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toBeNull()
+  })
+
+  it('Should call AnotherEvent with correct values', async () => {
+    const { sut, anotherEventStub } = makeSut()
+    const performSpy = jest.spyOn(anotherEventStub, 'perform')
+    await sut.perform(makeFakeEventManagerData())
+    expect(performSpy).toHaveBeenCalledWith({
+      userId: 'any_user_id',
+      userEmail: 'any_email@mail.com',
+      userName: 'any name'
+    })
   })
 })

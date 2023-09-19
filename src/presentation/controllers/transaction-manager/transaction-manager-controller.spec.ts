@@ -1,9 +1,9 @@
-import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
-import { TransactionManagerController } from './transaction-manager-controller'
-import type { HttpRequest } from '@/presentation/http-types/http'
 import { type TransactionManager, type TransactionManagerData, type TransactionManagerResponse } from '@/domain/usecases-contracts'
+import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
+import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
+import { TransactionManagerController } from './transaction-manager-controller'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -78,5 +78,11 @@ describe('TransactionManager Controller', () => {
     )
     const httpResonse = await sut.handle(makeFakeRequest())
     expect(httpResonse).toEqual(serverError(new Error('any_message')))
+  })
+
+  it('Should return 204 if TransactionManager is a success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(noContent())
   })
 })

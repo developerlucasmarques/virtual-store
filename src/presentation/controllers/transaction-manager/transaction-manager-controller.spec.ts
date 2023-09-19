@@ -1,9 +1,10 @@
-import { type TransactionManager, type TransactionManagerData, type TransactionManagerResponse } from '@/domain/usecases-contracts'
+import type { TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
 import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
-import { left, right } from '@/shared/either'
+import { type Either, left, right } from '@/shared/either'
 import { TransactionManagerController } from './transaction-manager-controller'
+import type { Validation } from '@/presentation/contracts'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -13,6 +14,15 @@ const makeFakeRequest = (): HttpRequest => ({
     payload: 'any_payload'
   }
 })
+
+const makeValidationComposite = (): Validation => {
+  class ValidationCompositeStub implements Validation {
+    validate (input: any): Either<Error, null> {
+      return right(null)
+    }
+  }
+  return new ValidationCompositeStub()
+}
 
 const makeTransactionManager = (): TransactionManager => {
   class TransactionManagerStub implements TransactionManager {
@@ -25,20 +35,30 @@ const makeTransactionManager = (): TransactionManager => {
 
 type SutTypes = {
   sut: TransactionManagerController
+  validationCompositeStub: Validation
   transactionManagerStub: TransactionManager
 }
 
 const makeSut = (): SutTypes => {
+  const validationCompositeStub = makeValidationComposite()
   const transactionManagerStub = makeTransactionManager()
-  const sut = new TransactionManagerController(transactionManagerStub)
+  const sut = new TransactionManagerController(validationCompositeStub, transactionManagerStub)
   return {
     sut,
+    validationCompositeStub,
     transactionManagerStub
   }
 }
 
 describe('TransactionManager Controller', () => {
-  it('Should return 400 if signature is not informed in headers', async () => {
+  it('Should call ValidationComposite with correct values', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+    await sut.handle(makeFakeRequest())
+    expect(validateSpy).toHaveBeenCalledWith(makeFakeRequest())
+  })
+
+  it('Should return 400 if Validation returns an error', async () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(badRequest(new SignatureNotInformedError()))

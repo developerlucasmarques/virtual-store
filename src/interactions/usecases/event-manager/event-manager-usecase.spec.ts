@@ -130,4 +130,13 @@ describe('EventManager UseCase', () => {
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
+
+  it('Should return an Error if AnotherEvent fails', async () => {
+    const { sut, anotherEventStub } = makeSut()
+    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    const result = await sut.perform(makeFakeEventManagerData())
+    expect(result.value).toEqual(new Error('any_message'))
+  })
 })

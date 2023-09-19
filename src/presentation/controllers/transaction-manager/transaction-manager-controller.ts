@@ -1,14 +1,18 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
-import type { Controller } from '@/presentation/contracts'
+import type { Controller, Validation } from '@/presentation/contracts'
 import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
-  constructor (private readonly transactionManager: TransactionManager) {}
+  constructor (
+    private readonly validationComposite: Validation,
+    private readonly transactionManager: TransactionManager
+  ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
+      this.validationComposite.validate(httpRequest)
       const signature = httpRequest.headers?.signature
       if (!signature) {
         return badRequest(new SignatureNotInformedError())

@@ -1,10 +1,9 @@
 import type { TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
+import type { Validation } from '@/presentation/contracts'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
-import { type Either, left, right } from '@/shared/either'
+import { left, right, type Either } from '@/shared/either'
 import { TransactionManagerController } from './transaction-manager-controller'
-import type { Validation } from '@/presentation/contracts'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -55,21 +54,16 @@ describe('TransactionManager Controller', () => {
     const { sut, validationCompositeStub } = makeSut()
     const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
     await sut.handle(makeFakeRequest())
-    expect(validateSpy).toHaveBeenCalledWith(makeFakeRequest())
+    expect(validateSpy).toHaveBeenCalledWith({ signature: 'any_signature' })
   })
 
-  it('Should return 400 if Validation returns an error', async () => {
-    const { sut } = makeSut()
+  it('Should return 400 if ValidationComposite returns an error', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+      left(new Error('any_message'))
+    )
     const httpResponse = await sut.handle({})
-    expect(httpResponse).toEqual(badRequest(new SignatureNotInformedError()))
-  })
-
-  it('Should return 400 if payload is not informed in body', async () => {
-    const { sut } = makeSut()
-    const httpResponse = await sut.handle({
-      headers: { signature: 'any_signature' }
-    })
-    expect(httpResponse).toEqual(badRequest(new PayloadNotInformedError()))
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 
   it('Should call TransactionManager with correct values', async () => {

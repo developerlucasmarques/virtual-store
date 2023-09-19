@@ -143,6 +143,18 @@ describe('EventManager UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
+  it('Should return the first error if any event returns an error', async () => {
+    const { sut, anyEventStub, anotherEventStub } = makeSut()
+    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
+    )
+    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('another_message')))
+    )
+    const result = await sut.perform(makeFakeEventManagerData())
+    expect(result.value).toEqual(new Error('any_message'))
+  })
+
   it('Should return null if Events are a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeEventManagerData())

@@ -80,6 +80,18 @@ describe('TransactionManager Controller', () => {
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 
+  it('Should return 400 with the first error that ValidationComposite returns', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+      left(new Error('any_message'))
+    )
+    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+      left(new Error('another_message'))
+    )
+    const httpResponse = await sut.handle({})
+    expect(httpResponse).toEqual(badRequest(new Error('any_message')))
+  })
+
   it('Should call TransactionManager with correct values', async () => {
     const { sut, transactionManagerStub } = makeSut()
     const performSpy = jest.spyOn(transactionManagerStub, 'perform')

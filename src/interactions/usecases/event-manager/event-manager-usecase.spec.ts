@@ -1,5 +1,5 @@
-import type { AddOrderData, AddOrderResponse, Event, EventManagerData } from '@/domain/usecases-contracts'
-import { EventNotFoundError, PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
+import type { AddOrderResponse, Event, EventManagerData } from '@/domain/usecases-contracts'
+import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right } from '@/shared/either'
 import { EventManagerUseCase } from './event-manager-usecase'
 
@@ -13,57 +13,62 @@ const makeFakeEventManagerData = (): EventManagerData => ({
   }
 })
 
-const makeAddOrder = (): Event<AddOrderData> => {
-  class AddOrderStub implements Event<AddOrderData> {
-    reqProps: Array<keyof AddOrderData> = ['purchaseIntentId', 'userId']
-    async perform (data: AddOrderData): Promise<AddOrderResponse> {
+type AnyEventData = {
+  userId: string
+  userEmail: string
+}
+
+const makeAnyEvent = (): Event<AnyEventData> => {
+  class AnyEventStub implements Event<AnyEventData> {
+    reqProps: Array<keyof AnyEventData> = ['userEmail', 'userId']
+    async perform (data: AnyEventData): Promise<AddOrderResponse> {
       return right(null)
     }
   }
-  return new AddOrderStub()
+  return new AnyEventStub()
 }
 
 type SutTypes = {
   sut: EventManagerUseCase
-  addOrderStub: Event<AddOrderData>
+  anyEventStub: Event<AnyEventData>
 }
 
 const makeSut = (): SutTypes => {
-  const addOrderStub = makeAddOrder()
+  const anyEventStub = makeAnyEvent()
   const sut = new EventManagerUseCase([
     {
-      PaymentSuccess: [{ event: addOrderStub }],
+      PaymentSuccess: [{ event: anyEventStub }],
       PaymentFailure: []
     }
   ])
-  return { sut, addOrderStub }
+  return { sut, anyEventStub }
 }
 
 describe('EventManager UseCase', () => {
-  it('Should call AddOrder with correct values', async () => {
-    const { sut, addOrderStub } = makeSut()
-    const performSpy = jest.spyOn(addOrderStub, 'perform')
+  it('Should call AnyEvent with correct values', async () => {
+    const { sut, anyEventStub } = makeSut()
+    const performSpy = jest.spyOn(anyEventStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
-      purchaseIntentId: 'any_purchase_intent_id'
+      userEmail: 'any_email@mail.com'
     })
   })
 
-  it('Should call AddOrder only once', async () => {
-    const { sut, addOrderStub } = makeSut()
-    const performSpy = jest.spyOn(addOrderStub, 'perform')
+  it('Should call AnyEvent only once', async () => {
+    const { sut, anyEventStub } = makeSut()
+    const performSpy = jest.spyOn(anyEventStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return PurchaseIntentNotFoundError if AddOrder fails', async () => {
-    const { sut, addOrderStub } = makeSut()
-    jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new PurchaseIntentNotFoundError('any_purchase_intent_id')))
+  it('Should return an Error if AnyEvent fails', async () => {
+    const { sut, anyEventStub } = makeSut()
+    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new Error('any_message')))
     )
     const result = await sut.perform(makeFakeEventManagerData())
-    expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
+    expect(result.value).toEqual(new Error('any_message'))
   })
 
   it('Should return EventNotFoundError if there is no event of the same type', async () => {
@@ -75,16 +80,16 @@ describe('EventManager UseCase', () => {
     expect(result.value).toEqual(new EventNotFoundError())
   })
 
-  it('Should throw if AddOrder throws', async () => {
-    const { sut, addOrderStub } = makeSut()
-    jest.spyOn(addOrderStub, 'perform').mockReturnValueOnce(
+  it('Should throw if AnyEvent throws', async () => {
+    const { sut, anyEventStub } = makeSut()
+    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
     const promise = sut.perform(makeFakeEventManagerData())
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return null if AddOrder is a success', async () => {
+  it('Should return null if AnyEvent is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toBeNull()

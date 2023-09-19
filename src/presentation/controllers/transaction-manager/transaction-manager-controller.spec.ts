@@ -50,11 +50,25 @@ const makeSut = (): SutTypes => {
 }
 
 describe('TransactionManager Controller', () => {
-  it('Should call ValidationComposite with correct values', async () => {
+  it('Should call ValidationComposite with correct headers', async () => {
     const { sut, validationCompositeStub } = makeSut()
     const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
     await sut.handle(makeFakeRequest())
     expect(validateSpy).toHaveBeenCalledWith({ signature: 'any_signature' })
+  })
+
+  it('Should call ValidationComposite with correct body', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+    await sut.handle(makeFakeRequest())
+    expect(validateSpy).toHaveBeenCalledWith({ payload: 'any_payload' })
+  })
+
+  it('Should call ValidationComposite twice', async () => {
+    const { sut, validationCompositeStub } = makeSut()
+    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+    await sut.handle(makeFakeRequest())
+    expect(validateSpy).toHaveBeenCalledTimes(2)
   })
 
   it('Should return 400 if ValidationComposite returns an error', async () => {

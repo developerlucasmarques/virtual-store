@@ -1,7 +1,7 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
 import type { Controller } from '@/presentation/contracts'
 import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
-import { badRequest, serverError } from '@/presentation/helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
@@ -21,7 +21,7 @@ export class TransactionManagerController implements Controller {
       if (transactionResult.isLeft()) {
         return serverError(transactionResult.value)
       }
-      return { statusCode: 0, body: '' }
+      return noContent()
     } catch (error: any) {
       return serverError(error)
     }

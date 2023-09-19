@@ -1,14 +1,14 @@
-import type { Event, EventConfigList, EventData, EventHandler, EventManager, EventManagerData, EventType } from '@/domain/usecases-contracts'
+import type { Event, EventData, EventManager, EventManagerData, EventType } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 
-type EventHandlerMap = Map<EventType, Array<{ event: Event<any> }>>
+export type EventConfigList = Array<Record<EventType, Array<Event<any>>>>
 
 export class EventManagerUseCase implements EventManager {
-  private readonly eventHandlers: EventHandlerMap
+  private readonly eventHandlers: Map<EventType, Array<Event<any>>>
 
   constructor (private readonly eventConfigList: EventConfigList) {
-    this.eventHandlers = new Map<EventType, Array<{ event: Event<any> }>>()
+    this.eventHandlers = new Map<EventType, Array<Event<any>>>()
     this.registerEventHandlers(this.eventConfigList)
   }
 
@@ -21,16 +21,16 @@ export class EventManagerUseCase implements EventManager {
     })
   }
 
-  private addToEventHandlers (eventType: EventType, event: Array<EventHandler<any>>): void {
+  private addToEventHandlers (eventType: EventType, event: Array<Event<any>>): void {
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, [])
     }
     this.eventHandlers.get(eventType)?.push(...event)
   }
 
-  private filterEventData (data: EventData, handler: EventHandler<any>): Partial<EventData> {
+  private filterEventData (data: EventData, handler: Event<any>): Partial<EventData> {
     const eventDataSubset: Partial<EventData> = {}
-    for (const property of handler.event.reqProps) {
+    for (const property of handler.reqProps) {
       eventDataSubset[property as keyof typeof data] = data[property as keyof typeof data]
     }
     return eventDataSubset
@@ -41,7 +41,7 @@ export class EventManagerUseCase implements EventManager {
     if (eventHandlers && eventHandlers.length !== 0) {
       for (const eventHandler of eventHandlers) {
         const eventDataSubset = this.filterEventData(data.eventData, eventHandler)
-        const result = await eventHandler.event.perform(eventDataSubset)
+        const result = await eventHandler.perform(eventDataSubset)
         if (result.isLeft()) {
           return left(result.value)
         }

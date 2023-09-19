@@ -55,7 +55,7 @@ const makeSut = (): SutTypes => {
   const anotherEventPaymentSuccessStub = makeAnotherEventPaymentSuccess()
   const sut = new EventManagerUseCase([
     {
-      PaymentSuccess: [{ event: anyEventPaymentSuccessStub }, { event: anotherEventPaymentSuccessStub }],
+      PaymentSuccess: [anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub],
       PaymentFailure: []
     }
   ])

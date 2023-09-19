@@ -15,7 +15,7 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
 const makeFakeTransactionListenerGatewayResponse = (): TransactionListenerGatewayResponse => ({
   purchaseIntentId: 'any_purchase_intent_id',
   userId: 'any_user_id',
-  eventName: 'PaymentSuccess'
+  eventType: 'PaymentSuccess'
 })
 
 const makeFakeUserModel = (): UserModel => ({
@@ -28,7 +28,7 @@ const makeFakeUserModel = (): UserModel => ({
 })
 
 const makeFakeEventManagerData = (): EventManagerData => ({
-  eventName: 'PaymentSuccess',
+  eventType: 'PaymentSuccess',
   eventData: {
     purchaseIntentId: 'any_purchase_intent_id',
     userId: 'any_user_id',

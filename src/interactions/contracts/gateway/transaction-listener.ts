@@ -8,7 +8,7 @@ export type TransactionListenerGatewayData = {
 export type TransactionListenerGatewayResponse = {
   userId: string
   purchaseIntentId: string
-  eventName: EventType
+  eventType: EventType
 }
 
 export interface TransactionListenerGateway {

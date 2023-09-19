@@ -20,7 +20,7 @@ export class TransactionManagerUseCase implements TransactionManager {
       return left(new UserNotFoundError())
     }
     const eventResult = await this.eventManager.perform({
-      eventName: listenerResult.eventName,
+      eventType: listenerResult.eventType,
       eventData: {
         purchaseIntentId: listenerResult.purchaseIntentId,
         userId: user.id,

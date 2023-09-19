@@ -16,7 +16,9 @@ export class TransactionManagerController implements Controller {
         this.validationComposite.validate(httpRequest.body)
       ]
       for (const validation of validations) {
-        if (validation.isLeft()) return badRequest(validation.value)
+        if (validation.isLeft()) {
+          return badRequest(validation.value)
+        }
       }
       const { headers: { signature }, body: { payload } } = httpRequest
       const transactionResult = await this.transactionManager.perform({ signature, payload })

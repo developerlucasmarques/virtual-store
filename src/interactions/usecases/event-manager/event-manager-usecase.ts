@@ -1,50 +1,47 @@
-import type { AddOrderData, Event, EventData, EventManager, EventManagerData, EventName } from '@/domain/usecases-contracts'
+import type { Event, EventConfigList, EventData, EventHandler, EventManager, EventManagerData, EventType } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 
-type EventHandler = Map<EventName, Array<{ event: Event<any>, reqProps: Array<keyof any> }>>
-type Handler = { event: Event<any>, reqProps: Array<keyof any> }
-type HandlerMap = Record<EventName, Array<{ event: Event<any>, reqProps: Array<keyof any> }>>
+type EventHandlerMap = Map<EventType, Array<{ event: Event<any> }>>
 
 export class EventManagerUseCase implements EventManager {
-  private readonly handlers: EventHandler
+  private readonly eventHandlers: EventHandlerMap
 
-  constructor (
-    private readonly addOrder: Event<AddOrderData>
-  ) {
-    this.handlers = new Map<EventName, Array<{ event: Event<any>, reqProps: Array<keyof any> }>>()
-    this.registerHandlers({
-      PaymentSuccess: [
-        { event: this.addOrder, reqProps: this.addOrder.reqProps }
-      ],
-      PaymentFailure: []
+  constructor (private readonly eventConfigList: EventConfigList) {
+    this.eventHandlers = new Map<EventType, Array<{ event: Event<any> }>>()
+    this.registerEventHandlers(this.eventConfigList)
+  }
+
+  private registerEventHandlers (eventConfigList: EventConfigList): void {
+    eventConfigList.forEach((eventConfig) => {
+      Object.keys(eventConfig).forEach((eventType) => {
+        const typedEventType = eventType as EventType
+        this.addToEventHandlers(typedEventType, eventConfig[typedEventType])
+      })
     })
   }
 
-  private registerHandlers (handlerMap: HandlerMap): void {
-    Object.entries(handlerMap).forEach(([eventName, event]) => {
-      const typedEventName = eventName as EventName
-      if (!this.handlers.has(typedEventName)) {
-        this.handlers.set(typedEventName, [])
-      }
-      this.handlers.get(typedEventName)?.push(...event)
-    })
+  private addToEventHandlers (eventType: EventType, event: Array<EventHandler<any>>): void {
+    if (!this.eventHandlers.has(eventType)) {
+      this.eventHandlers.set(eventType, [])
+    }
+    this.eventHandlers.get(eventType)?.push(...event)
   }
 
-  private filterEventData (data: EventData, handler: Handler): Partial<EventData> {
+  private filterEventData (data: EventData, handler: EventHandler<any>): Partial<EventData> {
     const eventDataSubset: Partial<EventData> = {}
-    for (const property of handler.reqProps) {
+    for (const property of handler.event.reqProps) {
       eventDataSubset[property as keyof typeof data] = data[property as keyof typeof data]
     }
     return eventDataSubset
   }
 
   async perform (data: EventManagerData): Promise<Either<Error, null>> {
-    const handlers = this.handlers.get(data.eventName)
-    if (handlers && handlers.length !== 0) {
-      for (const handler of handlers) {
-        const eventDataSubset = this.filterEventData(data.eventData, handler)
-        const result = await handler.event.perform(eventDataSubset)
+    const eventHandlers = this.eventHandlers.get(data.eventType)
+    if (eventHandlers && eventHandlers.length !== 0) {
+      for (const eventHandler of eventHandlers) {
+        const eventDataSubset = this.filterEventData(data.eventData, eventHandler)
+        const result = await eventHandler.event.perform(eventDataSubset)
         if (result.isLeft()) {
           return left(result.value)
         }

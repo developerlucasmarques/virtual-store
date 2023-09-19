@@ -1,20 +1,20 @@
-import type { EventManager, Event, AddOrder, AddOrderData, AddOrderResponse, EventManagerData } from '@/domain/usecases-contracts'
-import { EventManagerUseCase } from './event-manager-usecase'
-import { left, right } from '@/shared/either'
+import type { AddOrderData, AddOrderResponse, Event, EventManagerData } from '@/domain/usecases-contracts'
 import { EventNotFoundError, PurchaseIntentNotFoundError } from '@/domain/usecases-contracts/errors'
+import { left, right } from '@/shared/either'
+import { EventManagerUseCase } from './event-manager-usecase'
 
 const makeFakeEventManagerData = (): EventManagerData => ({
-  eventName: 'PaymentSuccess',
+  eventType: 'PaymentSuccess',
   eventData: {
+    purchaseIntentId: 'any_purchase_intent_id',
+    userEmail: 'any_email@mail.com',
     userId: 'any_user_id',
-    userName: 'any_user_name',
-    userEmail: 'any_user_email',
-    purchaseIntentId: 'any_purchase_intent_id'
+    userName: 'any name'
   }
 })
 
 const makeAddOrder = (): Event<AddOrderData> => {
-  class AddOrderStub implements AddOrder, Event<AddOrderData> {
+  class AddOrderStub implements Event<AddOrderData> {
     reqProps: Array<keyof AddOrderData> = ['purchaseIntentId', 'userId']
     async perform (data: AddOrderData): Promise<AddOrderResponse> {
       return right(null)
@@ -23,18 +23,20 @@ const makeAddOrder = (): Event<AddOrderData> => {
   return new AddOrderStub()
 }
 
-export type SutTypes = {
-  sut: EventManager
+type SutTypes = {
+  sut: EventManagerUseCase
   addOrderStub: Event<AddOrderData>
 }
 
 const makeSut = (): SutTypes => {
   const addOrderStub = makeAddOrder()
-  const sut = new EventManagerUseCase(addOrderStub)
-  return {
-    sut,
-    addOrderStub
-  }
+  const sut = new EventManagerUseCase([
+    {
+      PaymentSuccess: [{ event: addOrderStub }],
+      PaymentFailure: []
+    }
+  ])
+  return { sut, addOrderStub }
 }
 
 describe('EventManager UseCase', () => {
@@ -67,7 +69,7 @@ describe('EventManager UseCase', () => {
   it('Should return EventNotFoundError if there is no event of the same type', async () => {
     const { sut } = makeSut()
     const result = await sut.perform({
-      eventName: 'PaymentFailure',
+      eventType: 'PaymentFailure',
       eventData: makeFakeEventManagerData().eventData
     })
     expect(result.value).toEqual(new EventNotFoundError())

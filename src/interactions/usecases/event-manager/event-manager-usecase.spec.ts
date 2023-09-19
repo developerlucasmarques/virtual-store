@@ -123,4 +123,11 @@ describe('EventManager UseCase', () => {
       userName: 'any name'
     })
   })
+
+  it('Should call AnotherEvent only once', async () => {
+    const { sut, anotherEventStub } = makeSut()
+    const performSpy = jest.spyOn(anotherEventStub, 'perform')
+    await sut.perform(makeFakeEventManagerData())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
 })

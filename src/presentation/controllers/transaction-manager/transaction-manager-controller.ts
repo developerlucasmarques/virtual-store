@@ -5,16 +5,13 @@ import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
   constructor (
-    private readonly validationComposite: Validation,
+    private readonly validation: Validation,
     private readonly transactionManager: TransactionManager
   ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const validations = [
-        this.validationComposite.validate(httpRequest.headers),
-        this.validationComposite.validate(httpRequest.body)
-      ]
+      const validations = [this.validation.validate(httpRequest.headers), this.validation.validate(httpRequest.body)]
       for (const validation of validations) {
         if (validation.isLeft()) {
           return badRequest(validation.value)

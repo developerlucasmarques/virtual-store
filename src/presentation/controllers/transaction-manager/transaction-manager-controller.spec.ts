@@ -14,13 +14,13 @@ const makeFakeRequest = (): HttpRequest => ({
   }
 })
 
-const makeValidationComposite = (): Validation => {
-  class ValidationCompositeStub implements Validation {
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
     validate (input: any): Either<Error, null> {
       return right(null)
     }
   }
-  return new ValidationCompositeStub()
+  return new ValidationStub()
 }
 
 const makeTransactionManager = (): TransactionManager => {
@@ -34,58 +34,58 @@ const makeTransactionManager = (): TransactionManager => {
 
 type SutTypes = {
   sut: TransactionManagerController
-  validationCompositeStub: Validation
+  validationStub: Validation
   transactionManagerStub: TransactionManager
 }
 
 const makeSut = (): SutTypes => {
-  const validationCompositeStub = makeValidationComposite()
+  const validationStub = makeValidation()
   const transactionManagerStub = makeTransactionManager()
-  const sut = new TransactionManagerController(validationCompositeStub, transactionManagerStub)
+  const sut = new TransactionManagerController(validationStub, transactionManagerStub)
   return {
     sut,
-    validationCompositeStub,
+    validationStub,
     transactionManagerStub
   }
 }
 
 describe('TransactionManager Controller', () => {
-  it('Should call ValidationComposite with correct headers', async () => {
-    const { sut, validationCompositeStub } = makeSut()
-    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+  it('Should call Validation with correct headers', async () => {
+    const { sut, validationStub } = makeSut()
+    const validateSpy = jest.spyOn(validationStub, 'validate')
     await sut.handle(makeFakeRequest())
     expect(validateSpy).toHaveBeenCalledWith({ signature: 'any_signature' })
   })
 
-  it('Should call ValidationComposite with correct body', async () => {
-    const { sut, validationCompositeStub } = makeSut()
-    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+  it('Should call Validation with correct body', async () => {
+    const { sut, validationStub } = makeSut()
+    const validateSpy = jest.spyOn(validationStub, 'validate')
     await sut.handle(makeFakeRequest())
     expect(validateSpy).toHaveBeenCalledWith({ payload: 'any_payload' })
   })
 
-  it('Should call ValidationComposite twice', async () => {
-    const { sut, validationCompositeStub } = makeSut()
-    const validateSpy = jest.spyOn(validationCompositeStub, 'validate')
+  it('Should call Validation twice', async () => {
+    const { sut, validationStub } = makeSut()
+    const validateSpy = jest.spyOn(validationStub, 'validate')
     await sut.handle(makeFakeRequest())
     expect(validateSpy).toHaveBeenCalledTimes(2)
   })
 
-  it('Should return 400 if ValidationComposite returns an error', async () => {
-    const { sut, validationCompositeStub } = makeSut()
-    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+  it('Should return 400 if Validation returns an error', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(
       left(new Error('any_message'))
     )
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(badRequest(new Error('any_message')))
   })
 
-  it('Should return 400 with the first error that ValidationComposite returns', async () => {
-    const { sut, validationCompositeStub } = makeSut()
-    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+  it('Should return 400 with the first error that Validation returns', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(
       left(new Error('any_message'))
     )
-    jest.spyOn(validationCompositeStub, 'validate').mockReturnValueOnce(
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(
       left(new Error('another_message'))
     )
     const httpResponse = await sut.handle({})

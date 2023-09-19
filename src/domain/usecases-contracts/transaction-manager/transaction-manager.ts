@@ -6,6 +6,13 @@ export type TransactionManagerData = {
   payload: any
 }
 
+export type TransactionEventData = {
+  userId: string
+  userName: string
+  userEmail: string
+  purchaseIntentId: string
+}
+
 export type TransactionManagerResponse = Either<GatewayIncompatibilityError | UserNotFoundError, null>
 
 export interface TransactionManager {

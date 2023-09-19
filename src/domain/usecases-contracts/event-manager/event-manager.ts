@@ -2,18 +2,11 @@ import type { Either } from '@/shared/either'
 
 export type EventType = 'PaymentSuccess' | 'PaymentFailure'
 
-export type EventData = {
-  userId: string
-  userName: string
-  userEmail: string
-  purchaseIntentId: string
-}
-
-export type EventManagerData = {
+export type EventManagerData<T> = {
   eventType: EventType
-  eventData: EventData
+  eventData: T
 }
 
 export interface EventManager {
-  perform: (data: EventManagerData) => Promise<Either<Error, null>>
+  perform: (data: EventManagerData<any>) => Promise<Either<Error, null>>
 }

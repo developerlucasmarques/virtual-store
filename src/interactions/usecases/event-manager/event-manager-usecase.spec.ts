@@ -1,9 +1,9 @@
-import type { Event, EventManagerData } from '@/domain/usecases-contracts'
+import type { Event, EventManagerData, TransactionEventData } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 import { EventManagerUseCase } from './event-manager-usecase'
 
-const makeFakeEventManagerData = (): EventManagerData => ({
+const makeFakeEventManagerDataWithTypePaymentSuccess = (): EventManagerData<TransactionEventData> => ({
   eventType: 'PaymentSuccess',
   eventData: {
     purchaseIntentId: 'any_purchase_intent_id',
@@ -45,7 +45,7 @@ const makeAnotherEventPaymentSuccess = (): Event<AnotherEventPaymentSuccessData>
 }
 
 type SutTypes = {
-  sut: EventManagerUseCase
+  sut: EventManagerUseCase<TransactionEventData>
   anyEventPaymentSuccessStub: Event<AnyEventPaymentSuccessData>
   anotherEventPaymentSuccessStub: Event<AnotherEventPaymentSuccessData>
 }
@@ -53,12 +53,10 @@ type SutTypes = {
 const makeSut = (): SutTypes => {
   const anyEventPaymentSuccessStub = makeAnyEventPaymentSuccess()
   const anotherEventPaymentSuccessStub = makeAnotherEventPaymentSuccess()
-  const sut = new EventManagerUseCase([
-    {
-      PaymentSuccess: [anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub],
-      PaymentFailure: []
-    }
-  ])
+  const sut = new EventManagerUseCase({
+    PaymentSuccess: [anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub],
+    PaymentFailure: []
+  })
   return { sut, anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub }
 }
 
@@ -66,7 +64,7 @@ describe('EventManager UseCase', () => {
   it('Should call AnyEventPaymentSuccess with correct values', async () => {
     const { sut, anyEventPaymentSuccessStub } = makeSut()
     const performSpy = jest.spyOn(anyEventPaymentSuccessStub, 'perform')
-    await sut.perform(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
       userEmail: 'any_email@mail.com'
@@ -76,7 +74,7 @@ describe('EventManager UseCase', () => {
   it('Should call AnyEventPaymentSuccess only once', async () => {
     const { sut, anyEventPaymentSuccessStub } = makeSut()
     const performSpy = jest.spyOn(anyEventPaymentSuccessStub, 'perform')
-    await sut.perform(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -85,7 +83,7 @@ describe('EventManager UseCase', () => {
     jest.spyOn(anyEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
-    const result = await sut.perform(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(result.value).toEqual(new Error('any_message'))
   })
 
@@ -93,7 +91,7 @@ describe('EventManager UseCase', () => {
     const { sut } = makeSut()
     const result = await sut.perform({
       eventType: 'PaymentFailure',
-      eventData: makeFakeEventManagerData().eventData
+      eventData: makeFakeEventManagerDataWithTypePaymentSuccess().eventData
     })
     expect(result.value).toEqual(new EventNotFoundError())
   })
@@ -103,14 +101,14 @@ describe('EventManager UseCase', () => {
     jest.spyOn(anyEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
-    const promise = sut.perform(makeFakeEventManagerData())
+    const promise = sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     await expect(promise).rejects.toThrow()
   })
 
   it('Should call AnotherEventPaymentSuccess with correct values', async () => {
     const { sut, anotherEventPaymentSuccessStub } = makeSut()
     const performSpy = jest.spyOn(anotherEventPaymentSuccessStub, 'perform')
-    await sut.perform(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
       userEmail: 'any_email@mail.com',
@@ -121,7 +119,7 @@ describe('EventManager UseCase', () => {
   it('Should call AnotherEventPaymentSuccess only once', async () => {
     const { sut, anotherEventPaymentSuccessStub } = makeSut()
     const performSpy = jest.spyOn(anotherEventPaymentSuccessStub, 'perform')
-    await sut.perform(makeFakeEventManagerData())
+    await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -130,7 +128,7 @@ describe('EventManager UseCase', () => {
     jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
-    const result = await sut.perform(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(result.value).toEqual(new Error('any_message'))
   })
 
@@ -139,7 +137,7 @@ describe('EventManager UseCase', () => {
     jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
-    const promise = sut.perform(makeFakeEventManagerData())
+    const promise = sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     await expect(promise).rejects.toThrow()
   })
 
@@ -151,13 +149,13 @@ describe('EventManager UseCase', () => {
     jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('another_message')))
     )
-    const result = await sut.perform(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(result.value).toEqual(new Error('any_message'))
   })
 
   it('Should return null if Events are a success', async () => {
     const { sut } = makeSut()
-    const result = await sut.perform(makeFakeEventManagerData())
+    const result = await sut.perform(makeFakeEventManagerDataWithTypePaymentSuccess())
     expect(result.value).toBeNull()
   })
 })

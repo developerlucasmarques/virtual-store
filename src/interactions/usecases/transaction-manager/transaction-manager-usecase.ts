@@ -1,4 +1,4 @@
-import type { EventManager, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
+import type { EventManager, TransactionEventData, TransactionEventType, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
 import { GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
@@ -7,7 +7,7 @@ export class TransactionManagerUseCase implements TransactionManager {
   constructor (
     private readonly transactionListenerGateway: TransactionListenerGateway,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
-    private readonly eventManager: EventManager
+    private readonly eventManager: EventManager<TransactionEventType, TransactionEventData>
   ) {}
 
   async perform (data: TransactionManagerData): Promise<TransactionManagerResponse> {

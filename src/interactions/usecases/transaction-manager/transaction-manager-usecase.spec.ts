@@ -1,4 +1,4 @@
-import type { EventManager, EventManagerData, TransactionManagerData } from '@/domain/usecases-contracts'
+import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
 import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 import { GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
@@ -27,7 +27,9 @@ const makeFakeUserModel = (): UserModel => ({
   accessToken: 'any_token'
 })
 
-const makeFakeEventManagerData = (): EventManagerData => ({
+const makeFakeEventManagerData = (): EventManagerData<
+TransactionEventType, TransactionEventData
+> => ({
   eventType: 'PaymentSuccess',
   eventData: {
     purchaseIntentId: 'any_purchase_intent_id',
@@ -55,9 +57,9 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
   return new LoadUserByIdRepoStub()
 }
 
-const makeEventManager = (): EventManager => {
-  class EventManagerStub implements EventManager {
-    async perform (data: EventManagerData): Promise<Either<Error, null>> {
+const makeEventManager = (): EventManager<TransactionEventType, TransactionEventData> => {
+  class EventManagerStub implements EventManager<TransactionEventType, TransactionEventData> {
+    async perform (data: EventManagerData<TransactionEventType, TransactionEventData>): Promise<Either<Error, null>> {
       return await Promise.resolve(right(null))
     }
   }
@@ -68,7 +70,7 @@ type SutTypes = {
   sut: TransactionManagerUseCase
   transactionListenerGatewayStub: TransactionListenerGateway
   loadUserByIdRepoStub: LoadUserByIdRepo
-  eventManagerStub: EventManager
+  eventManagerStub: EventManager<TransactionEventType, TransactionEventData>
 }
 
 const makeSut = (): SutTypes => {

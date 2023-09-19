@@ -1,40 +1,41 @@
-import type { Event, EventManager, EventManagerData, EventType } from '@/domain/usecases-contracts'
+import type { Event, EventManager, EventManagerData } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 
-export type EventConfig = Record<EventType, Array<Event<any>>>
+export class EventManagerUseCase<Type, Data> implements EventManager<Type, Data> {
+  private readonly eventHandlers: Map<Type, Array<Event<any>>>
 
-export class EventManagerUseCase<T> implements EventManager {
-  private readonly eventHandlers: Map<EventType, Array<Event<any>>>
-
-  constructor (private readonly eventConfig: EventConfig) {
-    this.eventHandlers = new Map<EventType, Array<Event<any>>>()
+  constructor (private readonly eventConfig: { [key in Type as string]: Array<Event<any>> }) {
+    this.eventHandlers = new Map<Type, Array<Event<any>>>()
     this.registerEventHandlers(this.eventConfig)
   }
 
-  private registerEventHandlers (eventConfig: EventConfig): void {
+  private registerEventHandlers (eventConfig: { [key in Type as string]: Array<Event<any>> }): void {
     for (const eventType in eventConfig) {
-      const eventHandlers = eventConfig[eventType as EventType]
-      this.addToEventHandlers(eventType as EventType, eventHandlers)
+      this.addToEventHandlers(eventType as Type, eventConfig[eventType])
     }
   }
 
-  private addToEventHandlers (eventType: EventType, event: Array<Event<any>>): void {
+  private addToEventHandlers (eventType: Type, event: Array<Event<any>>): void {
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, [])
     }
     this.eventHandlers.get(eventType)?.push(...event)
   }
 
-  private filterEventData (data: T, handler: Event<any>): Partial<T> {
-    const eventDataSubset: Partial<T> = {}
-    for (const property of handler.reqProps) {
-      eventDataSubset[property as keyof typeof data] = data[property as keyof typeof data]
+  private filterEventData (data: Data, handler: Event<any>): Partial<Data> {
+    const eventDataSubset: Partial<Data> = {}
+    if (data !== null && typeof data === 'object') {
+      for (const property of handler.reqProps) {
+        if (property in data) {
+          eventDataSubset[property as keyof Partial<Data>] = data[property as keyof Partial<Data>]
+        }
+      }
     }
     return eventDataSubset
   }
 
-  async perform (data: EventManagerData<T>): Promise<Either<Error, null>> {
+  async perform (data: EventManagerData<Type, Data>): Promise<Either<Error, null>> {
     const eventHandlers = this.eventHandlers.get(data.eventType)
     if (eventHandlers && eventHandlers.length !== 0) {
       for (const eventHandler of eventHandlers) {
@@ -49,21 +50,3 @@ export class EventManagerUseCase<T> implements EventManager {
     return left(new EventNotFoundError())
   }
 }
-
-// type AnotherEventPaymentSuccessData = {
-//   userEmail: string
-//   userId: string
-//   userName: string
-// }
-
-// const makeAnotherEventPaymentSuccess = (): Event<AnotherEventPaymentSuccessData> => {
-//   class AnotherEventPaymentSuccessStub implements Event<AnotherEventPaymentSuccessData> {
-//     reqProps: Array<keyof AnotherEventPaymentSuccessData> = ['userEmail', 'userId', 'userName']
-//     async perform (data: AnotherEventPaymentSuccessData): Promise<Either<Error, null>> {
-//       return right(null)
-//     }
-//   }
-//   return new AnotherEventPaymentSuccessStub()
-// }
-// const a = makeAnotherEventPaymentSuccess()
-// const t = new EventManagerUseCase(makeAnotherEventPaymentSuccess())

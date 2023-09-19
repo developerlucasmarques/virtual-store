@@ -6,6 +6,8 @@ export type TransactionManagerData = {
   payload: any
 }
 
+export type TransactionEventType = 'PaymentSuccess' | 'PaymentFailure'
+
 export type TransactionEventData = {
   userId: string
   userName: string

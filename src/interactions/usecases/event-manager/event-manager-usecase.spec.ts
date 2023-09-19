@@ -1,9 +1,9 @@
-import type { Event, EventManagerData, TransactionEventData } from '@/domain/usecases-contracts'
+import type { Event, EventManagerData, TransactionEventData, TransactionEventType } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 import { EventManagerUseCase } from './event-manager-usecase'
 
-const makeFakeEventManagerDataWithTypePaymentSuccess = (): EventManagerData<TransactionEventData> => ({
+const makeFakeEventManagerDataWithTypePaymentSuccess = (): EventManagerData<TransactionEventType, TransactionEventData> => ({
   eventType: 'PaymentSuccess',
   eventData: {
     purchaseIntentId: 'any_purchase_intent_id',
@@ -45,7 +45,7 @@ const makeAnotherEventPaymentSuccess = (): Event<AnotherEventPaymentSuccessData>
 }
 
 type SutTypes = {
-  sut: EventManagerUseCase<TransactionEventData>
+  sut: EventManagerUseCase<TransactionEventType, TransactionEventData>
   anyEventPaymentSuccessStub: Event<AnyEventPaymentSuccessData>
   anotherEventPaymentSuccessStub: Event<AnotherEventPaymentSuccessData>
 }
@@ -53,7 +53,7 @@ type SutTypes = {
 const makeSut = (): SutTypes => {
   const anyEventPaymentSuccessStub = makeAnyEventPaymentSuccess()
   const anotherEventPaymentSuccessStub = makeAnotherEventPaymentSuccess()
-  const sut = new EventManagerUseCase({
+  const sut = new EventManagerUseCase<TransactionEventType, TransactionEventData>({
     PaymentSuccess: [anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub],
     PaymentFailure: []
   })

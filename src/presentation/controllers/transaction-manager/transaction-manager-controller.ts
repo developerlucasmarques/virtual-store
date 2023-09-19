@@ -1,8 +1,8 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
 import type { Controller, Validation } from '@/presentation/contracts'
-import { PayloadNotInformedError, SignatureNotInformedError } from '@/presentation/errors'
 import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
+import { type Either } from '@/shared/either'
 
 export class TransactionManagerController implements Controller {
   constructor (
@@ -12,15 +12,13 @@ export class TransactionManagerController implements Controller {
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      this.validationComposite.validate(httpRequest)
-      const signature = httpRequest.headers?.signature
-      if (!signature) {
-        return badRequest(new SignatureNotInformedError())
+      const validations: Array<Either<Error, null>> = []
+      validations.push(this.validationComposite.validate(httpRequest.headers))
+      validations.push(this.validationComposite.validate(httpRequest.body))
+      for (const validation of validations) {
+        if (validation.isLeft()) return badRequest(validation.value)
       }
-      const payload = httpRequest.body?.payload
-      if (!payload) {
-        return badRequest(new PayloadNotInformedError())
-      }
+      const { headers: { signature }, body: { payload } } = httpRequest
       const transactionResult = await this.transactionManager.perform({ signature, payload })
       if (transactionResult.isLeft()) {
         return serverError(transactionResult.value)

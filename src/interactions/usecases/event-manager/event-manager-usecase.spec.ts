@@ -13,59 +13,59 @@ const makeFakeEventManagerData = (): EventManagerData => ({
   }
 })
 
-type AnyEventData = {
+type AnyEventPaymentSuccessData = {
   userId: string
   userEmail: string
 }
 
-const makeAnyEvent = (): Event<AnyEventData> => {
-  class AnyEventStub implements Event<AnyEventData> {
-    reqProps: Array<keyof AnyEventData> = ['userEmail', 'userId']
-    async perform (data: AnyEventData): Promise<Either<Error, null>> {
+const makeAnyEventPaymentSuccess = (): Event<AnyEventPaymentSuccessData> => {
+  class AnyEventPaymentSuccessStub implements Event<AnyEventPaymentSuccessData> {
+    reqProps: Array<keyof AnyEventPaymentSuccessData> = ['userEmail', 'userId']
+    async perform (data: AnyEventPaymentSuccessData): Promise<Either<Error, null>> {
       return right(null)
     }
   }
-  return new AnyEventStub()
+  return new AnyEventPaymentSuccessStub()
 }
 
-type AnotherEventData = {
+type AnotherEventPaymentSuccessData = {
   userEmail: string
   userId: string
   userName: string
 }
 
-const makeAnotherEvent = (): Event<AnotherEventData> => {
-  class AnotherEventStub implements Event<AnotherEventData> {
-    reqProps: Array<keyof AnotherEventData> = ['userEmail', 'userId', 'userName']
-    async perform (data: AnotherEventData): Promise<Either<Error, null>> {
+const makeAnotherEventPaymentSuccess = (): Event<AnotherEventPaymentSuccessData> => {
+  class AnotherEventPaymentSuccessStub implements Event<AnotherEventPaymentSuccessData> {
+    reqProps: Array<keyof AnotherEventPaymentSuccessData> = ['userEmail', 'userId', 'userName']
+    async perform (data: AnotherEventPaymentSuccessData): Promise<Either<Error, null>> {
       return right(null)
     }
   }
-  return new AnotherEventStub()
+  return new AnotherEventPaymentSuccessStub()
 }
 
 type SutTypes = {
   sut: EventManagerUseCase
-  anyEventStub: Event<AnyEventData>
-  anotherEventStub: Event<AnotherEventData>
+  anyEventPaymentSuccessStub: Event<AnyEventPaymentSuccessData>
+  anotherEventPaymentSuccessStub: Event<AnotherEventPaymentSuccessData>
 }
 
 const makeSut = (): SutTypes => {
-  const anyEventStub = makeAnyEvent()
-  const anotherEventStub = makeAnotherEvent()
+  const anyEventPaymentSuccessStub = makeAnyEventPaymentSuccess()
+  const anotherEventPaymentSuccessStub = makeAnotherEventPaymentSuccess()
   const sut = new EventManagerUseCase([
     {
-      PaymentSuccess: [{ event: anyEventStub }, { event: anotherEventStub }],
+      PaymentSuccess: [{ event: anyEventPaymentSuccessStub }, { event: anotherEventPaymentSuccessStub }],
       PaymentFailure: []
     }
   ])
-  return { sut, anyEventStub, anotherEventStub }
+  return { sut, anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub }
 }
 
 describe('EventManager UseCase', () => {
-  it('Should call AnyEvent with correct values', async () => {
-    const { sut, anyEventStub } = makeSut()
-    const performSpy = jest.spyOn(anyEventStub, 'perform')
+  it('Should call AnyEventPaymentSuccess with correct values', async () => {
+    const { sut, anyEventPaymentSuccessStub } = makeSut()
+    const performSpy = jest.spyOn(anyEventPaymentSuccessStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
@@ -73,16 +73,16 @@ describe('EventManager UseCase', () => {
     })
   })
 
-  it('Should call AnyEvent only once', async () => {
-    const { sut, anyEventStub } = makeSut()
-    const performSpy = jest.spyOn(anyEventStub, 'perform')
+  it('Should call AnyEventPaymentSuccess only once', async () => {
+    const { sut, anyEventPaymentSuccessStub } = makeSut()
+    const performSpy = jest.spyOn(anyEventPaymentSuccessStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return an Error if AnyEvent fails', async () => {
-    const { sut, anyEventStub } = makeSut()
-    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
+  it('Should return an Error if AnyEventPaymentSuccess fails', async () => {
+    const { sut, anyEventPaymentSuccessStub } = makeSut()
+    jest.spyOn(anyEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
     const result = await sut.perform(makeFakeEventManagerData())
@@ -98,18 +98,18 @@ describe('EventManager UseCase', () => {
     expect(result.value).toEqual(new EventNotFoundError())
   })
 
-  it('Should throw if AnyEvent throws', async () => {
-    const { sut, anyEventStub } = makeSut()
-    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
+  it('Should throw if AnyEventPaymentSuccess throws', async () => {
+    const { sut, anyEventPaymentSuccessStub } = makeSut()
+    jest.spyOn(anyEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
     const promise = sut.perform(makeFakeEventManagerData())
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should call AnotherEvent with correct values', async () => {
-    const { sut, anotherEventStub } = makeSut()
-    const performSpy = jest.spyOn(anotherEventStub, 'perform')
+  it('Should call AnotherEventPaymentSuccess with correct values', async () => {
+    const { sut, anotherEventPaymentSuccessStub } = makeSut()
+    const performSpy = jest.spyOn(anotherEventPaymentSuccessStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledWith({
       userId: 'any_user_id',
@@ -118,25 +118,25 @@ describe('EventManager UseCase', () => {
     })
   })
 
-  it('Should call AnotherEvent only once', async () => {
-    const { sut, anotherEventStub } = makeSut()
-    const performSpy = jest.spyOn(anotherEventStub, 'perform')
+  it('Should call AnotherEventPaymentSuccess only once', async () => {
+    const { sut, anotherEventPaymentSuccessStub } = makeSut()
+    const performSpy = jest.spyOn(anotherEventPaymentSuccessStub, 'perform')
     await sut.perform(makeFakeEventManagerData())
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return an Error if AnotherEvent fails', async () => {
-    const { sut, anotherEventStub } = makeSut()
-    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
+  it('Should return an Error if AnotherEventPaymentSuccess fails', async () => {
+    const { sut, anotherEventPaymentSuccessStub } = makeSut()
+    jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
     const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toEqual(new Error('any_message'))
   })
 
-  it('Should throw if AnotherEvent throws', async () => {
-    const { sut, anotherEventStub } = makeSut()
-    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
+  it('Should throw if AnotherEventPaymentSuccess throws', async () => {
+    const { sut, anotherEventPaymentSuccessStub } = makeSut()
+    jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.reject(new Error())
     )
     const promise = sut.perform(makeFakeEventManagerData())
@@ -144,11 +144,11 @@ describe('EventManager UseCase', () => {
   })
 
   it('Should return the first error if any event returns an error', async () => {
-    const { sut, anyEventStub, anotherEventStub } = makeSut()
-    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
+    const { sut, anyEventPaymentSuccessStub, anotherEventPaymentSuccessStub } = makeSut()
+    jest.spyOn(anyEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('any_message')))
     )
-    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
+    jest.spyOn(anotherEventPaymentSuccessStub, 'perform').mockReturnValueOnce(
       Promise.resolve(left(new Error('another_message')))
     )
     const result = await sut.perform(makeFakeEventManagerData())

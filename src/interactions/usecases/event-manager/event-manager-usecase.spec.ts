@@ -107,12 +107,6 @@ describe('EventManager UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return null if AnyEvent is a success', async () => {
-    const { sut } = makeSut()
-    const result = await sut.perform(makeFakeEventManagerData())
-    expect(result.value).toBeNull()
-  })
-
   it('Should call AnotherEvent with correct values', async () => {
     const { sut, anotherEventStub } = makeSut()
     const performSpy = jest.spyOn(anotherEventStub, 'perform')
@@ -149,7 +143,7 @@ describe('EventManager UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return null if AnyEvent is a success', async () => {
+  it('Should return null if Events are a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeEventManagerData())
     expect(result.value).toBeNull()

@@ -1,5 +1,5 @@
 import type { Middleware, Validation } from '../contracts'
-import { badRequest, serverError } from '../helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 
 export class HeadersValidationMiddleware implements Middleware {
@@ -11,7 +11,7 @@ export class HeadersValidationMiddleware implements Middleware {
       if (validation.isLeft()) {
         return badRequest(validation.value)
       }
-      return { statusCode: 0, body: '' }
+      return noContent()
     } catch (error: any) {
       return serverError(error)
     }

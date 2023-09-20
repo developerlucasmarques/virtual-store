@@ -95,6 +95,13 @@ describe('TransactionManager Controller', () => {
     })
   })
 
+  it('Should call TransactionManager only once', async () => {
+    const { sut, transactionManagerStub } = makeSut()
+    const performSpy = jest.spyOn(transactionManagerStub, 'perform')
+    await sut.handle(makeFakeRequest())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should return 500 if TransactionManager returns an error', async () => {
     const { sut, transactionManagerStub } = makeSut()
     jest.spyOn(transactionManagerStub, 'perform').mockReturnValueOnce(

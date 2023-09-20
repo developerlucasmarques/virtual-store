@@ -1,4 +1,4 @@
-import { adaptMiddleware, adaptRoute } from '@/main/adapters'
+import { adaptMiddleware, adaptRoute } from '@/main/adapters/express'
 import { makeAddProductToCartController, makeLoadCartController } from '@/main/factories/controllers/cart'
 import type { Router } from 'express'
 import { makeCustomerMiddleware } from '../middlewares'

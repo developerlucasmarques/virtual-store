@@ -1,5 +1,5 @@
 import type { Router } from 'express'
-import { adaptMiddleware, adaptRoute } from '../adapters'
+import { adaptMiddleware, adaptRoute } from '../adapters/express'
 import { makeCustomerMiddleware } from '../middlewares'
 import { makeCheckoutController } from '../factories/controllers/checkout'
 

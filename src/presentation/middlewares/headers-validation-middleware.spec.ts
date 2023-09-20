@@ -2,7 +2,7 @@ import { right, type Either, left } from '@/shared/either'
 import type { Validation } from '../contracts'
 import type { HttpRequest } from '../http-types/http'
 import { HeadersValidationMiddleware } from './headers-validation-middleware'
-import { badRequest, serverError } from '../helpers/http/http-helpers'
+import { badRequest, noContent, serverError } from '../helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: { anyField: 'any_value', anotherField: 'another_value' }
@@ -55,5 +55,11 @@ describe('HeadersValidation Middleware', () => {
     })
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new Error('any_message')))
+  })
+
+  it('Should return 204 if Validation is a success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(noContent())
   })
 })

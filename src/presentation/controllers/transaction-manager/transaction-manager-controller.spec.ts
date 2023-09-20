@@ -50,13 +50,6 @@ const makeSut = (): SutTypes => {
 }
 
 describe('TransactionManager Controller', () => {
-  it('Should call Validation with correct headers', async () => {
-    const { sut, validationStub } = makeSut()
-    const validateSpy = jest.spyOn(validationStub, 'validate')
-    await sut.handle(makeFakeRequest())
-    expect(validateSpy).toHaveBeenCalledWith({ signature: 'any_signature' })
-  })
-
   it('Should call Validation with correct body', async () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
@@ -64,11 +57,11 @@ describe('TransactionManager Controller', () => {
     expect(validateSpy).toHaveBeenCalledWith({ payload: 'any_payload' })
   })
 
-  it('Should call Validation twice', async () => {
+  it('Should call Validation only once', async () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
     await sut.handle(makeFakeRequest())
-    expect(validateSpy).toHaveBeenCalledTimes(2)
+    expect(validateSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should return 400 if Validation returns an error', async () => {

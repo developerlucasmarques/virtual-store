@@ -11,11 +11,9 @@ export class TransactionManagerController implements Controller {
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const validations = [this.validation.validate(httpRequest.headers), this.validation.validate(httpRequest.body)]
-      for (const validation of validations) {
-        if (validation.isLeft()) {
-          return badRequest(validation.value)
-        }
+      const validation = this.validation.validate(httpRequest.body)
+      if (validation.isLeft()) {
+        return badRequest(validation.value)
       }
       const { headers: { signature }, body: { payload } } = httpRequest
       const transactionResult = await this.transactionManager.perform({ signature, payload })

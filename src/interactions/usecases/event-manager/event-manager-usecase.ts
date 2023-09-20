@@ -2,25 +2,21 @@ import type { Event, EventManager, EventManagerData } from '@/domain/usecases-co
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
 import { left, right, type Either } from '@/shared/either'
 
-export class EventManagerUseCase<T, D> implements EventManager<T, D> {
+export class EventManagerUseCase<T extends string, D> implements EventManager<T, D> {
   private readonly eventHandlers: Map<T, Array<Event<any>>>
 
-  constructor (private readonly eventConfig: { [key in T as string]: Array<Event<any>> }) {
+  constructor (private readonly eventConfig: { [key in T]: Array<Event<any>> }) {
     this.eventHandlers = new Map<T, Array<Event<any>>>()
     this.registerEventHandlers(this.eventConfig)
   }
 
-  private registerEventHandlers (eventConfig: { [key in T as string]: Array<Event<any>> }): void {
+  private registerEventHandlers (eventConfig: { [key in T]: Array<Event<any>> }): void {
     for (const eventType in eventConfig) {
-      this.addToEventHandlers(eventType as T, eventConfig[eventType])
+      if (!this.eventHandlers.has(eventType)) {
+        this.eventHandlers.set(eventType, [])
+      }
+      this.eventHandlers.get(eventType)?.push(...eventConfig[eventType])
     }
-  }
-
-  private addToEventHandlers (eventType: T, event: Array<Event<any>>): void {
-    if (!this.eventHandlers.has(eventType)) {
-      this.eventHandlers.set(eventType, [])
-    }
-    this.eventHandlers.get(eventType)?.push(...event)
   }
 
   private filterEventData (data: D, handler: Event<any>): Partial<D> {

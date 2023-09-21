@@ -1,5 +1,5 @@
 import type { TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { noContent, serverError } from '@/presentation/helpers/http/http-helpers'
+import { noContent, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { TransactionManagerController } from './transaction-manager-controller'
@@ -80,9 +80,9 @@ describe('TransactionManager Controller', () => {
     expect(httpResonse).toEqual(serverError(new Error('any_message')))
   })
 
-  it('Should return 204 if TransactionManager is a success', async () => {
+  it('Should return 200 if TransactionManager is a success', async () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(noContent())
+    expect(httpResponse).toEqual(ok({ success: true }))
   })
 })

@@ -20,14 +20,9 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (!user) {
       return left(new UserNotFoundError())
     }
+    const { email: userEmail, name: userName } = user
     const eventResult = await this.eventManager.perform({
-      eventType,
-      eventData: {
-        purchaseIntentId,
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name
-      }
+      eventType, eventData: { purchaseIntentId, userId, userEmail, userName }
     })
     if (eventResult.isLeft()) {
       return left(eventResult.value)

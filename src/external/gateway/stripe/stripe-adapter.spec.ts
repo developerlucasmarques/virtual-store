@@ -30,7 +30,6 @@ jest.mock('stripe', () => {
           }
         },
         webhooks: {
-          generateTestHeaderString: jest.fn(async () => await Promise.resolve('any_headers')),
           constructEvent: jest.fn(() => ({
             data: {
               object: {
@@ -87,7 +86,7 @@ describe('Stripe Adapter', () => {
     it('Should return TransactionListenerGatewayResponse on success', async () => {
       const sut = makeSut()
       const result = await sut.listener(makeFakeTransactionListenerGatewayData())
-      expect(result).toEqual({
+      expect(result.value).toEqual({
         eventType: 'PaymentSuccess',
         userId: 'any_user_id',
         purchaseIntentId: 'any_purchase_intent_id'

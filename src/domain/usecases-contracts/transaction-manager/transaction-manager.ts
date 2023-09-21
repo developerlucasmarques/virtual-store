@@ -1,5 +1,5 @@
 import type { Either } from '@/shared/either'
-import type { GatewayIncompatibilityError, UserNotFoundError } from '../errors'
+import type { EventNotProcessError, GatewayIncompatibilityError, UserNotFoundError } from '../errors'
 
 export type TransactionManagerData = {
   signature: string
@@ -15,7 +15,9 @@ export type TransactionEventData = {
   purchaseIntentId: string
 }
 
-export type TransactionManagerResponse = Either<GatewayIncompatibilityError | UserNotFoundError, null>
+export type TransactionManagerResponse = Either<
+GatewayIncompatibilityError | EventNotProcessError | UserNotFoundError, null
+>
 
 export interface TransactionManager {
   perform: (data: TransactionManagerData) => Promise<TransactionManagerResponse>

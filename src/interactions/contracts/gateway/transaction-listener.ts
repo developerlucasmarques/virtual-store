@@ -1,5 +1,5 @@
 import type { TransactionEventType } from '@/domain/usecases-contracts'
-import type { GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
+import type { EventNotProcessError, GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 import { type Either } from '@/shared/either'
 
 export type TransactionListenerGatewayData = {
@@ -13,7 +13,9 @@ export type TransactionListenerGatewayValue = {
   eventType: TransactionEventType
 }
 
-export type TransactionListenerGatewayResponse = Either<GatewayIncompatibilityError | null, TransactionListenerGatewayValue>
+export type TransactionListenerGatewayResponse = Either<
+GatewayIncompatibilityError | EventNotProcessError, TransactionListenerGatewayValue
+>
 
 export interface TransactionListenerGateway {
   listener: (data: TransactionListenerGatewayData) => Promise<TransactionListenerGatewayResponse>

@@ -1,4 +1,4 @@
-import { EventNotProcessError, GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway, CheckoutGatewayData, CheckoutGatewayResponse, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
 import env from '@/main/config/env'
 import { left, right } from '@/shared/either'
@@ -66,7 +66,7 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
       if (error.type === 'StripeSignatureVerificationError') {
         return left(new GatewayIncompatibilityError(error.stack))
       }
-      return left(error)
+      return left(new GatewayExceptionError(error.stack))
     }
   }
 }

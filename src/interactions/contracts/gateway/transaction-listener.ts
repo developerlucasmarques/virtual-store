@@ -1,4 +1,4 @@
-import type { EventType } from '@/domain/usecases-contracts'
+import type { TransactionEventType } from '@/domain/usecases-contracts'
 
 export type TransactionListenerGatewayData = {
   signature: string
@@ -8,7 +8,7 @@ export type TransactionListenerGatewayData = {
 export type TransactionListenerGatewayResponse = {
   userId: string
   purchaseIntentId: string
-  eventType: EventType
+  eventType: TransactionEventType
 }
 
 export interface TransactionListenerGateway {

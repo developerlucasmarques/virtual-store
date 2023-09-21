@@ -1,4 +1,4 @@
-import type { CheckoutGatewayData } from '@/interactions/contracts'
+import type { CheckoutGatewayData, TransactionListenerGatewayData } from '@/interactions/contracts'
 import { StripeAdapter } from './stripe-adapter'
 
 jest.mock('stripe', () => {
@@ -8,7 +8,11 @@ jest.mock('stripe', () => {
       return {
         customers: {
           retrieve: jest.fn(async () => await Promise.resolve({
-            id: 'any_customer_id'
+            id: 'any_customer_id',
+            metadata: {
+              userId: 'any_user_id',
+              purchaseIntentId: 'any_purchase_intent_id'
+            }
           })),
           create: jest.fn(async () => await Promise.resolve({
             id: 'any_customer_id',
@@ -24,6 +28,20 @@ jest.mock('stripe', () => {
               url: 'https://checkout.stripe.com/c/pay/cs_test_any_token'
             }))
           }
+        },
+        webhooks: {
+          generateTestHeaderString: jest.fn(async () => await Promise.resolve('any_headers')),
+          constructEvent: jest.fn(() => ({
+            data: {
+              object: {
+                metadata: {
+                  userId: 'any_user_id',
+                  purchaseIntentId: 'any_purchase_intent_id'
+                }
+              }
+            },
+            type: 'payment_intent.succeeded'
+          }))
         }
       }
     })
@@ -43,16 +61,37 @@ const makeFakeCheckoutGatewayData = (): CheckoutGatewayData => ({
   }]
 })
 
+const makeFakeTransactionListenerGatewayData = (): TransactionListenerGatewayData => ({
+  signature: 'any_signature',
+  payload: 'any_payload'
+})
+
+const webhookSecret = 'any_secret'
+
 const makeSut = (): StripeAdapter => {
-  return new StripeAdapter()
+  return new StripeAdapter(webhookSecret)
 }
 
 describe('Stripe Adapter', () => {
-  it('Should return CheckoutGatewayResponse on success', async () => {
-    const sut = makeSut()
-    const result = await sut.payment(makeFakeCheckoutGatewayData())
-    expect(result).toEqual({
-      url: 'https://checkout.stripe.com/c/pay/cs_test_any_token'
+  describe('payment()', () => {
+    it('Should return CheckoutGatewayResponse on success', async () => {
+      const sut = makeSut()
+      const result = await sut.payment(makeFakeCheckoutGatewayData())
+      expect(result).toEqual({
+        url: 'https://checkout.stripe.com/c/pay/cs_test_any_token'
+      })
+    })
+  })
+
+  describe('listener()', () => {
+    it('Should return TransactionListenerGatewayResponse on success', async () => {
+      const sut = makeSut()
+      const result = await sut.listener(makeFakeTransactionListenerGatewayData())
+      expect(result).toEqual({
+        eventType: 'PaymentSuccess',
+        userId: 'any_user_id',
+        purchaseIntentId: 'any_purchase_intent_id'
+      })
     })
   })
 })

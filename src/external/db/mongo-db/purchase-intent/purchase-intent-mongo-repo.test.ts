@@ -65,5 +65,11 @@ describe('PurchaseIntentMongo Repository', () => {
       const purchaseIntent = await sut.loadById(idString)
       expect(purchaseIntent).toEqual(MongoHelper.convertCollectionIdObjectIdToString(purchaseIntentData))
     })
+
+    it('Should return null if not found a purchase intent', async () => {
+      const sut = makeSut()
+      const product = await sut.loadById(idString)
+      expect(product).toBeNull()
+    })
   })
 })

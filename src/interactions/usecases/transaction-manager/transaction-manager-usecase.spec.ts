@@ -1,7 +1,7 @@
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
 import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
-import { EventNotProcessError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { UserModel } from '@/domain/models'
 import { type Either, right, left } from '@/shared/either'
 
@@ -106,10 +106,10 @@ describe('TransactionManager UseCase', () => {
   it('Should return GatewayIncompatibilityError if TransactionListenerGateway returns null', async () => {
     const { sut, transactionListenerGatewayStub } = makeSut()
     jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
-      Promise.resolve(left(new GatewayIncompatibilityError()))
+      Promise.resolve(left(new GatewayIncompatibilityError('any_stack')))
     )
     const result = await sut.perform(makeFakeTransactionManagerData())
-    expect(result.value).toEqual(new GatewayIncompatibilityError())
+    expect(result.value).toEqual(new GatewayIncompatibilityError('any_stack'))
   })
 
   it('Should return EventNotProcessError if TransactionListenerGateway returns EventNotProcessError', async () => {
@@ -121,7 +121,16 @@ describe('TransactionManager UseCase', () => {
     expect(result.value).toEqual(new EventNotProcessError('any_event'))
   })
 
-  it('Should throw if GatewayIncompatibilityError throws', async () => {
+  it('Should return GatewayExceptionError if TransactionListenerGateway returns GatewayExceptionError', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
+      Promise.resolve(left(new GatewayExceptionError('any_event')))
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new GatewayExceptionError('any_event'))
+  })
+
+  it('Should throw if TransactionListenerGateway throws', async () => {
     const { sut, transactionListenerGatewayStub } = makeSut()
     jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
       Promise.reject(new Error())

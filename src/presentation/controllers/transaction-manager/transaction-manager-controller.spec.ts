@@ -3,6 +3,7 @@ import { noContent, serverError } from '@/presentation/helpers/http/http-helpers
 import type { HttpRequest } from '@/presentation/http-types/http'
 import { left, right } from '@/shared/either'
 import { TransactionManagerController } from './transaction-manager-controller'
+import { EventNotProcessError } from '@/domain/usecases-contracts/errors'
 
 const makeFakeRequest = (): HttpRequest => ({
   headers: {
@@ -50,6 +51,15 @@ describe('TransactionManager Controller', () => {
     const performSpy = jest.spyOn(transactionManagerStub, 'perform')
     await sut.handle(makeFakeRequest())
     expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return 204 if TransactionManager returns EventNotProcessError', async () => {
+    const { sut, transactionManagerStub } = makeSut()
+    jest.spyOn(transactionManagerStub, 'perform').mockReturnValueOnce(
+      Promise.resolve(left(new EventNotProcessError('any_message')))
+    )
+    const httpResonse = await sut.handle(makeFakeRequest())
+    expect(httpResonse).toEqual(noContent())
   })
 
   it('Should return 500 if TransactionManager returns an error', async () => {

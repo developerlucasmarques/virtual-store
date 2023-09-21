@@ -1,5 +1,5 @@
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
-import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
+import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 import { GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { UserModel } from '@/domain/models'
@@ -12,7 +12,7 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
   signature: 'any_signature'
 })
 
-const makeFakeTransactionListenerGatewayResponse = (): TransactionListenerGatewayResponse => ({
+const makeFakeTransactionListenerGatewayValue = (): TransactionListenerGatewayValue => ({
   purchaseIntentId: 'any_purchase_intent_id',
   userId: 'any_user_id',
   eventType: 'PaymentSuccess'
@@ -42,7 +42,7 @@ TransactionEventType, TransactionEventData
 const makeTransactionListenerGateway = (): TransactionListenerGateway => {
   class TransactionListenerGatewayStub implements TransactionListenerGateway {
     async listener (data: TransactionListenerGatewayData): Promise<TransactionListenerGatewayResponse> {
-      return await Promise.resolve(makeFakeTransactionListenerGatewayResponse())
+      return await Promise.resolve(right(makeFakeTransactionListenerGatewayValue()))
     }
   }
   return new TransactionListenerGatewayStub()
@@ -106,7 +106,7 @@ describe('TransactionManager UseCase', () => {
   it('Should return GatewayIncompatibilityError if TransactionListenerGateway returns null', async () => {
     const { sut, transactionListenerGatewayStub } = makeSut()
     jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
-      Promise.resolve(null)
+      Promise.resolve(left(new GatewayIncompatibilityError()))
     )
     const result = await sut.perform(makeFakeTransactionManagerData())
     expect(result.value).toEqual(new GatewayIncompatibilityError())

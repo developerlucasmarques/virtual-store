@@ -12,17 +12,21 @@ export class TransactionManagerUseCase implements TransactionManager {
 
   async perform (data: TransactionManagerData): Promise<TransactionManagerResponse> {
     const listenerResult = await this.transactionListenerGateway.listener(data)
-    if (!listenerResult) {
-      return left(new GatewayIncompatibilityError())
+    if (listenerResult.isLeft()) {
+      if (listenerResult.value instanceof GatewayIncompatibilityError) {
+        return left(listenerResult.value)
+      }
+      return right(null)
     }
-    const user = await this.loadUserByIdRepo.loadById(listenerResult.userId)
+    const { userId, eventType, purchaseIntentId } = listenerResult.value
+    const user = await this.loadUserByIdRepo.loadById(userId)
     if (!user) {
       return left(new UserNotFoundError())
     }
     const eventResult = await this.eventManager.perform({
-      eventType: listenerResult.eventType,
+      eventType,
       eventData: {
-        purchaseIntentId: listenerResult.purchaseIntentId,
+        purchaseIntentId,
         userId: user.id,
         userEmail: user.email,
         userName: user.name

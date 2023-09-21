@@ -8,8 +8,10 @@ describe('TransactionManagerValidation Factory', () => {
   it('Should call ValidationComposite with all validations', () => {
     makeTransactionManagerValidation()
     const validations: Validation[] = []
-    validations.push(new RequiredFieldValidation('payload'))
-    validations.push(new OnlyRequiredFieldsValidation(['payload']))
+    validations.push(
+      new RequiredFieldValidation('payload'),
+      new OnlyRequiredFieldsValidation(['payload'])
+    )
     expect(ValidationComposite).toHaveBeenCalledWith(validations)
   })
 })

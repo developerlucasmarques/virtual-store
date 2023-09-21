@@ -3,7 +3,9 @@ import { OnlyRequiredFieldsValidation, RequiredFieldValidation, ValidationCompos
 
 export const makeTransactionManagerValidation = (): ValidationComposite => {
   const validations: Validation[] = []
-  validations.push(new RequiredFieldValidation('payload'))
-  validations.push(new OnlyRequiredFieldsValidation(['payload']))
+  validations.push(
+    new RequiredFieldValidation('payload'),
+    new OnlyRequiredFieldsValidation(['payload'])
+  )
   return new ValidationComposite(validations)
 }

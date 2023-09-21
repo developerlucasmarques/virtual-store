@@ -1,7 +1,7 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
 import { EventNotProcessError } from '@/domain/usecases-contracts/errors'
 import type { Controller } from '@/presentation/contracts'
-import { noContent, serverError } from '@/presentation/helpers/http/http-helpers'
+import { noContent, ok, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
@@ -17,7 +17,7 @@ export class TransactionManagerController implements Controller {
         }
         return serverError(transactionResult.value)
       }
-      return noContent()
+      return ok({ success: true })
     } catch (error: any) {
       return serverError(error)
     }

@@ -1,21 +1,14 @@
 import type { TransactionManager } from '@/domain/usecases-contracts'
-import type { Controller, Validation } from '@/presentation/contracts'
-import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helpers'
+import type { Controller } from '@/presentation/contracts'
+import { noContent, serverError } from '@/presentation/helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '@/presentation/http-types/http'
 
 export class TransactionManagerController implements Controller {
-  constructor (
-    private readonly validation: Validation,
-    private readonly transactionManager: TransactionManager
-  ) {}
+  constructor (private readonly transactionManager: TransactionManager) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
-      const validation = this.validation.validate(httpRequest.body)
-      if (validation.isLeft()) {
-        return badRequest(validation.value)
-      }
-      const { headers: { signature }, body: { payload } } = httpRequest
+      const { headers: { signature }, body: payload } = httpRequest
       const transactionResult = await this.transactionManager.perform({ signature, payload })
       if (transactionResult.isLeft()) {
         return serverError(transactionResult.value)

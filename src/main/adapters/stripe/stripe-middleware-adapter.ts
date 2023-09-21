@@ -10,7 +10,6 @@ export const stripeAdaptMiddleware = (middleare: Middleware) => {
     const httpResponse = await middleare.handle(httpRequest)
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode <= 299) {
       Object.assign(req.headers, { signature: req.headers['stripe-signature'] })
-      req.body = { payload: { ...req.body } }
       next()
     } else {
       res.status(httpResponse.statusCode).json({

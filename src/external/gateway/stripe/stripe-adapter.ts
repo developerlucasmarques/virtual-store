@@ -1,8 +1,10 @@
+import { EventNotProcessError, GatewayIncompatibilityError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway, CheckoutGatewayData, CheckoutGatewayResponse, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse } from '@/interactions/contracts'
 import env from '@/main/config/env'
+import { left, right } from '@/shared/either'
 import type Stripe from 'stripe'
-import { StripeHelper } from './helpers/stripe-helper'
 import type { CustomCustomer } from './auxiliary-type-for-stripe'
+import { StripeHelper } from './helpers/stripe-helper'
 
 export class StripeAdapter implements CheckoutGateway, TransactionListenerGateway {
   constructor (private readonly webhookSecret: string) {}
@@ -46,7 +48,7 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
     return null
   }
 
-  async listener (data: TransactionListenerGatewayData): Promise<null | TransactionListenerGatewayResponse> {
+  async listener (data: TransactionListenerGatewayData): Promise<TransactionListenerGatewayResponse> {
     const stripe = await StripeHelper.getInstance()
     const payloadString = JSON.stringify(data.payload, (key, value) => {
       if (key === 'payload') {
@@ -54,28 +56,21 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
       }
       return value
     }, 2)
-    const header = stripe.webhooks.generateTestHeaderString({
-      payload: payloadString,
-      secret: this.webhookSecret
-    })
     try {
-      const event = stripe.webhooks.constructEvent(payloadString, header, this.webhookSecret)
+      const event = stripe.webhooks.constructEvent(payloadString, data.signature, this.webhookSecret)
       if (event.type === 'payment_intent.succeeded') {
         const cutomerId = (event.data.object as { customer: string }).customer
         const customer = await stripe.customers.retrieve(cutomerId) as unknown as CustomCustomer
-        return {
+        return right({
           eventType: 'PaymentSuccess',
           userId: customer.metadata.userId,
           purchaseIntentId: customer.metadata.purchaseIntentId
-        }
+        })
       }
+      return left(new EventNotProcessError(event.type))
     } catch (error: any) {
-      return null
-    }
-    return {
-      eventType: 'PaymentSuccess',
-      userId: 'any_user_id',
-      purchaseIntentId: 'any_purchase'
+      console.log('constructEvent constructEvent constructEvent', error)
+      return left(new GatewayIncompatibilityError())
     }
   }
 }

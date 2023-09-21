@@ -9,5 +9,5 @@ export default {
   stripeKey: process.env.STRIPE_KEY ?? 'any_key',
   clientStripeSuccessUrl: process.env.CLIENT_STRIPE_SUCCESS_URL ?? 'http://any-success-url.com',
   clientStripeCancelUrl: process.env.CLIENT_STRIPE_SUCCESS_URL ?? 'http://any-cancel-url.com',
-  webhookScret: process.env.WEBHOOK_SCRET ?? 'any_webhook_secret'
+  webhookScret: process.env.WEBHOOK_SECRET ?? 'any_webhook_secret'
 }

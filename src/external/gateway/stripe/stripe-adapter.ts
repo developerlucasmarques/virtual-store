@@ -50,14 +50,8 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
 
   async listener (data: TransactionListenerGatewayData): Promise<TransactionListenerGatewayResponse> {
     const stripe = await StripeHelper.getInstance()
-    const payloadString = JSON.stringify(data.payload, (key, value) => {
-      if (key === 'payload') {
-        return undefined
-      }
-      return value
-    }, 2)
     try {
-      const event = stripe.webhooks.constructEvent(payloadString, data.signature, this.webhookSecret)
+      const event = stripe.webhooks.constructEvent(data.payload, data.signature, this.webhookSecret)
       if (event.type === 'payment_intent.succeeded') {
         const cutomerId = (event.data.object as { customer: string }).customer
         const customer = await stripe.customers.retrieve(cutomerId) as unknown as CustomCustomer
@@ -69,8 +63,10 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
       }
       return left(new EventNotProcessError(event.type))
     } catch (error: any) {
-      console.log('constructEvent constructEvent constructEvent', error)
-      return left(new GatewayIncompatibilityError())
+      if (error.type === 'StripeSignatureVerificationError') {
+        return left(new GatewayIncompatibilityError(error.stack))
+      }
+      return left(error)
     }
   }
 }

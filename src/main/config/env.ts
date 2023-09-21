@@ -8,5 +8,6 @@ export default {
   jwtSecretKey: process.env.JWT_SECRET_KEY ?? 'secret_key_Ls9a8çF0b4c3e5T6g7h2X1Qw3E4r5T6y7',
   stripeKey: process.env.STRIPE_KEY ?? 'any_key',
   clientStripeSuccessUrl: process.env.CLIENT_STRIPE_SUCCESS_URL ?? 'http://any-success-url.com',
-  clientStripeCancelUrl: process.env.CLIENT_STRIPE_SUCCESS_URL ?? 'http://any-cancel-url.com'
+  clientStripeCancelUrl: process.env.CLIENT_STRIPE_SUCCESS_URL ?? 'http://any-cancel-url.com',
+  webhookScret: process.env.WEBHOOK_SCRET ?? 'any_webhook_secret'
 }

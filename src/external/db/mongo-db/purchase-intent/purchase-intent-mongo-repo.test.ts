@@ -23,6 +23,10 @@ const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   }]
 })
 
+const makeSut = (): PurchaseIntentMongoRepo => {
+  return new PurchaseIntentMongoRepo()
+}
+
 describe('PurchaseIntentMongo Repository', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -39,13 +43,27 @@ describe('PurchaseIntentMongo Repository', () => {
     await purchaseIntentCollection.deleteMany({})
   })
 
-  it('Should create a PurchaseIntent if add on success', async () => {
-    const sut = new PurchaseIntentMongoRepo()
-    await sut.add(makeFakePurchaseIntentModel())
-    const purchaseIntent = await purchaseIntentCollection.findOne({ _id: objectId })
-    const purchaseIntentWithObejctId = MongoHelper.convertCollectionIdStringToObjectId(
-      makeFakePurchaseIntentModel()
-    )
-    expect(purchaseIntent).toEqual(purchaseIntentWithObejctId)
+  describe('add()', () => {
+    it('Should create a PurchaseIntent if add on success', async () => {
+      const sut = makeSut()
+      await sut.add(makeFakePurchaseIntentModel())
+      const purchaseIntent = await purchaseIntentCollection.findOne({ _id: objectId })
+      const purchaseIntentWithObejctId = MongoHelper.convertCollectionIdStringToObjectId(
+        makeFakePurchaseIntentModel()
+      )
+      expect(purchaseIntent).toEqual(purchaseIntentWithObejctId)
+    })
+  })
+
+  describe('loadById()', () => {
+    it('Should load purchase intent on success', async () => {
+      const sut = makeSut()
+      const purchaseIntentData = MongoHelper.convertCollectionIdStringToObjectId(
+        makeFakePurchaseIntentModel()
+      )
+      await purchaseIntentCollection.insertOne(purchaseIntentData)
+      const purchaseIntent = await sut.loadById(idString)
+      expect(purchaseIntent).toEqual(MongoHelper.convertCollectionIdObjectIdToString(purchaseIntentData))
+    })
   })
 })

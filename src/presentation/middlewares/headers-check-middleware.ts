@@ -2,7 +2,7 @@ import type { Middleware, Validation } from '../contracts'
 import { badRequest, noContent, serverError } from '../helpers/http/http-helpers'
 import type { HttpRequest, HttpResponse } from '../http-types/http'
 
-export class HeadersValidationMiddleware implements Middleware {
+export class HeadersCheckMiddleware implements Middleware {
   constructor (private readonly validation: Validation) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {

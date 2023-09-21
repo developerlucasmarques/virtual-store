@@ -1,7 +1,7 @@
 import { right, type Either, left } from '@/shared/either'
 import type { Validation } from '../contracts'
 import type { HttpRequest } from '../http-types/http'
-import { HeadersValidationMiddleware } from './headers-validation-middleware'
+import { HeadersCheckMiddleware } from './headers-check-middleware'
 import { badRequest, noContent, serverError } from '../helpers/http/http-helpers'
 
 const makeFakeRequest = (): HttpRequest => ({
@@ -18,20 +18,20 @@ const makeValidation = (): Validation => {
 }
 
 type SutTypes = {
-  sut: HeadersValidationMiddleware
+  sut: HeadersCheckMiddleware
   validationStub: Validation
 }
 
 const makeSut = (): SutTypes => {
   const validationStub = makeValidation()
-  const sut = new HeadersValidationMiddleware(validationStub)
+  const sut = new HeadersCheckMiddleware(validationStub)
   return {
     sut,
     validationStub
   }
 }
 
-describe('HeadersValidation Middleware', () => {
+describe('HeadersCheck Middleware', () => {
   it('Should call Validation with correct values', async () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')

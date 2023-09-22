@@ -5,13 +5,11 @@ export type ProductOfPurchaseIntentModel = {
   quantity: number
 }
 
-export type StatusOfPurchaseIntentModel = 'completed' | 'declined' | 'pending'
-
 export type PurchaseIntentModel = {
   id: string
   userId: string
+  orderCode: string
   createdAt: Date
   updateDat: Date
-  status: StatusOfPurchaseIntentModel
   products: ProductOfPurchaseIntentModel[]
 }

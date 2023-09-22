@@ -1,5 +1,5 @@
 import type { PurchaseIntentModel, UserModel } from '@/domain/models'
-import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
+import type { Checkout, CheckoutResponse, CreateOrderCode, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { AddPurchaseIntentRepo, CheckoutGateway, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
@@ -9,6 +9,7 @@ export class CheckoutUseCase implements Checkout {
     private readonly loadCart: LoadCart,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
     private readonly checkoutGateway: CheckoutGateway,
+    private readonly createOrderCode: CreateOrderCode,
     private readonly idBuilder: IdBuilder,
     private readonly addPurchaseIntentRepo: AddPurchaseIntentRepo
   ) {}
@@ -19,13 +20,14 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
+    await this.createOrderCode.perform(userId)
     const { id: purchaseIntentId } = this.idBuilder.build()
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
       id: purchaseIntentId,
       userId,
+      orderCode: 'any_order_code',
       createdAt: new Date(),
       updateDat: new Date(),
-      status: 'pending',
       products: loadCartResult.value.products.map(
         ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
       )

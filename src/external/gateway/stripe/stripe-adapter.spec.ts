@@ -39,7 +39,7 @@ jest.mock('stripe', () => {
                 }
               }
             },
-            type: 'payment_intent.succeeded'
+            type: 'checkout.session.completed'
           }))
         }
       }
@@ -87,7 +87,7 @@ describe('Stripe Adapter', () => {
       const sut = makeSut()
       const result = await sut.listener(makeFakeTransactionListenerGatewayData())
       expect(result.value).toEqual({
-        eventType: 'PaymentSuccess',
+        eventType: 'CheckoutCompleted',
         userId: 'any_user_id',
         purchaseIntentId: 'any_purchase_intent_id'
       })

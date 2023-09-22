@@ -10,7 +10,8 @@ export const makeTransactioManagerUseCase = (): TransactionManager => {
   const stripeAdapter = new StripeAdapter(env.webhookScret)
   const userMongoRepo = new UserMongoRepo()
   const eventConfig = makeEventManagerUseCase<TransactionEventType, TransactionEventData>({
-    PaymentSuccess: [makeAddOrderUseCase()],
+    CheckoutCompleted: [makeAddOrderUseCase()],
+    PaymentSuccess: [],
     PaymentFailure: []
   })
   return new TransactionManagerUseCase(stripeAdapter, userMongoRepo, eventConfig)

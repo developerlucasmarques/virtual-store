@@ -50,23 +50,24 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
 
   async listener (data: TransactionListenerGatewayData): Promise<TransactionListenerGatewayResponse> {
     const stripe = await StripeHelper.getInstance()
+    let event: Stripe.Event
     try {
-      const event = stripe.webhooks.constructEvent(data.payload, data.signature, this.webhookSecret)
-      if (event.type === 'payment_intent.succeeded') {
-        const cutomerId = (event.data.object as { customer: string }).customer
-        const customer = await stripe.customers.retrieve(cutomerId) as unknown as CustomCustomer
-        return right({
-          eventType: 'PaymentSuccess',
-          userId: customer.metadata.userId,
-          purchaseIntentId: customer.metadata.purchaseIntentId
-        })
-      }
-      return left(new EventNotProcessError(event.type))
+      event = stripe.webhooks.constructEvent(data.payload, data.signature, this.webhookSecret)
     } catch (error: any) {
       if (error.type === 'StripeSignatureVerificationError') {
         return left(new GatewayIncompatibilityError(error.stack))
       }
       return left(new GatewayExceptionError(error.stack))
     }
+    if (event.type === 'checkout.session.completed') {
+      const cutomerId = (event.data.object as { customer: string }).customer
+      const customer = await stripe.customers.retrieve(cutomerId) as unknown as CustomCustomer
+      return right({
+        eventType: 'CheckoutCompleted',
+        userId: customer.metadata.userId,
+        purchaseIntentId: customer.metadata.purchaseIntentId
+      })
+    }
+    return left(new EventNotProcessError(event.type))
   }
 }

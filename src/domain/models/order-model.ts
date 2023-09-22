@@ -8,5 +8,8 @@ export type ProductOfOrderModel = {
 export type OrderModel = {
   id: string
   userId: string
+  orderCode: string
+  createdAt: Date
+  updatedAt: Date
   products: ProductOfOrderModel[]
 }

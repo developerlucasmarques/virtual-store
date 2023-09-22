@@ -10,6 +10,6 @@ export type PurchaseIntentModel = {
   userId: string
   orderCode: string
   createdAt: Date
-  updateDat: Date
+  updatedAt: Date
   products: ProductOfPurchaseIntentModel[]
 }

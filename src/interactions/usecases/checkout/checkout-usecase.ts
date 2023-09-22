@@ -20,12 +20,12 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
-    await this.createOrderCode.perform(userId)
+    const { code: orderCode } = await this.createOrderCode.perform(userId)
     const { id: purchaseIntentId } = this.idBuilder.build()
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
       id: purchaseIntentId,
       userId,
-      orderCode: 'any_order_code',
+      orderCode,
       createdAt: new Date(),
       updateDat: new Date(),
       products: loadCartResult.value.products.map(

@@ -243,9 +243,16 @@ describe('Checkout UseCase', () => {
 
   it('Should call CreateOrderNumber with correct user id', async () => {
     const { sut, createOrderCodeStub } = makeSut()
-    const addSpy = jest.spyOn(createOrderCodeStub, 'perform')
+    const performSpy = jest.spyOn(createOrderCodeStub, 'perform')
     await sut.perform('any_user_id')
-    expect(addSpy).toHaveBeenCalledWith('any_user_id')
+    expect(performSpy).toHaveBeenCalledWith('any_user_id')
+  })
+
+  it('Should call CreateOrderNumber only once', async () => {
+    const { sut, createOrderCodeStub } = makeSut()
+    const performSpy = jest.spyOn(createOrderCodeStub, 'perform')
+    await sut.perform('any_user_id')
+    expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should call IdBuilder only once', async () => {

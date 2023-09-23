@@ -102,4 +102,10 @@ describe('AddOrder UseCase', () => {
     const promise = sut.perform(makeFakeAddOrderData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if AddOrderRepo is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform(makeFakeAddOrderData())
+    expect(result.value).toBeNull()
+  })
 })

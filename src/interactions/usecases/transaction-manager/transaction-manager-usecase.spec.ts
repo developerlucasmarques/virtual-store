@@ -15,7 +15,7 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
 const makeFakeTransactionListenerGatewayValue = (): TransactionListenerGatewayValue => ({
   purchaseIntentId: 'any_purchase_intent_id',
   userId: 'any_user_id',
-  eventType: 'PaymentSuccess'
+  eventType: 'CheckoutCompleted'
 })
 
 const makeFakeUserModel = (): UserModel => ({
@@ -30,12 +30,18 @@ const makeFakeUserModel = (): UserModel => ({
 const makeFakeEventManagerData = (): EventManagerData<
 TransactionEventType, TransactionEventData
 > => ({
-  eventType: 'PaymentSuccess',
+  eventType: 'CheckoutCompleted',
   eventData: {
-    purchaseIntentId: 'any_purchase_intent_id',
     userId: 'any_user_id',
     userName: 'any name',
-    userEmail: 'any_email@mail.com'
+    userEmail: 'any_email@mail.com',
+    orderCode: 'any_order_code',
+    products: [{
+      id: 'any_product_id',
+      name: 'any name',
+      amount: 10.90,
+      quantity: 1
+    }]
   }
 })
 

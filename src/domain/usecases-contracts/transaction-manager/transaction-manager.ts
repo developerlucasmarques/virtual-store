@@ -8,11 +8,19 @@ export type TransactionManagerData = {
 
 export type TransactionEventType = 'CheckoutCompleted' | 'PaymentSuccess' | 'PaymentFailure'
 
+export type ProductOfTransactionEvent = {
+  id: string
+  name: string
+  amount: number
+  quantity: number
+}
+
 export type TransactionEventData = {
   userId: string
   userName: string
   userEmail: string
-  purchaseIntentId: string
+  orderCode: string
+  products: ProductOfTransactionEvent[]
 }
 
 export type TransactionManagerResponse = Either<

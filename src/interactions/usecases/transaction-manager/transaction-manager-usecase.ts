@@ -15,14 +15,26 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (listenerResult.isLeft()) {
       return left(listenerResult.value)
     }
-    const { userId, eventType, purchaseIntentId } = listenerResult.value
+    const { userId, eventType } = listenerResult.value
     const user = await this.loadUserByIdRepo.loadById(userId)
     if (!user) {
       return left(new UserNotFoundError())
     }
     const { email: userEmail, name: userName } = user
     const eventResult = await this.eventManager.perform({
-      eventType, eventData: { purchaseIntentId, userId, userEmail, userName }
+      eventType,
+      eventData: {
+        userId,
+        userEmail,
+        userName,
+        orderCode: 'any_order_code',
+        products: [{
+          id: 'any_product_id',
+          name: 'any name',
+          amount: 10.90,
+          quantity: 1
+        }]
+      }
     })
     if (eventResult.isLeft()) {
       return left(eventResult.value)

@@ -1,7 +1,8 @@
-import type { OrderModel } from '@/domain/models'
+import type { OrderModel, StatusOfOrderModel } from '@/domain/models'
 import type { AddOrderData } from '@/domain/usecases-contracts'
 import type { AddOrderRepo, Id, IdBuilder } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
+import MockDate from 'mockdate'
 
 const makeFakeAddOrderData = (): AddOrderData => ({
   userId: 'any_user_id',
@@ -18,6 +19,7 @@ const makeFakeOrderModel = (): OrderModel => ({
   id: 'any_order_id',
   userId: 'any_user_id',
   orderCode: 'any_order_code',
+  status: 'Payment_Pending',
   createdAt: new Date(),
   updatedAt: new Date(),
   products: [{
@@ -37,6 +39,10 @@ const makeIdBuilder = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
+const makeStatusOfOrderModel = (): StatusOfOrderModel => {
+  return 'Payment_Pending'
+}
+
 const makeAddOrderRepo = (): AddOrderRepo => {
   class AddOrderRepoStub implements AddOrderRepo {
     async add (data: OrderModel): Promise<void> {
@@ -54,8 +60,9 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
+  const statusOfOrderModelStub = makeStatusOfOrderModel()
   const addOrderRepoStub = makeAddOrderRepo()
-  const sut = new AddOrderUseCase(idBuilderStub, addOrderRepoStub)
+  const sut = new AddOrderUseCase(idBuilderStub, statusOfOrderModelStub, addOrderRepoStub)
   return {
     sut,
     idBuilderStub,
@@ -64,6 +71,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('AddOrder UseCase', () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+
   it('Should call IdBuilder only once', async () => {
     const { sut, idBuilderStub } = makeSut()
     const buildSpy = jest.spyOn(idBuilderStub, 'build')

@@ -1,5 +1,5 @@
 import type { Either } from '@/shared/either'
-import type { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, PurchaseIntentNotFoundError, UserNotFoundError } from '../errors'
+import type { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, PurchaseIntentNotFoundError, UserMismatchError, UserNotFoundError } from '../errors'
 
 export type TransactionManagerData = {
   signature: string
@@ -28,7 +28,8 @@ GatewayIncompatibilityError |
 GatewayExceptionError |
 EventNotProcessError |
 UserNotFoundError |
-PurchaseIntentNotFoundError,
+PurchaseIntentNotFoundError |
+UserMismatchError,
 null
 >
 

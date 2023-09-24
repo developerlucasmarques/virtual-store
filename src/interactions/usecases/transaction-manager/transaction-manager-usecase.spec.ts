@@ -1,7 +1,7 @@
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
 import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
-import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, PurchaseIntentNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, PurchaseIntentNotFoundError, UserMismatchError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { PurchaseIntentModel, UserModel } from '@/domain/models'
 import { type Either, right, left } from '@/shared/either'
 
@@ -235,6 +235,19 @@ describe('TransactionManager UseCase', () => {
     )
     const promise = sut.perform(makeFakeTransactionManagerData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
+      Promise.resolve(right({
+        purchaseIntentId: 'any_purchase_intent_id',
+        userId: 'another_user_id',
+        eventType: 'CheckoutCompleted'
+      }))
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new UserMismatchError())
   })
 
   test('Should call EventManager with correct values', async () => {

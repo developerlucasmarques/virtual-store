@@ -45,9 +45,7 @@ const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   createdAt: new Date(),
   updatedAt: new Date(),
   orderCode: 'any_order_code',
-  products: makeFakeCompleteCartModel().products.map(
-    ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
-  )
+  products: makeFakeCompleteCartModel().products.map((product) => ({ ...product }))
 })
 
 const makeLoadCartStub = (): LoadCart => {

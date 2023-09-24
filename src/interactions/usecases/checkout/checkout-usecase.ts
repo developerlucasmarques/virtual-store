@@ -19,25 +19,17 @@ export class CheckoutUseCase implements Checkout {
     if (loadCartResult.isLeft()) {
       return left(loadCartResult.value)
     }
-    const user = await this.loadUserByIdRepo.loadById(userId) as UserModel
+    const { email: userEmail } = await this.loadUserByIdRepo.loadById(userId) as UserModel
     const { code: orderCode } = await this.createOrderCode.perform(userId)
-    const { id: purchaseIntentId } = this.idBuilder.build()
+    const { id } = this.idBuilder.build()
+    const date = new Date()
+    const products = loadCartResult.value.products.map((product) => ({ ...product }))
     const addPurchaseIntentRepoData: PurchaseIntentModel = {
-      id: purchaseIntentId,
-      userId,
-      orderCode,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      products: loadCartResult.value.products.map(
-        ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
-      )
+      id, userId, orderCode, createdAt: date, updatedAt: date, products
     }
     await this.addPurchaseIntentRepo.add(addPurchaseIntentRepoData)
     const checkoutResult = await this.checkoutGateway.payment({
-      ...loadCartResult.value,
-      userEmail: user.email,
-      userId,
-      purchaseIntentId
+      ...loadCartResult.value, userEmail, userId, purchaseIntentId: id
     })
     if (!checkoutResult) {
       return left(new CheckoutFailureError())

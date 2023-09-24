@@ -24,12 +24,10 @@ export class CreateOrderCodeUseCase implements CreateOrderCode {
   async perform (userId: string): Promise<OrderCode> {
     const dateCode = Math.floor(new Date().getTime() / this.generateRandom())
     const hash = crypto.createHash('md5').update(userId + dateCode.toString()).digest('hex')
-    const resultingNumber = parseInt(hash, 16)
-    const numberCode = resultingNumber / (Math.pow(11, 17) - this.generateRandom())
+    const hashHex = parseInt(hash, 16)
+    const numberCode = hashHex / (Math.pow(11, 17) - this.generateRandom())
     const stringCode = String(Math.round(numberCode))
-    const chars = this.shuffle(`${stringCode.slice(0, 17)}${dateCode}`)
-    const part1 = chars.slice(0, 7)
-    const part2 = chars.slice(7)
-    return { code: part1 + '-' + part2 }
+    const code = this.shuffle(`${stringCode.slice(0, 17)}${dateCode}`)
+    return { code: code.slice(0, 7) + '-' + code.slice(7) }
   }
 }

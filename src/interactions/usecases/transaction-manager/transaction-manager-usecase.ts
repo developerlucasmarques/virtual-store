@@ -1,5 +1,5 @@
 import type { EventManager, TransactionEventData, TransactionEventType, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { PurchaseIntentNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { PurchaseIntentNotFoundError, UserMismatchError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -26,20 +26,13 @@ export class TransactionManagerUseCase implements TransactionManager {
       return left(new PurchaseIntentNotFoundError(purchaseIntentId))
     }
     const { email: userEmail, name: userName } = user
+    const { orderCode, products } = purchaseIntent
+    if (userId !== purchaseIntent.userId) {
+      return left(new UserMismatchError())
+    }
     const eventResult = await this.eventManager.perform({
       eventType,
-      eventData: {
-        userId,
-        userEmail,
-        userName,
-        orderCode: 'any_order_code',
-        products: [{
-          id: 'any_product_id',
-          name: 'any name',
-          amount: 10.90,
-          quantity: 1
-        }]
-      }
+      eventData: { userId, userEmail, userName, orderCode, products }
     })
     if (eventResult.isLeft()) {
       return left(eventResult.value)

@@ -2,18 +2,23 @@ import { type OrderModel } from '@/domain/models'
 import { ObjectId, type Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { OrderMongoRepo } from './order-mongo-repo'
+import MockDate from 'mockdate'
 
 const idString = new ObjectId().toHexString()
 const objectId = new ObjectId(idString)
 
-const makeOrderModel = (): OrderModel => ({
+const makeFakeOrderModel = (): OrderModel => ({
   id: idString,
   userId: 'any_user_id',
+  orderCode: 'any_order_code',
+  status: 'Payment_Pending',
+  createdAt: new Date(),
+  updatedAt: new Date(),
   products: [{
     id: 'any_product_id',
-    name: 'any_product_name',
+    name: 'any name',
     amount: 10.90,
-    quantity: 2
+    quantity: 1
   }]
 })
 
@@ -21,10 +26,12 @@ let orderCollection: Collection
 
 describe('OrderMongo Repository', () => {
   beforeAll(async () => {
+    MockDate.set(new Date())
     await MongoHelper.connect(process.env.MONGO_URL)
   })
 
   afterAll(async () => {
+    MockDate.reset()
     await MongoHelper.disconnect()
   })
 
@@ -35,9 +42,9 @@ describe('OrderMongo Repository', () => {
 
   it('Should create an order on success', async () => {
     const sut = new OrderMongoRepo()
-    await sut.add(makeOrderModel())
+    await sut.add(makeFakeOrderModel())
     const order = await orderCollection.findOne({ _id: objectId })
-    const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeOrderModel())
+    const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
     expect(order).toEqual(orderWithMongoId)
   })
 })

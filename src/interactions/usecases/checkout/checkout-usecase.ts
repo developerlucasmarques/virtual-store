@@ -27,7 +27,7 @@ export class CheckoutUseCase implements Checkout {
       userId,
       orderCode,
       createdAt: new Date(),
-      updateDat: new Date(),
+      updatedAt: new Date(),
       products: loadCartResult.value.products.map(
         ({ id, name, amount, quantity }) => ({ id, name, amount, quantity })
       )

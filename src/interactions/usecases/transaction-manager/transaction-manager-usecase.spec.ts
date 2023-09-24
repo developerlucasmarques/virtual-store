@@ -1,8 +1,8 @@
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
-import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
+import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { UserModel } from '@/domain/models'
+import type { PurchaseIntentModel, UserModel } from '@/domain/models'
 import { type Either, right, left } from '@/shared/either'
 
 const makeFakeTransactionManagerData = (): TransactionManagerData => ({
@@ -27,9 +27,22 @@ const makeFakeUserModel = (): UserModel => ({
   accessToken: 'any_token'
 })
 
+const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
+  id: 'any_purchase_intent_id',
+  userId: 'any_user_id',
+  orderCode: 'any_order_code',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  products: [{
+    id: 'any_product_id',
+    name: 'any name',
+    amount: 10.90,
+    quantity: 1
+  }]
+})
+
 const makeFakeEventManagerData = (): EventManagerData<
-TransactionEventType, TransactionEventData
-> => ({
+TransactionEventType, TransactionEventData> => ({
   eventType: 'CheckoutCompleted',
   eventData: {
     userId: 'any_user_id',
@@ -63,6 +76,15 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
   return new LoadUserByIdRepoStub()
 }
 
+const makeLoadPurchaseIntentByIdRepo = (): LoadPurchaseIntentByIdRepo => {
+  class LoadPurchaseIntentByIdRepoStub implements LoadPurchaseIntentByIdRepo {
+    async loadById (id: string): Promise<null | PurchaseIntentModel> {
+      return await Promise.resolve(makeFakePurchaseIntentModel())
+    }
+  }
+  return new LoadPurchaseIntentByIdRepoStub()
+}
+
 const makeEventManager = (): EventManager<TransactionEventType, TransactionEventData> => {
   class EventManagerStub implements EventManager<TransactionEventType, TransactionEventData> {
     async perform (data: EventManagerData<TransactionEventType, TransactionEventData>): Promise<Either<Error, null>> {
@@ -76,20 +98,26 @@ type SutTypes = {
   sut: TransactionManagerUseCase
   transactionListenerGatewayStub: TransactionListenerGateway
   loadUserByIdRepoStub: LoadUserByIdRepo
+  loadPurchaseIntentByIdRepoStub: LoadPurchaseIntentByIdRepo
   eventManagerStub: EventManager<TransactionEventType, TransactionEventData>
 }
 
 const makeSut = (): SutTypes => {
   const transactionListenerGatewayStub = makeTransactionListenerGateway()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const loadPurchaseIntentByIdRepoStub = makeLoadPurchaseIntentByIdRepo()
   const eventManagerStub = makeEventManager()
   const sut = new TransactionManagerUseCase(
-    transactionListenerGatewayStub, loadUserByIdRepoStub, eventManagerStub
+    transactionListenerGatewayStub,
+    loadUserByIdRepoStub,
+    loadPurchaseIntentByIdRepoStub,
+    eventManagerStub
   )
   return {
     sut,
     transactionListenerGatewayStub,
     loadUserByIdRepoStub,
+    loadPurchaseIntentByIdRepoStub,
     eventManagerStub
   }
 }
@@ -175,6 +203,13 @@ describe('TransactionManager UseCase', () => {
     )
     const promise = sut.perform(makeFakeTransactionManagerData())
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call LoadPurchaseIntentByIdRepo with correct purchase intent id', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(loadByIdSpy).toHaveBeenCalledWith('any_purchase_intent_id')
   })
 
   test('Should call EventManager with correct values', async () => {

@@ -212,6 +212,13 @@ describe('TransactionManager UseCase', () => {
     expect(loadByIdSpy).toHaveBeenCalledWith('any_purchase_intent_id')
   })
 
+  test('Should call LoadPurchaseIntentByIdRepo only once', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(loadByIdSpy).toHaveBeenCalledTimes(1)
+  })
+
   test('Should call EventManager with correct values', async () => {
     const { sut, eventManagerStub } = makeSut()
     const performSpy = jest.spyOn(eventManagerStub, 'perform')

@@ -1,7 +1,7 @@
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
 import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
-import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, PurchaseIntentNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { PurchaseIntentModel, UserModel } from '@/domain/models'
 import { type Either, right, left } from '@/shared/either'
 
@@ -217,6 +217,15 @@ describe('TransactionManager UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById')
     await sut.perform(makeFakeTransactionManagerData())
     expect(loadByIdSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return PurchaseIntentNotFoundError if LoadPurchaseIntentByIdRepo returns null', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
 
   test('Should call EventManager with correct values', async () => {

@@ -1,7 +1,7 @@
 import type { PurchaseIntentModel, UserModel } from '@/domain/models'
-import type { Checkout, CheckoutResponse, CreateOrderCode, LoadCart } from '@/domain/usecases-contracts'
+import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { AddPurchaseIntentRepo, CheckoutGateway, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { AddPurchaseIntentRepo, CheckoutGateway, GenerateOrderCode, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class CheckoutUseCase implements Checkout {
@@ -9,7 +9,7 @@ export class CheckoutUseCase implements Checkout {
     private readonly loadCart: LoadCart,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
     private readonly checkoutGateway: CheckoutGateway,
-    private readonly createOrderCode: CreateOrderCode,
+    private readonly generateOrderCode: GenerateOrderCode,
     private readonly idBuilder: IdBuilder,
     private readonly addPurchaseIntentRepo: AddPurchaseIntentRepo
   ) {}
@@ -20,7 +20,7 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const { email: userEmail } = await this.loadUserByIdRepo.loadById(userId) as UserModel
-    const { code: orderCode } = await this.createOrderCode.perform(userId)
+    const { code: orderCode } = await this.generateOrderCode.execute(userId)
     const { id } = this.idBuilder.build()
     const date = new Date()
     const products = loadCartResult.value.products.map((product) => ({ ...product }))

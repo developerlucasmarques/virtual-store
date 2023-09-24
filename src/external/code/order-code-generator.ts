@@ -1,7 +1,7 @@
-import type { CreateOrderCode, OrderCode } from '@/domain/usecases-contracts'
+import type { GenerateOrderCode, OrderCode } from '@/interactions/contracts'
 import crypto from 'crypto'
 
-export class CreateOrderCodeUseCase implements CreateOrderCode {
+export class OrderCodeGenerator implements GenerateOrderCode {
   private generateRandom (): number {
     const random = Math.random() * Math.random()
     const randomString = random.toString().split('.')[1]
@@ -21,7 +21,7 @@ export class CreateOrderCodeUseCase implements CreateOrderCode {
     return charArray.join('').slice(0, 14)
   }
 
-  async perform (userId: string): Promise<OrderCode> {
+  async execute (userId: string): Promise<OrderCode> {
     const dateCode = Math.floor(new Date().getTime() / this.generateRandom())
     const hash = crypto.createHash('md5').update(userId + dateCode.toString()).digest('hex')
     const hashHex = parseInt(hash, 16)

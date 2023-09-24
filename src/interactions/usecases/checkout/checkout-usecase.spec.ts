@@ -1,7 +1,7 @@
 import type { CompleteCartModel, PurchaseIntentModel, UserModel } from '@/domain/models'
-import type { CreateOrderCode, LoadCart, LoadCartResponse, OrderCode } from '@/domain/usecases-contracts'
+import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, Id, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { GenerateOrderCode, OrderCode, AddPurchaseIntentRepo, CheckoutGateway, CheckoutGatewayResponse, Id, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 import MockDate from 'mockdate'
 import { CheckoutUseCase } from './checkout-usecase'
@@ -75,13 +75,13 @@ const makeCheckoutGatewayStub = (): CheckoutGateway => {
   return new CheckoutGatewayStub()
 }
 
-const makeCreateOrderCode = (): CreateOrderCode => {
-  class CreateOrderCodeStub implements CreateOrderCode {
-    async perform (userId: string): Promise<OrderCode> {
+const makeGenerateOrderCode = (): GenerateOrderCode => {
+  class GenerateOrderCodeStub implements GenerateOrderCode {
+    async execute (userId: string): Promise<OrderCode> {
       return await Promise.resolve({ code: 'any_order_code' })
     }
   }
-  return new CreateOrderCodeStub()
+  return new GenerateOrderCodeStub()
 }
 
 const makeIdBuilder = (): IdBuilder => {
@@ -108,7 +108,7 @@ type SutTypes = {
   loadUserByIdRepoStub: LoadUserByIdRepo
   checkoutGatewayStub: CheckoutGateway
   idBuilderStub: IdBuilder
-  createOrderCodeStub: CreateOrderCode
+  generateOrderCodeStub: GenerateOrderCode
   addPurchaseIntentRepoStub: AddPurchaseIntentRepo
 }
 
@@ -116,14 +116,14 @@ const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
   const checkoutGatewayStub = makeCheckoutGatewayStub()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
-  const createOrderCodeStub = makeCreateOrderCode()
+  const generateOrderCodeStub = makeGenerateOrderCode()
   const idBuilderStub = makeIdBuilder()
   const addPurchaseIntentRepoStub = makeAddPurchaseIntentRepo()
   const sut = new CheckoutUseCase(
     loadCartStub,
     loadUserByIdRepoStub,
     checkoutGatewayStub,
-    createOrderCodeStub,
+    generateOrderCodeStub,
     idBuilderStub,
     addPurchaseIntentRepoStub
   )
@@ -133,7 +133,7 @@ const makeSut = (): SutTypes => {
     loadUserByIdRepoStub,
     checkoutGatewayStub,
     idBuilderStub,
-    createOrderCodeStub,
+    generateOrderCodeStub,
     addPurchaseIntentRepoStub
   }
 }
@@ -239,18 +239,18 @@ describe('Checkout UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should call CreateOrderNumber with correct user id', async () => {
-    const { sut, createOrderCodeStub } = makeSut()
-    const performSpy = jest.spyOn(createOrderCodeStub, 'perform')
+  it('Should call GenerateOrderCode with correct user id', async () => {
+    const { sut, generateOrderCodeStub } = makeSut()
+    const executeSpy = jest.spyOn(generateOrderCodeStub, 'execute')
     await sut.perform('any_user_id')
-    expect(performSpy).toHaveBeenCalledWith('any_user_id')
+    expect(executeSpy).toHaveBeenCalledWith('any_user_id')
   })
 
-  it('Should call CreateOrderNumber only once', async () => {
-    const { sut, createOrderCodeStub } = makeSut()
-    const performSpy = jest.spyOn(createOrderCodeStub, 'perform')
+  it('Should call GenerateOrderCode only once', async () => {
+    const { sut, generateOrderCodeStub } = makeSut()
+    const executeSpy = jest.spyOn(generateOrderCodeStub, 'execute')
     await sut.perform('any_user_id')
-    expect(performSpy).toHaveBeenCalledTimes(1)
+    expect(executeSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should call IdBuilder only once', async () => {

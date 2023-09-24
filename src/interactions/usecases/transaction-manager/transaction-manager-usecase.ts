@@ -1,12 +1,13 @@
 import type { EventManager, TransactionEventData, TransactionEventType, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
 import { UserNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
+import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class TransactionManagerUseCase implements TransactionManager {
   constructor (
     private readonly transactionListenerGateway: TransactionListenerGateway,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
+    private readonly loadPurchaseIntentByIdRepo: LoadPurchaseIntentByIdRepo,
     private readonly eventManager: EventManager<TransactionEventType, TransactionEventData>
   ) {}
 
@@ -15,11 +16,12 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (listenerResult.isLeft()) {
       return left(listenerResult.value)
     }
-    const { userId, eventType } = listenerResult.value
+    const { userId, eventType, purchaseIntentId } = listenerResult.value
     const user = await this.loadUserByIdRepo.loadById(userId)
     if (!user) {
       return left(new UserNotFoundError())
     }
+    await this.loadPurchaseIntentByIdRepo.loadById(purchaseIntentId)
     const { email: userEmail, name: userName } = user
     const eventResult = await this.eventManager.perform({
       eventType,

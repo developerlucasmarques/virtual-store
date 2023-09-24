@@ -228,6 +228,15 @@ describe('TransactionManager UseCase', () => {
     expect(result.value).toEqual(new PurchaseIntentNotFoundError('any_purchase_intent_id'))
   })
 
+  it('Should throw if LoadPurchaseIntentByIdRepo throws', async () => {
+    const { sut, loadPurchaseIntentByIdRepoStub } = makeSut()
+    jest.spyOn(loadPurchaseIntentByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeTransactionManagerData())
+    await expect(promise).rejects.toThrow()
+  })
+
   test('Should call EventManager with correct values', async () => {
     const { sut, eventManagerStub } = makeSut()
     const performSpy = jest.spyOn(eventManagerStub, 'perform')

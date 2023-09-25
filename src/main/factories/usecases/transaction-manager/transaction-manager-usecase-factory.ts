@@ -12,7 +12,7 @@ export const makeTransactioManagerUseCase = (): TransactionManager => {
   const userMongoRepo = new UserMongoRepo()
   const purchaseIntentMongoRepo = new PurchaseIntentMongoRepo()
   const eventConfig = makeEventManagerUseCase<TransactionEventType, TransactionEventData>({
-    CheckoutCompleted: [makeAddOrderUseCase('Payment_Pending')],
+    CheckoutCompleted: [makeAddOrderUseCase('Processing', 'Payment_Pending')],
     PaymentSuccess: [],
     PaymentFailure: []
   })

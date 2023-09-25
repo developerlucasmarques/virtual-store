@@ -1,4 +1,4 @@
-import type { OrderModel, PaymentStatusOfOrderModel } from '@/domain/models'
+import type { OrderModel, PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
 import type { AddOrderData } from '@/domain/usecases-contracts'
 import type { AddOrderRepo, Id, IdBuilder } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
@@ -44,6 +44,10 @@ const makePaymentStatusOfOrderModel = (): PaymentStatusOfOrderModel => {
   return 'Payment_Pending'
 }
 
+const makeStatusOfOrderModel = (): StatusOfOrderModel => {
+  return 'Processing'
+}
+
 const makeAddOrderRepo = (): AddOrderRepo => {
   class AddOrderRepoStub implements AddOrderRepo {
     async add (data: OrderModel): Promise<void> {
@@ -61,9 +65,12 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
+  const statusOfOrderModelStub = makeStatusOfOrderModel()
   const paymentStatusOfOrderModelStub = makePaymentStatusOfOrderModel()
   const addOrderRepoStub = makeAddOrderRepo()
-  const sut = new AddOrderUseCase(idBuilderStub, paymentStatusOfOrderModelStub, addOrderRepoStub)
+  const sut = new AddOrderUseCase(
+    idBuilderStub, statusOfOrderModelStub, paymentStatusOfOrderModelStub, addOrderRepoStub
+  )
   return {
     sut,
     idBuilderStub,

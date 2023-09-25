@@ -14,10 +14,11 @@ export class AddOrderUseCase implements AddOrder {
   async perform (data: AddOrderData): Promise<Either<Error, null>> {
     const { orderCode, products, userId } = data
     const { id } = this.idBuilder.build()
-    const date = new Date()
+    const createdAt = new Date(); const updatedAt = createdAt
     const paymentStatus = this.paymentStatus
+    const status = 'Processing'
     await this.addOrderRepo.add(
-      { id, userId, orderCode, products, createdAt: date, updatedAt: date, paymentStatus }
+      { id, userId, orderCode, products, createdAt, updatedAt, paymentStatus, status }
     )
     return right(null)
   }

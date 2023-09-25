@@ -133,6 +133,15 @@ describe('AddOrder UseCase', () => {
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('Should throw if GenerateOrderCode throws', async () => {
+    const { sut, generateOrderCodeStub } = makeSut()
+    jest.spyOn(generateOrderCodeStub, 'perform').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeAddOrderData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call AddOrderRepo with correct values', async () => {
     const { sut, addOrderRepoStub } = makeSut()
     const addSpy = jest.spyOn(addOrderRepoStub, 'add')

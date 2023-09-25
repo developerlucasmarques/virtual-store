@@ -4,7 +4,6 @@ import type { Event } from '../event-manager/event'
 
 export type AddOrderData = {
   userId: string
-  orderCode: string
   products: ProductOfOrderModel[]
 }
 

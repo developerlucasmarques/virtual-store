@@ -4,7 +4,7 @@ import type { AddOrderRepo, IdBuilder } from '@/interactions/contracts'
 import { right, type Either } from '@/shared/either'
 
 export class AddOrderUseCase implements AddOrder {
-  reqProps: Array<keyof AddOrderData> = ['orderCode', 'userId', 'products']
+  reqProps: Array<keyof AddOrderData> = ['userId', 'products']
   constructor (
     private readonly idBuilder: IdBuilder,
     private readonly status: StatusOfOrderModel,

@@ -6,7 +6,6 @@ import MockDate from 'mockdate'
 
 const makeFakeAddOrderData = (): AddOrderData => ({
   userId: 'any_user_id',
-  orderCode: 'any_order_code',
   products: [{
     id: 'any_product_id',
     name: 'any name',

@@ -1,5 +1,5 @@
 import type { OrderModel, PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
-import type { AddOrderData } from '@/domain/usecases-contracts'
+import type { AddOrderData, GenerateOrderCode, OrderCode } from '@/domain/usecases-contracts'
 import type { AddOrderRepo, Id, IdBuilder } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
 import MockDate from 'mockdate'
@@ -48,6 +48,15 @@ const makeStatusOfOrderModel = (): StatusOfOrderModel => {
   return 'Processing'
 }
 
+const makeGenerateOrderCode = (): GenerateOrderCode => {
+  class GenerateOrderCodeStub implements GenerateOrderCode {
+    async perform (userId: string): Promise<OrderCode> {
+      return await Promise.resolve({ code: 'any_order_code' })
+    }
+  }
+  return new GenerateOrderCodeStub()
+}
+
 const makeAddOrderRepo = (): AddOrderRepo => {
   class AddOrderRepoStub implements AddOrderRepo {
     async add (data: OrderModel): Promise<void> {
@@ -60,6 +69,7 @@ const makeAddOrderRepo = (): AddOrderRepo => {
 type SutTypes = {
   sut: AddOrderUseCase
   idBuilderStub: IdBuilder
+  generateOrderCodeStub: GenerateOrderCode
   addOrderRepoStub: AddOrderRepo
 }
 
@@ -67,13 +77,19 @@ const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
   const statusOfOrderModelStub = makeStatusOfOrderModel()
   const paymentStatusOfOrderModelStub = makePaymentStatusOfOrderModel()
+  const generateOrderCodeStub = makeGenerateOrderCode()
   const addOrderRepoStub = makeAddOrderRepo()
   const sut = new AddOrderUseCase(
-    idBuilderStub, statusOfOrderModelStub, paymentStatusOfOrderModelStub, addOrderRepoStub
+    idBuilderStub,
+    statusOfOrderModelStub,
+    paymentStatusOfOrderModelStub,
+    generateOrderCodeStub,
+    addOrderRepoStub
   )
   return {
     sut,
     idBuilderStub,
+    generateOrderCodeStub,
     addOrderRepoStub
   }
 }
@@ -101,6 +117,13 @@ describe('AddOrder UseCase', () => {
     })
     const promise = sut.perform(makeFakeAddOrderData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call GenerateOrderCode with correct user id', async () => {
+    const { sut, generateOrderCodeStub } = makeSut()
+    const performSpy = jest.spyOn(generateOrderCodeStub, 'perform')
+    await sut.perform(makeFakeAddOrderData())
+    expect(performSpy).toHaveBeenCalledWith('any_user_id')
   })
 
   it('Should call AddOrderRepo with correct values', async () => {

@@ -126,6 +126,13 @@ describe('AddOrder UseCase', () => {
     expect(performSpy).toHaveBeenCalledWith('any_user_id')
   })
 
+  it('Should call GenerateOrderCode only once', async () => {
+    const { sut, generateOrderCodeStub } = makeSut()
+    const performSpy = jest.spyOn(generateOrderCodeStub, 'perform')
+    await sut.perform(makeFakeAddOrderData())
+    expect(performSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('Should call AddOrderRepo with correct values', async () => {
     const { sut, addOrderRepoStub } = makeSut()
     const addSpy = jest.spyOn(addOrderRepoStub, 'add')

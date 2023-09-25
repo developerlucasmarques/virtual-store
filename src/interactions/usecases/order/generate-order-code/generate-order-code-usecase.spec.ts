@@ -43,4 +43,13 @@ describe('GenerateOrderCode UseCase', () => {
     expect(test1).toBe(true)
     expect(test2).toBe(true)
   })
+
+  it('Should throw if Encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encrypt').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(id)
+    await expect(promise).rejects.toThrow()
+  })
 })

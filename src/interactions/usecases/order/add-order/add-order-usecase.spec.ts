@@ -1,4 +1,4 @@
-import type { OrderModel, StatusOfOrderModel } from '@/domain/models'
+import type { OrderModel, PaymentStatusOfOrderModel } from '@/domain/models'
 import type { AddOrderData } from '@/domain/usecases-contracts'
 import type { AddOrderRepo, Id, IdBuilder } from '@/interactions/contracts'
 import { AddOrderUseCase } from './add-order-usecase'
@@ -19,7 +19,7 @@ const makeFakeOrderModel = (): OrderModel => ({
   id: 'any_order_id',
   userId: 'any_user_id',
   orderCode: 'any_order_code',
-  status: 'Payment_Pending',
+  paymentStatus: 'Payment_Pending',
   createdAt: new Date(),
   updatedAt: new Date(),
   products: [{
@@ -39,7 +39,7 @@ const makeIdBuilder = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
-const makeStatusOfOrderModel = (): StatusOfOrderModel => {
+const makePaymentStatusOfOrderModel = (): PaymentStatusOfOrderModel => {
   return 'Payment_Pending'
 }
 
@@ -60,9 +60,9 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
-  const statusOfOrderModelStub = makeStatusOfOrderModel()
+  const paymentStatusOfOrderModelStub = makePaymentStatusOfOrderModel()
   const addOrderRepoStub = makeAddOrderRepo()
-  const sut = new AddOrderUseCase(idBuilderStub, statusOfOrderModelStub, addOrderRepoStub)
+  const sut = new AddOrderUseCase(idBuilderStub, paymentStatusOfOrderModelStub, addOrderRepoStub)
   return {
     sut,
     idBuilderStub,

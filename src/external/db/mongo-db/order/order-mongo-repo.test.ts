@@ -11,7 +11,7 @@ const makeFakeOrderModel = (): OrderModel => ({
   id: idString,
   userId: 'any_user_id',
   orderCode: 'any_order_code',
-  status: 'Payment_Pending',
+  paymentStatus: 'Payment_Pending',
   createdAt: new Date(),
   updatedAt: new Date(),
   products: [{

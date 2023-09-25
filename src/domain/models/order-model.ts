@@ -5,13 +5,13 @@ export type ProductOfOrderModel = {
   quantity: number
 }
 
-export type StatusOfOrderModel = 'Payment_Pending' | 'Payment_Confirmed' | 'Payment_Declined'
+export type PaymentStatusOfOrderModel = 'Payment_Not_Started' | 'Payment_Pending' | 'Payment_Confirmed' | 'Payment_Declined'
 
 export type OrderModel = {
   id: string
   userId: string
   orderCode: string
-  status: StatusOfOrderModel
+  paymentStatus: PaymentStatusOfOrderModel
   createdAt: Date
   updatedAt: Date
   products: ProductOfOrderModel[]

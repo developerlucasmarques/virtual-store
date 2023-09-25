@@ -14,7 +14,6 @@ const makeFakePurchaseIntentModel = (): PurchaseIntentModel => ({
   userId: 'any_user_id',
   createdAt: new Date(),
   updatedAt: new Date(),
-  orderCode: 'any_order_code',
   products: [{
     id: 'any_product_id',
     name: 'any name',

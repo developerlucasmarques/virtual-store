@@ -8,7 +8,6 @@ export type ProductOfPurchaseIntentModel = {
 export type PurchaseIntentModel = {
   id: string
   userId: string
-  orderCode: string
   createdAt: Date
   updatedAt: Date
   products: ProductOfPurchaseIntentModel[]

@@ -1,13 +1,12 @@
 import type { EventManager, TransactionEventData, TransactionEventType, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { PurchaseIntentNotFoundError, UserMismatchError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { LoadPurchaseIntentByIdRepo, LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
+import { UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import type { LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class TransactionManagerUseCase implements TransactionManager {
   constructor (
     private readonly transactionListenerGateway: TransactionListenerGateway,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
-    private readonly loadPurchaseIntentByIdRepo: LoadPurchaseIntentByIdRepo,
     private readonly eventManager: EventManager<TransactionEventType, TransactionEventData>
   ) {}
 
@@ -16,23 +15,26 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (listenerResult.isLeft()) {
       return left(listenerResult.value)
     }
-    const { userId, eventType, purchaseIntentId } = listenerResult.value
+    const { userId, eventType } = listenerResult.value
     const user = await this.loadUserByIdRepo.loadById(userId)
     if (!user) {
       return left(new UserNotFoundError())
     }
-    const purchaseIntent = await this.loadPurchaseIntentByIdRepo.loadById(purchaseIntentId)
-    if (!purchaseIntent) {
-      return left(new PurchaseIntentNotFoundError(purchaseIntentId))
-    }
     const { email: userEmail, name: userName } = user
-    const { orderCode, products } = purchaseIntent
-    if (userId !== purchaseIntent.userId) {
-      return left(new UserMismatchError())
-    }
     const eventResult = await this.eventManager.perform({
       eventType,
-      eventData: { userId, userEmail, userName, orderCode, products }
+      eventData: {
+        userId,
+        userEmail,
+        userName,
+        orderCode: 'any_order_code',
+        products: [{
+          id: 'any_product_id',
+          name: 'any name',
+          amount: 10.90,
+          quantity: 1
+        }]
+      }
     })
     if (eventResult.isLeft()) {
       return left(eventResult.value)

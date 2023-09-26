@@ -1,29 +1,30 @@
-import type { CompleteCartModel, UserModel } from '@/domain/models'
-import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
+import type { CompleteCartModel, OrderModel, UserModel } from '@/domain/models'
+import type { AddOrder, AddOrderData, LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway, CheckoutGatewayResponse, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 import MockDate from 'mockdate'
 import { CheckoutUseCase } from './checkout-usecase'
 
+const products = [{
+  id: 'any_product_id_1',
+  name: 'any name',
+  amount: 10.90,
+  quantity: 1
+}, {
+  id: 'any_product_id_2',
+  name: 'any name 2',
+  amount: 20.90,
+  quantity: 2
+}, {
+  id: 'any_product_id_3',
+  name: 'any name 3',
+  amount: 32.99,
+  quantity: 3
+}]
+
 const makeFakeCompleteCartModel = (): CompleteCartModel => ({
-  total: 151.67,
-  products: [{
-    id: 'any_product_id_1',
-    name: 'any name',
-    amount: 10.90,
-    quantity: 1
-  }, {
-    id: 'any_product_id_2',
-    name: 'any name 2',
-    amount: 20.90,
-    quantity: 2
-  }, {
-    id: 'any_product_id_3',
-    name: 'any name 3',
-    amount: 32.99,
-    quantity: 3
-  }]
+  total: 151.67, products
 })
 
 const makeFakeUserModel = (): UserModel => ({
@@ -33,6 +34,17 @@ const makeFakeUserModel = (): UserModel => ({
   password: 'hashed_password',
   role: 'customer',
   accessToken: 'any_token'
+})
+
+const makeFakeOrderModel = (): OrderModel => ({
+  id: 'any_order_id',
+  userId: 'any_user_id',
+  orderCode: 'any_order_code',
+  paymentStatus: 'Payment_Pending',
+  status: 'Processing',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  products
 })
 
 const makeCheckoutGatewayResponse = (): CheckoutGatewayResponse => ({
@@ -57,6 +69,15 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
   return new LoadUserByIdRepoStub()
 }
 
+const makeAddOrder = (): AddOrder => {
+  class AddOrderStub implements AddOrder {
+    async perform (data: AddOrderData): Promise<OrderModel> {
+      return await Promise.resolve(makeFakeOrderModel())
+    }
+  }
+  return new AddOrderStub()
+}
+
 const makeCheckoutGatewayStub = (): CheckoutGateway => {
   class CheckoutGatewayStub implements CheckoutGateway {
     async payment (data: CompleteCartModel): Promise<CheckoutGatewayResponse> {
@@ -70,20 +91,23 @@ type SutTypes = {
   sut: CheckoutUseCase
   loadCartStub: LoadCart
   loadUserByIdRepoStub: LoadUserByIdRepo
+  addOrderStub: AddOrder
   checkoutGatewayStub: CheckoutGateway
 }
 
 const makeSut = (): SutTypes => {
   const loadCartStub = makeLoadCartStub()
-  const checkoutGatewayStub = makeCheckoutGatewayStub()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const addOrderStub = makeAddOrder()
+  const checkoutGatewayStub = makeCheckoutGatewayStub()
   const sut = new CheckoutUseCase(
-    loadCartStub, loadUserByIdRepoStub, checkoutGatewayStub
+    loadCartStub, loadUserByIdRepoStub, addOrderStub, checkoutGatewayStub
   )
   return {
     sut,
     loadCartStub,
     loadUserByIdRepoStub,
+    addOrderStub,
     checkoutGatewayStub
   }
 }
@@ -150,6 +174,13 @@ describe('Checkout UseCase', () => {
     )
     const promise = sut.perform('any_user_id')
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call AddOrder with correct values', async () => {
+    const { sut, addOrderStub } = makeSut()
+    const performSpy = jest.spyOn(addOrderStub, 'perform')
+    await sut.perform('any_user_id')
+    expect(performSpy).toHaveBeenCalledWith({ userId: 'any_user_id', products })
   })
 
   it('Should call CheckoutGateway with correct values', async () => {

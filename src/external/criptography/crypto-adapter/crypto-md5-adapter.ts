@@ -3,7 +3,7 @@ import * as crypto from 'crypto'
 
 export class CryptoMd5Adapter implements Encrypter {
   async encrypt (data: EncrypterData): Promise<Token> {
-    crypto.createHash('md5').update(data.value).digest('hex')
+    crypto.createHash('md5').update(data.value)
     return await Promise.resolve({ token: '' })
   }
 }

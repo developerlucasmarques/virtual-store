@@ -18,11 +18,11 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const { email: userEmail } = await this.loadUserByIdRepo.loadById(userId) as UserModel
-    await this.addOrder.perform({
+    const { id: orderId } = await this.addOrder.perform({
       userId, products: loadCartResult.value.products
     })
     const checkoutResult = await this.checkoutGateway.payment({
-      ...loadCartResult.value, userEmail, userId, purchaseIntentId: 'any_purchase_intent_id'
+      ...loadCartResult.value, userEmail, userId, orderId
     })
     if (!checkoutResult) {
       return left(new CheckoutFailureError())

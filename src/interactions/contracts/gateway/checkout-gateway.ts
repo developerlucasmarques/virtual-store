@@ -7,7 +7,7 @@ export type CheckoutGatewayResponse = {
 export type CheckoutGatewayData = CompleteCartModel & {
   userId: string
   userEmail: string
-  purchaseIntentId: string
+  orderId: string
 }
 
 export interface CheckoutGateway {

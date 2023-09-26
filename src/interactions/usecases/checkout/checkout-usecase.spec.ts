@@ -198,7 +198,7 @@ describe('Checkout UseCase', () => {
       ...makeFakeCompleteCartModel(),
       userEmail: 'any_email@mail.com',
       userId: 'any_user_id',
-      purchaseIntentId: 'any_purchase_intent_id'
+      orderId: 'any_order_id'
     })
   })
 

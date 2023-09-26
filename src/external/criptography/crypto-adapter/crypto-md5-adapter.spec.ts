@@ -13,7 +13,7 @@ const makeSut = (): CryptoMd5Adapter => {
 }
 
 describe('Crypto Adapter', () => {
-  it('Should call crypto createHash with data using MD5', async () => {
+  it('Should call crypto createHash with data using "MD5"', async () => {
     const sut = makeSut()
     await sut.encrypt({ value: 'testData' })
     expect(crypto.createHash).toHaveBeenCalledWith('md5')
@@ -22,6 +22,14 @@ describe('Crypto Adapter', () => {
   it('Should call crypto update with correct value', async () => {
     const sut = makeSut()
     await sut.encrypt({ value: 'testData' })
-    expect(crypto.createHash('md5').update).toHaveBeenCalledWith('testData')
+    const update = crypto.createHash('md5').update
+    expect(update).toHaveBeenCalledWith('testData')
+  })
+
+  it('Should call crypto update digest with data using "hex"', async () => {
+    const sut = makeSut()
+    await sut.encrypt({ value: 'testData' })
+    const digest = crypto.createHash('md5').update('testData').digest
+    expect(digest).toHaveBeenCalledWith('hex')
   })
 })

@@ -11,7 +11,7 @@ jest.mock('stripe', () => {
             id: 'any_customer_id',
             metadata: {
               userId: 'any_user_id',
-              purchaseIntentId: 'any_purchase_intent_id'
+              orderId: 'any_order_id'
             }
           })),
           create: jest.fn(async () => await Promise.resolve({
@@ -35,7 +35,7 @@ jest.mock('stripe', () => {
               object: {
                 metadata: {
                   userId: 'any_user_id',
-                  purchaseIntentId: 'any_purchase_intent_id'
+                  orderId: 'any_order_id'
                 }
               }
             },
@@ -50,7 +50,7 @@ jest.mock('stripe', () => {
 const makeFakeCheckoutGatewayData = (): CheckoutGatewayData => ({
   userEmail: 'any_email@mail.com',
   userId: 'any_user_id',
-  purchaseIntentId: 'any_purchase_intent_id',
+  orderId: 'any_order_id',
   total: 10.90,
   products: [{
     id: 'any_product_id_1',
@@ -89,7 +89,7 @@ describe('Stripe Adapter', () => {
       expect(result.value).toEqual({
         eventType: 'CheckoutCompleted',
         userId: 'any_user_id',
-        purchaseIntentId: 'any_purchase_intent_id'
+        orderId: 'any_order_id'
       })
     })
   })

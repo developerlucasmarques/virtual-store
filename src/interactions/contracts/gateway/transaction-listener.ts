@@ -9,7 +9,7 @@ export type TransactionListenerGatewayData = {
 
 export type TransactionListenerGatewayValue = {
   userId: string
-  purchaseIntentId: string
+  orderId: string
   eventType: TransactionEventType
 }
 

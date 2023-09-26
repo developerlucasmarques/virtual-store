@@ -15,7 +15,7 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
       email: data.userEmail,
       metadata: {
         userId: data.userId,
-        purchaseIntentId: data.purchaseIntentId
+        orderId: data.orderId
       }
     })
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = data.products.map(
@@ -65,7 +65,7 @@ export class StripeAdapter implements CheckoutGateway, TransactionListenerGatewa
       return right({
         eventType: 'CheckoutCompleted',
         userId: customer.metadata.userId,
-        purchaseIntentId: customer.metadata.purchaseIntentId
+        orderId: customer.metadata.orderId
       })
     }
     return left(new EventNotProcessError(event.type))

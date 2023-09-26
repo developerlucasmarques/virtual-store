@@ -1,6 +1,6 @@
 import type { OrderModel, UserModel } from '@/domain/models'
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
-import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, OrderNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, OrderNotFoundError, UserMismatchError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadOrderByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { left, right, type Either } from '@/shared/either'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
@@ -239,18 +239,18 @@ describe('TransactionManager UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  // it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {
-  //   const { sut, transactionListenerGatewayStub } = makeSut()
-  //   jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
-  //     Promise.resolve(right({
-  //       purchaseIntentId: 'any_purchase_intent_id',
-  //       userId: 'another_user_id',
-  //       eventType: 'CheckoutCompleted'
-  //     }))
-  //   )
-  //   const result = await sut.perform(makeFakeTransactionManagerData())
-  //   expect(result.value).toEqual(new UserMismatchError())
-  // })
+  it('Should return UserMismatchError if the user id is different from the one saved on the order', async () => {
+    const { sut, transactionListenerGatewayStub } = makeSut()
+    jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(
+      Promise.resolve(right({
+        orderId: 'any_order_id',
+        userId: 'another_user_id',
+        eventType: 'CheckoutCompleted'
+      }))
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new UserMismatchError())
+  })
 
   test('Should call EventManager with correct values', async () => {
     const { sut, eventManagerStub } = makeSut()

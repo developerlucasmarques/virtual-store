@@ -214,6 +214,13 @@ describe('TransactionManager UseCase', () => {
     expect(loadByIdSpy).toHaveBeenCalledWith('any_order_id')
   })
 
+  test('Should call LoadOrderByIdRepo only once', async () => {
+    const { sut, loadOrderByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadOrderByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(loadByIdSpy).toHaveBeenCalledTimes(1)
+  })
+
   // it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {
   //   const { sut, transactionListenerGatewayStub } = makeSut()
   //   jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(

@@ -230,6 +230,15 @@ describe('TransactionManager UseCase', () => {
     expect(result.value).toEqual(new OrderNotFoundError('any_order_id'))
   })
 
+  it('Should throw if LoadOrderByIdRepo throws', async () => {
+    const { sut, loadOrderByIdRepoStub } = makeSut()
+    jest.spyOn(loadOrderByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeTransactionManagerData())
+    await expect(promise).rejects.toThrow()
+  })
+
   // it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {
   //   const { sut, transactionListenerGatewayStub } = makeSut()
   //   jest.spyOn(transactionListenerGatewayStub, 'listener').mockReturnValueOnce(

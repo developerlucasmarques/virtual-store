@@ -167,6 +167,6 @@ describe('AddOrder UseCase', () => {
   it('Should return null if AddOrderRepo is a success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAddOrderData())
-    expect(result.value).toBeNull()
+    expect(result).toEqual(makeFakeOrderModel())
   })
 })

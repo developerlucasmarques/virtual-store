@@ -1,7 +1,7 @@
-import type { UserModel } from '@/domain/models'
+import type { OrderModel, UserModel } from '@/domain/models'
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
 import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
-import type { LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
+import type { LoadOrderByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { left, right, type Either } from '@/shared/either'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
 
@@ -13,7 +13,7 @@ const makeFakeTransactionManagerData = (): TransactionManagerData => ({
 })
 
 const makeFakeTransactionListenerGatewayValue = (): TransactionListenerGatewayValue => ({
-  purchaseIntentId: 'any_purchase_intent_id',
+  orderId: 'any_order_id',
   userId: 'any_user_id',
   eventType: 'CheckoutCompleted'
 })
@@ -25,6 +25,22 @@ const makeFakeUserModel = (): UserModel => ({
   password: 'hashed_password',
   role: 'admin',
   accessToken: 'any_token'
+})
+
+const makeFakeOrderModel = (): OrderModel => ({
+  id: 'any_order_id',
+  userId: 'any_user_id',
+  orderCode: 'any_order_code',
+  paymentStatus: 'Payment_Pending',
+  status: 'Processing',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  products: [{
+    id: 'any_product_id',
+    name: 'any name',
+    amount: 10.90,
+    quantity: 1
+  }]
 })
 
 const makeFakeEventManagerData = (): EventManagerData<
@@ -62,6 +78,15 @@ const makeLoadUserByIdRepo = (): LoadUserByIdRepo => {
   return new LoadUserByIdRepoStub()
 }
 
+const makeLoadOrderByIdRepo = (): LoadOrderByIdRepo => {
+  class LoadOrderByIdRepoStub implements LoadOrderByIdRepo {
+    async loadById (id: string): Promise<null | OrderModel> {
+      return await Promise.resolve(makeFakeOrderModel())
+    }
+  }
+  return new LoadOrderByIdRepoStub()
+}
+
 const makeEventManager = (): EventManager<TransactionEventType, TransactionEventData> => {
   class EventManagerStub implements EventManager<TransactionEventType, TransactionEventData> {
     async perform (data: EventManagerData<TransactionEventType, TransactionEventData>): Promise<Either<Error, null>> {
@@ -75,22 +100,26 @@ type SutTypes = {
   sut: TransactionManagerUseCase
   transactionListenerGatewayStub: TransactionListenerGateway
   loadUserByIdRepoStub: LoadUserByIdRepo
+  loadOrderByIdRepoStub: LoadOrderByIdRepo
   eventManagerStub: EventManager<TransactionEventType, TransactionEventData>
 }
 
 const makeSut = (): SutTypes => {
   const transactionListenerGatewayStub = makeTransactionListenerGateway()
   const loadUserByIdRepoStub = makeLoadUserByIdRepo()
+  const loadOrderByIdRepoStub = makeLoadOrderByIdRepo()
   const eventManagerStub = makeEventManager()
   const sut = new TransactionManagerUseCase(
     transactionListenerGatewayStub,
     loadUserByIdRepoStub,
+    loadOrderByIdRepoStub,
     eventManagerStub
   )
   return {
     sut,
     transactionListenerGatewayStub,
     loadUserByIdRepoStub,
+    loadOrderByIdRepoStub,
     eventManagerStub
   }
 }
@@ -176,6 +205,13 @@ describe('TransactionManager UseCase', () => {
     )
     const promise = sut.perform(makeFakeTransactionManagerData())
     await expect(promise).rejects.toThrow()
+  })
+
+  it('Should call LoadOrderByIdRepo with correct order id', async () => {
+    const { sut, loadOrderByIdRepoStub } = makeSut()
+    const loadByIdSpy = jest.spyOn(loadOrderByIdRepoStub, 'loadById')
+    await sut.perform(makeFakeTransactionManagerData())
+    expect(loadByIdSpy).toHaveBeenCalledWith('any_order_id')
   })
 
   // it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {

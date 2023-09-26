@@ -1,5 +1,5 @@
 import type { EventManager, TransactionEventData, TransactionEventType, TransactionManager, TransactionManagerData, TransactionManagerResponse } from '@/domain/usecases-contracts'
-import { UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { OrderNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadOrderByIdRepo, LoadUserByIdRepo, TransactionListenerGateway } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -21,7 +21,10 @@ export class TransactionManagerUseCase implements TransactionManager {
     if (!user) {
       return left(new UserNotFoundError())
     }
-    await this.loadOrderByIdRepo.loadById(orderId)
+    const order = await this.loadOrderByIdRepo.loadById(orderId)
+    if (!order) {
+      return left(new OrderNotFoundError(orderId))
+    }
     const { email: userEmail, name: userName } = user
     const eventResult = await this.eventManager.perform({
       eventType,

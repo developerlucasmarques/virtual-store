@@ -1,16 +1,14 @@
-import type { PurchaseIntentModel, UserModel } from '@/domain/models'
+import type { UserModel } from '@/domain/models'
 import type { Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
-import type { AddPurchaseIntentRepo, CheckoutGateway, IdBuilder, LoadUserByIdRepo } from '@/interactions/contracts'
+import type { CheckoutGateway, LoadUserByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class CheckoutUseCase implements Checkout {
   constructor (
     private readonly loadCart: LoadCart,
     private readonly loadUserByIdRepo: LoadUserByIdRepo,
-    private readonly checkoutGateway: CheckoutGateway,
-    private readonly idBuilder: IdBuilder,
-    private readonly addPurchaseIntentRepo: AddPurchaseIntentRepo
+    private readonly checkoutGateway: CheckoutGateway
   ) {}
 
   async perform (userId: string): Promise<CheckoutResponse> {
@@ -19,15 +17,8 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const { email: userEmail } = await this.loadUserByIdRepo.loadById(userId) as UserModel
-    const { id } = this.idBuilder.build()
-    const date = new Date()
-    const products = loadCartResult.value.products.map((product) => ({ ...product }))
-    const addPurchaseIntentRepoData: PurchaseIntentModel = {
-      id, userId, createdAt: date, updatedAt: date, products
-    }
-    await this.addPurchaseIntentRepo.add(addPurchaseIntentRepoData)
     const checkoutResult = await this.checkoutGateway.payment({
-      ...loadCartResult.value, userEmail, userId, purchaseIntentId: id
+      ...loadCartResult.value, userEmail, userId, purchaseIntentId: 'any_purchase_intent_id'
     })
     if (!checkoutResult) {
       return left(new CheckoutFailureError())

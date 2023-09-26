@@ -162,9 +162,9 @@ describe('Checkout UseCase', () => {
 
   it('Should call LoadUsertById only once', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
-    const performSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
+    const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform('any_user_id')
-    expect(performSpy).toHaveBeenCalledTimes(1)
+    expect(loadByIdSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should throw if LoadUsertById throws', async () => {
@@ -181,6 +181,13 @@ describe('Checkout UseCase', () => {
     const performSpy = jest.spyOn(addOrderStub, 'perform')
     await sut.perform('any_user_id')
     expect(performSpy).toHaveBeenCalledWith({ userId: 'any_user_id', products })
+  })
+
+  it('Should call AddOrder only once', async () => {
+    const { sut, addOrderStub } = makeSut()
+    const performSpy = jest.spyOn(addOrderStub, 'perform')
+    await sut.perform('any_user_id')
+    expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
   it('Should call CheckoutGateway with correct values', async () => {

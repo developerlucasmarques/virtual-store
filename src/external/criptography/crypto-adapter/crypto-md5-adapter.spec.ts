@@ -1,4 +1,5 @@
-import * as crypto from 'crypto'
+import crypto from 'crypto'
+
 import { CryptoMd5Adapter } from './crypto-md5-adapter'
 
 jest.mock('crypto', () => ({
@@ -16,5 +17,11 @@ describe('Crypto Adapter', () => {
     const sut = makeSut()
     await sut.encrypt({ value: 'testData' })
     expect(crypto.createHash).toHaveBeenCalledWith('md5')
+  })
+
+  it('Should call crypto update with correct value', async () => {
+    const sut = makeSut()
+    await sut.encrypt({ value: 'testData' })
+    expect(crypto.createHash('md5').update).toHaveBeenCalledWith('testData')
   })
 })

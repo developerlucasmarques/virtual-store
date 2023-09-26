@@ -1,6 +1,6 @@
 import type { OrderModel, UserModel } from '@/domain/models'
 import type { EventManager, EventManagerData, TransactionEventData, TransactionEventType, TransactionManagerData } from '@/domain/usecases-contracts'
-import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
+import { EventNotProcessError, GatewayExceptionError, GatewayIncompatibilityError, OrderNotFoundError, UserNotFoundError } from '@/domain/usecases-contracts/errors'
 import type { LoadOrderByIdRepo, LoadUserByIdRepo, TransactionListenerGateway, TransactionListenerGatewayData, TransactionListenerGatewayResponse, TransactionListenerGatewayValue } from '@/interactions/contracts'
 import { left, right, type Either } from '@/shared/either'
 import { TransactionManagerUseCase } from './transaction-manager-usecase'
@@ -219,6 +219,15 @@ describe('TransactionManager UseCase', () => {
     const loadByIdSpy = jest.spyOn(loadOrderByIdRepoStub, 'loadById')
     await sut.perform(makeFakeTransactionManagerData())
     expect(loadByIdSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('Should return OrderNotFoundError if LoadOrderByIdRepo returns null', async () => {
+    const { sut, loadOrderByIdRepoStub } = makeSut()
+    jest.spyOn(loadOrderByIdRepoStub, 'loadById').mockReturnValueOnce(
+      Promise.resolve(null)
+    )
+    const result = await sut.perform(makeFakeTransactionManagerData())
+    expect(result.value).toEqual(new OrderNotFoundError('any_order_id'))
   })
 
   // it('Should return UserMismatchError if the user id is different from the one saved on the purchase intent', async () => {

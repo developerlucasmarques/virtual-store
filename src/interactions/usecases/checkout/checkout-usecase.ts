@@ -1,4 +1,4 @@
-import type { UserModel } from '@/domain/models'
+import type { PaymentStatusOfOrderModel, StatusOfOrderModel, UserModel } from '@/domain/models'
 import type { AddOrder, Checkout, CheckoutResponse, LoadCart } from '@/domain/usecases-contracts'
 import { CheckoutFailureError } from '@/domain/usecases-contracts/errors'
 import type { CheckoutGateway, LoadUserByIdRepo } from '@/interactions/contracts'
@@ -18,8 +18,11 @@ export class CheckoutUseCase implements Checkout {
       return left(loadCartResult.value)
     }
     const { email: userEmail } = await this.loadUserByIdRepo.loadById(userId) as UserModel
+    const status: StatusOfOrderModel = 'Incomplete'
+    const paymentStatus: PaymentStatusOfOrderModel = 'Payment_Not_Started'
+    const products = loadCartResult.value.products
     const { id: orderId } = await this.addOrder.perform({
-      userId, products: loadCartResult.value.products
+      userId, products, status, paymentStatus
     })
     const checkoutResult = await this.checkoutGateway.payment({
       ...loadCartResult.value, userEmail, userId, orderId

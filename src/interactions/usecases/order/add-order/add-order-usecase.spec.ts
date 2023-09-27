@@ -1,11 +1,13 @@
-import type { OrderModel, PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
+import type { OrderModel } from '@/domain/models'
 import type { AddOrderData, GenerateOrderCode, OrderCode } from '@/domain/usecases-contracts'
 import type { AddOrderRepo, Id, IdBuilder } from '@/interactions/contracts'
-import { AddOrderUseCase } from './add-order-usecase'
 import MockDate from 'mockdate'
+import { AddOrderUseCase } from './add-order-usecase'
 
 const makeFakeAddOrderData = (): AddOrderData => ({
   userId: 'any_user_id',
+  status: 'Processing',
+  paymentStatus: 'Payment_Pending',
   products: [{
     id: 'any_product_id',
     name: 'any name',
@@ -39,14 +41,6 @@ const makeIdBuilder = (): IdBuilder => {
   return new IdBuilderStub()
 }
 
-const makePaymentStatusOfOrderModel = (): PaymentStatusOfOrderModel => {
-  return 'Payment_Pending'
-}
-
-const makeStatusOfOrderModel = (): StatusOfOrderModel => {
-  return 'Processing'
-}
-
 const makeGenerateOrderCode = (): GenerateOrderCode => {
   class GenerateOrderCodeStub implements GenerateOrderCode {
     async perform (userId: string): Promise<OrderCode> {
@@ -74,14 +68,10 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const idBuilderStub = makeIdBuilder()
-  const statusOfOrderModelStub = makeStatusOfOrderModel()
-  const paymentStatusOfOrderModelStub = makePaymentStatusOfOrderModel()
   const generateOrderCodeStub = makeGenerateOrderCode()
   const addOrderRepoStub = makeAddOrderRepo()
   const sut = new AddOrderUseCase(
     idBuilderStub,
-    statusOfOrderModelStub,
-    paymentStatusOfOrderModelStub,
     generateOrderCodeStub,
     addOrderRepoStub
   )

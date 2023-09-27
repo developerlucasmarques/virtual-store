@@ -180,7 +180,12 @@ describe('Checkout UseCase', () => {
     const { sut, addOrderStub } = makeSut()
     const performSpy = jest.spyOn(addOrderStub, 'perform')
     await sut.perform('any_user_id')
-    expect(performSpy).toHaveBeenCalledWith({ userId: 'any_user_id', products })
+    expect(performSpy).toHaveBeenCalledWith({
+      userId: 'any_user_id',
+      products,
+      status: 'Incomplete',
+      paymentStatus: 'Payment_Not_Started'
+    })
   })
 
   it('Should call AddOrder only once', async () => {

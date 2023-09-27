@@ -59,5 +59,11 @@ describe('OrderMongo Repository', () => {
       const order = await sut.loadById(idString)
       expect(order).toEqual(makeFakeOrderModel())
     })
+
+    it('Should return null if not found a order', async () => {
+      const sut = new OrderMongoRepo()
+      const order = await sut.loadById(idString)
+      expect(order).toBeNull()
+    })
   })
 })

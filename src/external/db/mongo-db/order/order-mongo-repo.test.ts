@@ -41,11 +41,23 @@ describe('OrderMongo Repository', () => {
     await orderCollection.deleteMany({})
   })
 
-  it('Should create an order on success', async () => {
-    const sut = new OrderMongoRepo()
-    await sut.add(makeFakeOrderModel())
-    const order = await orderCollection.findOne({ _id: objectId })
-    const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
-    expect(order).toEqual(orderWithMongoId)
+  describe('add()', () => {
+    it('Should create an order on success', async () => {
+      const sut = new OrderMongoRepo()
+      await sut.add(makeFakeOrderModel())
+      const order = await orderCollection.findOne({ _id: objectId })
+      const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
+      expect(order).toEqual(orderWithMongoId)
+    })
+  })
+
+  describe('loadById()', () => {
+    it('Should load an order on success', async () => {
+      const sut = new OrderMongoRepo()
+      const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
+      await orderCollection.insertOne(orderWithMongoId)
+      const order = await sut.loadById(idString)
+      expect(order).toEqual(makeFakeOrderModel())
+    })
   })
 })

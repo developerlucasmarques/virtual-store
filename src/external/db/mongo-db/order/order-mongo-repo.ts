@@ -10,6 +10,9 @@ export class OrderMongoRepo implements AddOrderRepo, LoadOrderByIdRepo {
   }
 
   async loadById (id: string): Promise<null | OrderModel > {
-    return null
+    const orderCollection = await MongoHelper.getCollection('order')
+    const objectId = MongoHelper.transformIdInObjectId(id)
+    const order = await orderCollection.findOne({ _id: objectId })
+    return MongoHelper.convertCollectionIdObjectIdToString(order)
   }
 }

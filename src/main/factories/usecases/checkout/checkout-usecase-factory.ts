@@ -4,9 +4,12 @@ import { StripeAdapter } from '@/external/gateway/stripe/stripe-adapter'
 import { CheckoutUseCase } from '@/interactions/usecases/checkout'
 import env from '@/main/config/env'
 import { makeLoadCartUseCase } from '../cart'
+import { makeAddOrderUseCase } from '../order'
 
 export const makeCheckoutUseCase = (): Checkout => {
   const userMongoRepo = new UserMongoRepo()
   const stripeAdapter = new StripeAdapter(env.webhookScret)
-  return new CheckoutUseCase(makeLoadCartUseCase(), userMongoRepo, stripeAdapter)
+  return new CheckoutUseCase(
+    makeLoadCartUseCase(), userMongoRepo, makeAddOrderUseCase(), stripeAdapter
+  )
 }

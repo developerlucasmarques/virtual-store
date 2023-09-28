@@ -18,10 +18,9 @@ export class UpdateOrderUseCase implements UpdateOrder {
       return left(new MissingStatusError())
     }
     const { orderId: id } = data
-    const status = this.status
-    const paymentStatus = this.paymentStatus
-    const updatedAt = new Date()
-    await this.updateOrderRepo.updateById({ id, status, paymentStatus, updatedAt })
+    await this.updateOrderRepo.updateById({
+      id, status: this.status, paymentStatus: this.paymentStatus, updatedAt: new Date()
+    })
     return right(null)
   }
 }

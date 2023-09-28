@@ -3,6 +3,7 @@ import { MissingStatusError } from '@/domain/usecases-contracts/errors'
 import { UpdateOrderUseCase } from './update-order-usecase'
 import type { PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
 import type { UpdateOrderRepo, UpdateOrderRepoData } from '@/interactions/contracts'
+import MockDate from 'mockdate'
 
 const makeFakeUpdateOrderData = (): UpdateOrderData => ({
   orderId: 'any_order_id'
@@ -34,6 +35,14 @@ const makeSut = (
 }
 
 describe('UpdateOrder UseCase', () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+
   it('Should return MissingStatusError if status and payment status not informed', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeUpdateOrderData())
@@ -59,5 +68,12 @@ describe('UpdateOrder UseCase', () => {
       paymentStatus: 'Payment_Pending',
       updatedAt: new Date()
     })
+  })
+
+  it('Should call UpdateOrderRepo only once', async () => {
+    const { sut, updateOrderRepoStub } = makeSut(status, paymentStatus)
+    const updateByIdSpy = jest.spyOn(updateOrderRepoStub, 'updateById')
+    await sut.perform(makeFakeUpdateOrderData())
+    expect(updateByIdSpy).toHaveBeenCalledTimes(1)
   })
 })

@@ -85,4 +85,10 @@ describe('UpdateOrder UseCase', () => {
     const promise = sut.perform(makeFakeUpdateOrderData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if UpdateOrderRepo is a success', async () => {
+    const { sut } = makeSut(status, paymentStatus)
+    const result = await sut.perform(makeFakeUpdateOrderData())
+    expect(result.value).toBeNull()
+  })
 })

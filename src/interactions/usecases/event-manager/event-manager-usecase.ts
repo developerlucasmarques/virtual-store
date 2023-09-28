@@ -22,7 +22,7 @@ export class EventManagerUseCase<T extends string, D> implements EventManager<T,
   private filterEventData (data: D, handler: Event<any>): Partial<D> {
     const eventDataSubset: Partial<D> = {}
     if (data !== null && typeof data === 'object') {
-      for (const property of handler.reqProps) {
+      for (const property of handler.requiredProps) {
         if (property in data) {
           eventDataSubset[property as keyof Partial<D>] = data[property as keyof Partial<D>]
         }

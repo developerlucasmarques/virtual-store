@@ -4,7 +4,7 @@ import { MissingStatusError } from '@/domain/usecases-contracts/errors'
 import { left, right } from '@/shared/either'
 
 export class UpdateOrderUseCase implements UpdateOrder {
-  reqProps: Array<keyof UpdateOrderData> = ['orderId']
+  requiredProps: Array<keyof UpdateOrderData> = ['orderId']
 
   constructor (
     private readonly status?: StatusOfOrderModel,

@@ -32,7 +32,7 @@ const makeFakeEventManagerData = (): EventManagerData<AnyEventType, AnyEventGene
 
 const makeAnyEvent = (): Event<AnyEventData> => {
   class AnyEventStub implements Event<AnyEventData> {
-    reqProps: Array<keyof AnyEventData> = ['anyfield', 'anotherField']
+    requiredProps: Array<keyof AnyEventData> = ['anyfield', 'anotherField']
     async perform (data: AnyEventData): Promise<Either<Error, null>> {
       return right(null)
     }
@@ -42,7 +42,7 @@ const makeAnyEvent = (): Event<AnyEventData> => {
 
 const makeAnotherEvent = (): Event<AnotherEventData> => {
   class AnotherEventStub implements Event<AnotherEventData> {
-    reqProps: Array<keyof AnotherEventData> = ['anyfield', 'someField']
+    requiredProps: Array<keyof AnotherEventData> = ['anyfield', 'someField']
     async perform (data: AnotherEventData): Promise<Either<Error, null>> {
       return right(null)
     }

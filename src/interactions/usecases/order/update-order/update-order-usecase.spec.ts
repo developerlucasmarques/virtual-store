@@ -76,4 +76,13 @@ describe('UpdateOrder UseCase', () => {
     await sut.perform(makeFakeUpdateOrderData())
     expect(updateByIdSpy).toHaveBeenCalledTimes(1)
   })
+
+  it('Should throw if UpdateOrderRepo throws', async () => {
+    const { sut, updateOrderRepoStub } = makeSut(status, paymentStatus)
+    jest.spyOn(updateOrderRepoStub, 'updateById').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeUpdateOrderData())
+    await expect(promise).rejects.toThrow()
+  })
 })

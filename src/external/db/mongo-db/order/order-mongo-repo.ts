@@ -23,7 +23,9 @@ export class OrderMongoRepo implements AddOrderRepo, LoadOrderByIdRepo, UpdateOr
     if (data.paymentStatus) {
       updateObject.paymentStatus = data.paymentStatus
     }
-    updateObject.status = data.status
+    if (data.status) {
+      updateObject.status = data.status
+    }
     updateObject.updatedAt = data.updatedAt
     await orderCollection.updateOne({ _id: objectId }, { $set: updateObject })
   }

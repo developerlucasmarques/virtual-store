@@ -19,15 +19,12 @@ export class OrderMongoRepo implements AddOrderRepo, LoadOrderByIdRepo, UpdateOr
   async updateById (data: UpdateOrderRepoData): Promise<void> {
     const objectId = MongoHelper.transformIdInObjectId(data.id)
     const orderCollection = await MongoHelper.getCollection('order')
-    await orderCollection.updateOne(
-      { _id: objectId },
-      {
-        $set: {
-          status: data.status,
-          paymentStatus: data.paymentStatus,
-          updatedAt: data.updatedAt
-        }
-      }
-    )
+    const updateObject: Record<string, any> = {}
+    if (data.paymentStatus) {
+      updateObject.paymentStatus = data.paymentStatus
+    }
+    updateObject.status = data.status
+    updateObject.updatedAt = data.updatedAt
+    await orderCollection.updateOne({ _id: objectId }, { $set: updateObject })
   }
 }

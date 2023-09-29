@@ -51,6 +51,7 @@ TransactionEventType, TransactionEventData> => ({
     userName: 'any name',
     userEmail: 'any_email@mail.com',
     orderCode: 'any_order_code',
+    orderId: 'any_order_id',
     products: [{
       id: 'any_product_id',
       name: 'any name',

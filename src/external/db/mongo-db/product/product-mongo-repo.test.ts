@@ -51,8 +51,8 @@ describe('ProductMongo Repository', () => {
       const sut = makeSut()
       await sut.add(makeFakeProductModel())
       const product = await productCollection.findOne({ _id: objectId })
-      const productWithMongoId = makeFakeProductWithObjectId(makeFakeProductModel())
-      expect(product).toEqual(productWithMongoId)
+      const productWithObjectId = makeFakeProductWithObjectId(makeFakeProductModel())
+      expect(product).toEqual(productWithObjectId)
     })
   })
 

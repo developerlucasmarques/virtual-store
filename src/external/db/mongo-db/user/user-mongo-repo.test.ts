@@ -41,8 +41,8 @@ describe('UserMongo Repository', () => {
       const sut = makeSut()
       await sut.add(makeFakeUserModel())
       const user = await userCollection.findOne({ _id: objectId })
-      const userWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
-      expect(user).toEqual(userWithMongoId)
+      const userWithObjectId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      expect(user).toEqual(userWithObjectId)
     })
   })
 

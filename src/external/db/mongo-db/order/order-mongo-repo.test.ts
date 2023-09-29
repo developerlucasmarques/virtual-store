@@ -121,8 +121,25 @@ describe('OrderMongo Repository', () => {
       })
       const updatedOrder = await orderCollection.findOne({ _id: objectId })
       const updatedOrderWithObjectId = makeFakeOrderWithObjectId({
-        ...makeFakeOrderModel(),
-        status: 'Completed'
+        ...makeFakeOrderModel(), status: 'Completed'
+      })
+      expect(orderWithObjectId).toEqual(orderAdded)
+      expect(updatedOrder).toEqual(updatedOrderWithObjectId)
+    })
+
+    it('Should not update the status if it is not informed', async () => {
+      const sut = new OrderMongoRepo()
+      const orderWithObjectId = makeFakeOrderWithObjectId(makeFakeOrderModel())
+      await orderCollection.insertOne(orderWithObjectId)
+      const orderAdded = await orderCollection.findOne({ _id: objectId })
+      await sut.updateById({
+        id: idString,
+        paymentStatus: 'Payment_Confirmed',
+        updatedAt: new Date()
+      })
+      const updatedOrder = await orderCollection.findOne({ _id: objectId })
+      const updatedOrderWithObjectId = makeFakeOrderWithObjectId({
+        ...makeFakeOrderModel(), paymentStatus: 'Payment_Confirmed'
       })
       expect(orderWithObjectId).toEqual(orderAdded)
       expect(updatedOrder).toEqual(updatedOrderWithObjectId)

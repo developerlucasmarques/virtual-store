@@ -8,6 +8,13 @@ import { type UpdateOrderRepoData } from '@/interactions/contracts'
 const idString = new ObjectId().toHexString()
 const objectId = new ObjectId(idString)
 
+const products = [{
+  id: 'any_product_id',
+  name: 'any name',
+  amount: 10.90,
+  quantity: 1
+}]
+
 const makeFakeOrderModel = (): OrderModel => ({
   id: idString,
   userId: 'any_user_id',
@@ -16,13 +23,16 @@ const makeFakeOrderModel = (): OrderModel => ({
   status: 'Processing',
   createdAt: new Date(),
   updatedAt: new Date(),
-  products: [{
-    id: 'any_product_id',
-    name: 'any name',
-    amount: 10.90,
-    quantity: 1
-  }]
+  products
 })
+
+type OrderModelWithObjectId = Omit<OrderModel, 'id'> & {
+  _id: ObjectId
+}
+
+const makeFakeOrderWithObjectId = (order: OrderModel): OrderModelWithObjectId => {
+  return MongoHelper.convertCollectionIdStringToObjectId(order)
+}
 
 const makeFakeUpdateOrderRepoData = (): UpdateOrderRepoData => ({
   id: idString,
@@ -39,12 +49,7 @@ const makeFakeUpdatedOrderModel = (): OrderModel => ({
   status: 'Completed',
   createdAt: new Date(),
   updatedAt: new Date(),
-  products: [{
-    id: 'any_product_id',
-    name: 'any name',
-    amount: 10.90,
-    quantity: 1
-  }]
+  products
 })
 
 let orderCollection: Collection
@@ -70,16 +75,16 @@ describe('OrderMongo Repository', () => {
       const sut = new OrderMongoRepo()
       await sut.add(makeFakeOrderModel())
       const order = await orderCollection.findOne({ _id: objectId })
-      const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
-      expect(order).toEqual(orderWithMongoId)
+      const orderWithObjectId = makeFakeOrderWithObjectId(makeFakeOrderModel())
+      expect(order).toEqual(orderWithObjectId)
     })
   })
 
   describe('loadById()', () => {
     it('Should load an order on success', async () => {
       const sut = new OrderMongoRepo()
-      const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeOrderModel())
-      await orderCollection.insertOne(orderWithMongoId)
+      const orderWithObjectId = makeFakeOrderWithObjectId(makeFakeOrderModel())
+      await orderCollection.insertOne(orderWithObjectId)
       const order = await sut.loadById(idString)
       expect(order).toEqual(makeFakeOrderModel())
     })
@@ -94,18 +99,14 @@ describe('OrderMongo Repository', () => {
   describe('updateById()', () => {
     it('Should update an order on success', async () => {
       const sut = new OrderMongoRepo()
-      const orderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(
-        makeFakeOrderModel()
-      )
-      await orderCollection.insertOne(orderWithMongoId)
+      const orderWithObjectId = makeFakeOrderWithObjectId(makeFakeOrderModel())
+      await orderCollection.insertOne(orderWithObjectId)
       const orderAdded = await orderCollection.findOne({ _id: objectId })
       await sut.updateById(makeFakeUpdateOrderRepoData())
       const updatedOrder = await orderCollection.findOne({ _id: objectId })
-      const updatedOrderWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(
-        makeFakeUpdatedOrderModel()
-      )
-      expect(orderWithMongoId).toEqual(orderAdded)
-      expect(updatedOrder).toEqual(updatedOrderWithMongoId)
+      const updatedOrderWithObjectId = makeFakeOrderWithObjectId(makeFakeUpdatedOrderModel())
+      expect(orderWithObjectId).toEqual(orderAdded)
+      expect(updatedOrder).toEqual(updatedOrderWithObjectId)
     })
   })
 })

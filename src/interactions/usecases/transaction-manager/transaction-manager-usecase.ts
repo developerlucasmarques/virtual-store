@@ -31,7 +31,7 @@ export class TransactionManagerUseCase implements TransactionManager {
     const { email: userEmail, name: userName } = user
     const { orderCode, products } = order
     const eventResult = await this.eventManager.perform({
-      eventType, eventData: { userId, userEmail, userName, orderCode, products }
+      eventType, eventData: { userId, userEmail, userName, orderCode, orderId, products }
     })
     if (eventResult.isLeft()) {
       return left(eventResult.value)

@@ -20,6 +20,7 @@ export type TransactionEventData = {
   userName: string
   userEmail: string
   orderCode: string
+  orderId: string
   products: ProductOfTransactionEvent[]
 }
 

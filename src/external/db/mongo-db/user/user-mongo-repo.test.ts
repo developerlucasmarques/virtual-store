@@ -15,6 +15,18 @@ const makeFakeUserModel = (): UserModel => ({
   accessToken: 'any_token'
 })
 
+type UserModelWithObjectId = Omit<UserModel, 'id'> & {
+  _id: ObjectId
+}
+
+const makeFakeUserWithObjectId = (user: UserModel): UserModelWithObjectId => {
+  return MongoHelper.convertCollectionIdStringToObjectId(user)
+}
+
+const makeFakeUserWithStringId = (user: UserModelWithObjectId): UserModel => {
+  return MongoHelper.convertCollectionIdObjectIdToString(user)
+}
+
 let userCollection: Collection
 
 const makeSut = (): UserMongoRepo => {
@@ -41,7 +53,7 @@ describe('UserMongo Repository', () => {
       const sut = makeSut()
       await sut.add(makeFakeUserModel())
       const user = await userCollection.findOne({ _id: objectId })
-      const userWithObjectId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      const userWithObjectId = makeFakeUserWithObjectId(makeFakeUserModel())
       expect(user).toEqual(userWithObjectId)
     })
   })
@@ -49,10 +61,10 @@ describe('UserMongo Repository', () => {
   describe('loadByEmail()', () => {
     it('Should return an user if loadByEmail on success', async () => {
       const sut = makeSut()
-      const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      const userData = makeFakeUserWithObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
       const user = await sut.loadByEmail('any_email@mail.com')
-      const userWithStringId = MongoHelper.convertCollectionIdObjectIdToString(userData)
+      const userWithStringId = makeFakeUserWithStringId(userData)
       expect(user).toEqual(userWithStringId)
     })
 
@@ -66,7 +78,7 @@ describe('UserMongo Repository', () => {
   describe('updateAccessToken', () => {
     it('Should update access token if updateAccessToken on success', async () => {
       const sut = makeSut()
-      const userModel = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      const userModel = makeFakeUserWithObjectId(makeFakeUserModel())
       await userCollection.insertOne(userModel)
       await sut.updateAccessToken({ userId: idString, accessToken: 'another_token' })
       const user = await userCollection.findOne({ _id: objectId })
@@ -77,7 +89,7 @@ describe('UserMongo Repository', () => {
   describe('loadById()', () => {
     test('Should return an user if loadById on success', async () => {
       const sut = makeSut()
-      const userData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeUserModel())
+      const userData = makeFakeUserWithObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
       const user = await sut.loadById(idString)
       expect(user).toEqual(makeFakeUserModel())

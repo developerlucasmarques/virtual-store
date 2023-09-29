@@ -1,4 +1,4 @@
-import { type PaymentStatusOfOrderModel, type StatusOfOrderModel } from '@/domain/models'
+import type { PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
 import type { UpdateOrder, UpdateOrderData, UpdateOrderResponse } from '@/domain/usecases-contracts'
 import { MissingStatusError } from '@/domain/usecases-contracts/errors'
 import type { UpdateOrderRepo } from '@/interactions/contracts'

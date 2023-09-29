@@ -13,6 +13,18 @@ const makeFakeProductModel = (): ProductModel => ({
   description: 'any description'
 })
 
+type ProductModelWithObjectId = Omit<ProductModel, 'id'> & {
+  _id: ObjectId
+}
+
+const makeFakeProductWithObjectId = (product: ProductModel): ProductModelWithObjectId => {
+  return MongoHelper.convertCollectionIdStringToObjectId(product)
+}
+
+const makeFakeProductWithStringId = (product: ProductModelWithObjectId): ProductModel => {
+  return MongoHelper.convertCollectionIdObjectIdToString(product)
+}
+
 let productCollection: Collection
 
 const makeSut = (): ProductMongoRepo => {
@@ -39,7 +51,7 @@ describe('ProductMongo Repository', () => {
       const sut = makeSut()
       await sut.add(makeFakeProductModel())
       const product = await productCollection.findOne({ _id: objectId })
-      const productWithMongoId = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const productWithMongoId = makeFakeProductWithObjectId(makeFakeProductModel())
       expect(product).toEqual(productWithMongoId)
     })
   })
@@ -48,7 +60,7 @@ describe('ProductMongo Repository', () => {
     it('Should load all products on success', async () => {
       const sut = makeSut()
       const anotherObjectId = new ObjectId()
-      const anyProduct = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const anyProduct = makeFakeProductWithObjectId(makeFakeProductModel())
       const anotherProduct = {
         _id: anotherObjectId,
         name: 'another name',
@@ -57,8 +69,8 @@ describe('ProductMongo Repository', () => {
       }
       await productCollection.insertMany([anyProduct, anotherProduct])
       const products = await sut.loadAll()
-      expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
-      expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+      expect(products[0]).toEqual(makeFakeProductWithStringId(anyProduct))
+      expect(products[1]).toEqual(makeFakeProductWithStringId(anotherProduct))
     })
 
     it('Should load empty list if no product was found', async () => {
@@ -71,10 +83,10 @@ describe('ProductMongo Repository', () => {
   describe('loadById()', () => {
     it('Should load product on success', async () => {
       const sut = makeSut()
-      const productData = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const productData = makeFakeProductWithObjectId(makeFakeProductModel())
       await productCollection.insertOne(productData)
       const product = await sut.loadById(idString)
-      expect(product).toEqual(MongoHelper.convertCollectionIdObjectIdToString(productData))
+      expect(product).toEqual(makeFakeProductWithStringId(productData))
     })
 
     it('Should return null if not found a product', async () => {
@@ -89,7 +101,7 @@ describe('ProductMongo Repository', () => {
       const sut = makeSut()
       const anotherObjectId = new ObjectId()
       const anotherStringId = anotherObjectId.toHexString()
-      const anyProduct = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const anyProduct = makeFakeProductWithObjectId(makeFakeProductModel())
       const anotherProduct = {
         _id: anotherObjectId,
         name: 'another name',
@@ -98,8 +110,8 @@ describe('ProductMongo Repository', () => {
       }
       await productCollection.insertMany([anyProduct, anotherProduct])
       const products = await sut.loadProductsByIds([idString, anotherStringId])
-      expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
-      expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+      expect(products[0]).toEqual(makeFakeProductWithStringId(anyProduct))
+      expect(products[1]).toEqual(makeFakeProductWithStringId(anotherProduct))
     })
 
     it('Should only load products that the id is valid', async () => {
@@ -107,7 +119,7 @@ describe('ProductMongo Repository', () => {
       const anotherObjectId = new ObjectId()
       const anotherStringId = anotherObjectId.toHexString()
       const productIdThatDoesNotExist = new ObjectId().toHexString()
-      const anyProduct = MongoHelper.convertCollectionIdStringToObjectId(makeFakeProductModel())
+      const anyProduct = makeFakeProductWithObjectId(makeFakeProductModel())
       const anotherProduct = {
         _id: anotherObjectId,
         name: 'another name',
@@ -117,8 +129,8 @@ describe('ProductMongo Repository', () => {
       await productCollection.insertMany([anyProduct, anotherProduct])
       const products = await sut.loadProductsByIds([idString, productIdThatDoesNotExist, anotherStringId])
       expect(products.length).toBe(2)
-      expect(products[0]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anyProduct))
-      expect(products[1]).toEqual(MongoHelper.convertCollectionIdObjectIdToString(anotherProduct))
+      expect(products[0]).toEqual(makeFakeProductWithStringId(anyProduct))
+      expect(products[1]).toEqual(makeFakeProductWithStringId(anotherProduct))
     })
 
     it('Should load empty list if no product was found', async () => {

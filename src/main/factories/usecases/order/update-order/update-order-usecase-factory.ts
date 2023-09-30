@@ -3,9 +3,12 @@ import type { UpdateOrder } from '@/domain/usecases-contracts'
 import { OrderMongoRepo } from '@/external/db/mongo-db/order/order-mongo-repo'
 import { UpdateOrderUseCase } from '@/interactions/usecases/order'
 
-export const makeUpdateOrderUseCase = (
-  status?: StatusOfOrderModel, paymentStatus?: PaymentStatusOfOrderModel
-): UpdateOrder => {
+export type UpdateOrderUseCaseFactoryData = {
+  status?: StatusOfOrderModel
+  paymentStatus?: PaymentStatusOfOrderModel
+}
+
+export const makeUpdateOrderUseCase = (data: UpdateOrderUseCaseFactoryData): UpdateOrder => {
   const orderMongoRepo = new OrderMongoRepo()
-  return new UpdateOrderUseCase(orderMongoRepo, status, paymentStatus)
+  return new UpdateOrderUseCase(orderMongoRepo, data.status, data.paymentStatus)
 }

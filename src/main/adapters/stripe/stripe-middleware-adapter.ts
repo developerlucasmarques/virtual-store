@@ -4,6 +4,10 @@ import type { HttpRequest } from '@/presentation/http-types/http'
 
 export const stripeAdaptMiddleware = (middleare: Middleware) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    const body = JSON.parse(req.body)
+    if (body.payload) {
+      req.body = JSON.stringify(body.payload, null, 2)
+    }
     const httpRequest: HttpRequest = {
       headers: req.headers
     }

@@ -1,4 +1,4 @@
-# Payment Success
+# Checkout Completed
 
 ## Request Headers
 * stripe-signature
@@ -10,9 +10,9 @@
 
 - ✅ Recebe uma requisição do tipo POST na rota /api/stripe/webhook
 - ✅ Valida se a requisição foi feita pelo Stripe
-- ✅ Busca as informações da intenção de compra pelo id que está no evento do Stripe
-- ✅ Cria um pedido no DB
-- ✅ Retorna 200 com success true
+- ✅ Busca as informações do pedido pelo id que está no evento do Stripe
+- ✅ Atualiza o status do pedido e o status de pagamento no DB
+- ✅ Retorna 200
 
 
 ## Exceções

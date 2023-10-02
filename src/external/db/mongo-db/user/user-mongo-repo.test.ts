@@ -87,7 +87,7 @@ describe('UserMongo Repository', () => {
   })
 
   describe('loadById()', () => {
-    test('Should return an user if loadById on success', async () => {
+    it('Should return an user if loadById on success', async () => {
       const sut = makeSut()
       const userData = makeFakeUserWithObjectId(makeFakeUserModel())
       await userCollection.insertOne(userData)
@@ -95,7 +95,7 @@ describe('UserMongo Repository', () => {
       expect(user).toEqual(makeFakeUserModel())
     })
 
-    test('Should return null if loadById fails', async () => {
+    it('Should return null if loadById fails', async () => {
       const sut = makeSut()
       const user = await sut.loadById(idString)
       expect(user).toBeNull()

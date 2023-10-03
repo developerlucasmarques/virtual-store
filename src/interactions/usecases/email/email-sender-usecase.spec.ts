@@ -29,7 +29,11 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const formatEmailStub = makeFormatEmail()
-  const sut = new EmailSenderUseCase<EmailSenderData>(formatEmailStub)
+  const requiredProps: Array<keyof EmailSenderData> = ['orderCode', 'userEmail', 'userName']
+  const sut = new EmailSenderUseCase<EmailSenderData>(
+    requiredProps,
+    formatEmailStub
+  )
   return {
     sut,
     formatEmailStub
@@ -37,6 +41,16 @@ const makeSut = (): SutTypes => {
 }
 
 describe('EmailSender UseCase', () => {
+  it('Should contain all EmailSenderData keys in the requiredProps', async () => {
+    const { sut } = makeSut()
+    const requiredProps: Array<keyof EmailSenderData> = sut.requiredProps
+    console.log(requiredProps)
+    const allKeysPresent = Object.keys(makeFakeEmailSenderData()).every(key =>
+      requiredProps.includes(key as keyof EmailSenderData)
+    )
+    expect(allKeysPresent).toBe(true)
+  })
+
   it('Should call FormatEmail with correct values', async () => {
     const { sut, formatEmailStub } = makeSut()
     const executeSpy = jest.spyOn(formatEmailStub, 'execute')

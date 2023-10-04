@@ -1,16 +1,24 @@
 import type { FormatEmail } from '@/domain/application-contracts'
 import { EmailSenderUseCase } from './email-sender-usecase'
+import type { EmailSenderProvider, EmailSenderProviderData } from '@/interactions/contracts'
+import type { RequiredFieldEmailSender } from '@/domain/usecases-contracts'
 
-type EmailSenderData = {
-  userEmail: string
-  userName: string
+type EmailSenderData = RequiredFieldEmailSender & {
   orderCode: string
 }
 
 const makeFakeEmailSenderData = (): EmailSenderData => ({
   userEmail: 'any_email@mail.com',
   userName: 'any user name',
-  orderCode: 'any_order_code'
+  orderCode: 'any_order_code',
+  eventType: 'any_event_type'
+})
+
+const makeFakeEmailSenderProviderData = (): EmailSenderProviderData => ({
+  recipientName: 'any user name',
+  recipientEmail: 'any_email@mail.com',
+  subject: 'any_subject',
+  html: 'any_email_formated'
 })
 
 const makeFormatEmail = (): FormatEmail<EmailSenderData> => {
@@ -22,21 +30,36 @@ const makeFormatEmail = (): FormatEmail<EmailSenderData> => {
   return new FormatEmailStub()
 }
 
+const makeEmailSenderProvider = (): EmailSenderProvider => {
+  class EmailSenderProviderStub implements EmailSenderProvider {
+    async sendEmail (data: EmailSenderProviderData): Promise<void> {
+      await Promise.resolve()
+    }
+  }
+  return new EmailSenderProviderStub()
+}
+
 type SutTypes = {
   sut: EmailSenderUseCase<EmailSenderData>
   formatEmailStub: FormatEmail<EmailSenderData>
+  emailSenderProviderStub: EmailSenderProvider
 }
 
 const makeSut = (): SutTypes => {
+  const requiredProps: Array<keyof EmailSenderData> = [
+    'orderCode', 'userEmail', 'userName', 'eventType'
+  ]
   const formatEmailStub = makeFormatEmail()
-  const requiredProps: Array<keyof EmailSenderData> = ['orderCode', 'userEmail', 'userName']
+  const emailSenderProviderStub = makeEmailSenderProvider()
   const sut = new EmailSenderUseCase<EmailSenderData>(
     requiredProps,
-    formatEmailStub
+    formatEmailStub,
+    emailSenderProviderStub
   )
   return {
     sut,
-    formatEmailStub
+    formatEmailStub,
+    emailSenderProviderStub
   }
 }
 
@@ -56,5 +79,12 @@ describe('EmailSender UseCase', () => {
     const executeSpy = jest.spyOn(formatEmailStub, 'execute')
     await sut.perform(makeFakeEmailSenderData())
     expect(executeSpy).toHaveBeenCalledWith(makeFakeEmailSenderData())
+  })
+
+  it('Should call EmailSenderProvider with correct values', async () => {
+    const { sut, emailSenderProviderStub } = makeSut()
+    const sendEmailSpy = jest.spyOn(emailSenderProviderStub, 'sendEmail')
+    await sut.perform(makeFakeEmailSenderData())
+    expect(sendEmailSpy).toHaveBeenCalledWith(makeFakeEmailSenderProviderData())
   })
 })

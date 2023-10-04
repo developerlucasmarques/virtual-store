@@ -1,1 +1,1 @@
-export * from './email/format-email'
+export * from './mail/format-email'

@@ -86,4 +86,13 @@ describe('EmailSender UseCase', () => {
     await sut.perform(makeFakeEmailSenderData())
     expect(sendEmailSpy).toHaveBeenCalledWith(makeFakeEmailSenderProviderData())
   })
+
+  it('Should throw if EmailSenderProvider throws', async () => {
+    const { sut, emailSenderProviderStub } = makeSut()
+    jest.spyOn(emailSenderProviderStub, 'sendEmail').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeEmailSenderData())
+    await expect(promise).rejects.toThrow()
+  })
 })

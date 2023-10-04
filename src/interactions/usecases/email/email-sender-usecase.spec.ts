@@ -80,6 +80,15 @@ describe('EmailSender UseCase', () => {
     expect(executeSpy).toHaveBeenCalledWith(makeFakeEmailSenderData())
   })
 
+  it('Should throw if FormatEmail throws', async () => {
+    const { sut, formatEmailStub } = makeSut()
+    jest.spyOn(formatEmailStub, 'execute').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.perform(makeFakeEmailSenderData())
+    await expect(promise).rejects.toThrow()
+  })
+
   it('Should call EmailSenderProvider with correct values', async () => {
     const { sut, emailSenderProviderStub } = makeSut()
     const sendEmailSpy = jest.spyOn(emailSenderProviderStub, 'sendEmail')

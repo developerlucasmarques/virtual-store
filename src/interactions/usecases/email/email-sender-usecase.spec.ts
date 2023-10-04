@@ -10,8 +10,7 @@ type EmailSenderData = RequiredFieldEmailSender & {
 const makeFakeEmailSenderData = (): EmailSenderData => ({
   userEmail: 'any_email@mail.com',
   userName: 'any user name',
-  orderCode: 'any_order_code',
-  eventType: 'any_event_type'
+  orderCode: 'any_order_code'
 })
 
 const makeFakeEmailSenderProviderData = (): EmailSenderProviderData => ({
@@ -46,9 +45,7 @@ type SutTypes = {
 }
 
 const makeSut = (): SutTypes => {
-  const requiredProps: Array<keyof EmailSenderData> = [
-    'orderCode', 'userEmail', 'userName', 'eventType'
-  ]
+  const requiredProps: Array<keyof EmailSenderData> = ['orderCode', 'userEmail', 'userName']
   const formatEmailStub = makeFormatEmail()
   const emailSenderProviderStub = makeEmailSenderProvider()
   const sut = new EmailSenderUseCase<EmailSenderData>(

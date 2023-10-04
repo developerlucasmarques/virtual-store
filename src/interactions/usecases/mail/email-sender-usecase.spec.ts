@@ -1,4 +1,4 @@
-import type { FormatEmail } from '@/domain/application-contracts'
+import type { FormatEmail, FormatEmailResponse } from '@/domain/application-contracts'
 import { EmailSenderUseCase } from './email-sender-usecase'
 import type { EmailSenderProvider, EmailSenderProviderData } from '@/interactions/contracts'
 import type { RequiredFieldEmailSender } from '@/domain/usecases-contracts'
@@ -22,8 +22,8 @@ const makeFakeEmailSenderProviderData = (): EmailSenderProviderData => ({
 
 const makeFormatEmail = (): FormatEmail<EmailSenderData> => {
   class FormatEmailStub implements FormatEmail<EmailSenderData> {
-    async execute (data: EmailSenderData): Promise<string> {
-      return await Promise.resolve('any_email_formated')
+    execute (data: EmailSenderData): FormatEmailResponse {
+      return { html: 'any_email_formated' }
     }
   }
   return new FormatEmailStub()
@@ -82,9 +82,9 @@ describe('EmailSender UseCase', () => {
 
   it('Should throw if FormatEmail throws', async () => {
     const { sut, formatEmailStub } = makeSut()
-    jest.spyOn(formatEmailStub, 'execute').mockReturnValueOnce(
-      Promise.reject(new Error())
-    )
+    jest.spyOn(formatEmailStub, 'execute').mockImplementationOnce(() => {
+      throw new Error()
+    })
     const promise = sut.perform(makeFakeEmailSenderData())
     await expect(promise).rejects.toThrow()
   })

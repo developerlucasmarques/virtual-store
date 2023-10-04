@@ -1,3 +1,7 @@
+export type FormatEmailResponse = {
+  html: string
+}
+
 export interface FormatEmail<T> {
-  execute: (data: T) => Promise<string>
+  execute: (data: T) => FormatEmailResponse
 }

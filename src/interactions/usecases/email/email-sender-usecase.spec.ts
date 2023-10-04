@@ -104,4 +104,10 @@ describe('EmailSender UseCase', () => {
     const promise = sut.perform(makeFakeEmailSenderData())
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should not return anything if EmailSenderProvider is a success', async () => {
+    const { sut } = makeSut()
+    const result = sut.perform(makeFakeEmailSenderData())
+    await expect(result).resolves.toBeUndefined()
+  })
 })

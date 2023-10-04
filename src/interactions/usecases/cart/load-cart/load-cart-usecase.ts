@@ -1,6 +1,6 @@
 import type { CreateCart } from '@/domain/entities/contracts'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
-import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { EmptyCartError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -16,12 +16,13 @@ export class LoadCartUseCase implements LoadCart {
     if (!cart || cart.products.length === 0) {
       return left(new EmptyCartError())
     }
-    const productIds = cart.products.map((product) => (product.id))
-    const products = await this.loadProductsByIdsRepo.loadProductsByIds(productIds)
-    for (const productId of productIds) {
-      const product = products.find((product) => (product.id === productId))
-      if (!product) {
-        return left(new ProductNotAvailableError(productId))
+    const cartProductIds = cart.products.map((product) => (product.id))
+    const products = await this.loadProductsByIdsRepo.loadProductsByIds(cartProductIds)
+    const ids = products.map((product) => product.id)
+    for (const productId of cartProductIds) {
+      if (!ids.includes(productId)) {
+        const indexToRemove = cart.products.findIndex(product => product.id === productId)
+        cart.products.splice(indexToRemove, 1)
       }
     }
     const completeCart = this.createCart.create({ cartModel: cart, products })

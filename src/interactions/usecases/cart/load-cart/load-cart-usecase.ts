@@ -18,13 +18,8 @@ export class LoadCartUseCase implements LoadCart {
     }
     const cartProductIds = cart.products.map((product) => (product.id))
     const products = await this.loadProductsByIdsRepo.loadProductsByIds(cartProductIds)
-    const ids = products.map((product) => product.id)
-    for (const productId of cartProductIds) {
-      if (!ids.includes(productId)) {
-        const indexToRemove = cart.products.findIndex(product => product.id === productId)
-        cart.products.splice(indexToRemove, 1)
-      }
-    }
+    const productIds = products.map(product => product.id)
+    cart.products = cart.products.filter(product => productIds.includes(product.id))
     const completeCart = this.createCart.create({ cartModel: cart, products })
     return right(completeCart)
   }

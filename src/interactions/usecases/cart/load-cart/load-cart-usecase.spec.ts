@@ -1,9 +1,9 @@
+import { type CreateCart, type CreateCartData } from '@/domain/entities/contracts'
 import type { CartModel, ProductModel } from '@/domain/models'
+import type { CompleteCartModel } from '@/domain/models/complete-cart'
+import { EmptyCartError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { LoadCartUseCase } from './load-cart-usecase'
-import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
-import type { CompleteCartModel } from '@/domain/models/complete-cart'
-import { type CreateCartData, type CreateCart } from '@/domain/entities/contracts'
 
 const makeFakeCartModel = (): CartModel => ({
   id: 'any_id',
@@ -164,17 +164,9 @@ describe('LoadCart UseCase', () => {
     expect(loadProductsByIdsSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return ProductNotAvailableError if LoadProductsByIdsRepo returns empty', async () => {
-    const { sut, loadProductsByIdsRepoStub } = makeSut()
-    jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds').mockReturnValueOnce(
-      Promise.resolve([])
-    )
-    const result = await sut.perform('any_user_id')
-    expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_1'))
-  })
-
-  it('Should return ProductNotAvailableError if LoadProductsByIdsRepo can\'t find one of the products', async () => {
-    const { sut, loadProductsByIdsRepoStub } = makeSut()
+  it('Should call CreateCart only with the products that are in the cart and exist in the DB', async () => {
+    const { sut, loadProductsByIdsRepoStub, createCartStub } = makeSut()
+    const createSpy = jest.spyOn(createCartStub, 'create')
     jest.spyOn(loadProductsByIdsRepoStub, 'loadProductsByIds').mockReturnValueOnce(
       Promise.resolve([{
         id: 'any_product_id_1',
@@ -188,8 +180,14 @@ describe('LoadCart UseCase', () => {
         description: 'another description'
       }])
     )
-    const result = await sut.perform('any_user_id')
-    expect(result.value).toEqual(new ProductNotAvailableError('any_product_id_2'))
+    await sut.perform('any_user_id')
+    const cartModel = {
+      id: 'any_id',
+      userId: 'any_user_id',
+      products: makeFakeCartModel().products.filter(product => product.id !== 'any_product_id_2')
+    }
+    const products = makeFakeProducts().filter(product => product.id !== 'any_product_id_2')
+    expect(createSpy).toHaveBeenCalledWith({ cartModel, products })
   })
 
   it('Should throw if LoadProductsByIdsRepo throws', async () => {

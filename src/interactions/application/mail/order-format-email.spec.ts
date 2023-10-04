@@ -2,21 +2,21 @@ import type { EmailTemplate, EmailTemplateResponse } from '@/domain/application-
 import { OrderFormatEmail } from './order-format-email'
 
 type OrderFormatEmailData = {
-  userEmail: string
   userName: string
   orderCode: string
+  another: string
 }
 
 const makeFakeOrderFormatEmailData = (): OrderFormatEmailData => ({
-  userEmail: 'any_email@mail.com',
-  userName: 'any user name',
-  orderCode: 'any_order_code'
+  userName: 'any_user_name',
+  orderCode: 'any_order_code',
+  another: 'any'
 })
 
 const makeEmailTemplate = (): EmailTemplate => {
   class EmailTemplateStub implements EmailTemplate {
     handle (): EmailTemplateResponse {
-      return { html: 'any_email_template' }
+      return { html: 'Hello {{userName}} {{orderCode}} {{another}}' }
     }
   }
   return new EmailTemplateStub()
@@ -39,5 +39,11 @@ describe('OrderFormatEmail', () => {
     const handleSpy = jest.spyOn(emailTemplateStub, 'handle')
     await sut.execute(makeFakeOrderFormatEmailData())
     expect(handleSpy).toHaveBeenCalled()
+  })
+
+  it('Should return format email templete with correct data', async () => {
+    const { sut } = makeSut()
+    const result = await sut.execute(makeFakeOrderFormatEmailData())
+    expect(result).toEqual('Hello any_user_name any_order_code any')
   })
 })

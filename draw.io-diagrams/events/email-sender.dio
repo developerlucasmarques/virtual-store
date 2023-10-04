@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="y4CEhVZX6JYzluVINX2o" name="Página-1">
-        <mxGraphModel dx="1623" dy="634" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1538" dy="335" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -24,7 +24,7 @@
                     <mxGeometry x="704.5" y="450" width="175" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="1188.5" y="430" width="246" height="490" as="geometry"/>
+                    <mxGeometry x="1188.5" y="430" width="246" height="430" as="geometry"/>
                 </mxCell>
                 <mxCell id="37" value="Domain" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="1188.5" y="400" width="60" height="30" as="geometry"/>
@@ -116,7 +116,7 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="65" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#ff3333;" edge="1" parent="1" source="57" target="62">
+                <mxCell id="65" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#ff3333;" parent="1" source="57" target="62" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="1015" y="740"/>
@@ -124,13 +124,13 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="57" value="TransactionFormatEmail" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
-                    <mxGeometry x="912.5" y="645" width="190.5" height="60" as="geometry"/>
+                <mxCell id="57" value="FormatEmailApplication" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
+                    <mxGeometry x="950" y="645" width="153" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="62" value="EmailTemplate" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00CCCC;dashed=1;" vertex="1" parent="1">
+                <mxCell id="62" value="EmailTemplate" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00CCCC;dashed=1;" parent="1" vertex="1">
                     <mxGeometry x="1236.5" y="770" width="144" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="64" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#6666FF;fillColor=#a20025;dashed=1;" edge="1" parent="1" source="63" target="62">
+                <mxCell id="64" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#6666FF;fillColor=#a20025;dashed=1;" parent="1" source="63" target="62" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="1150" y="800"/>
@@ -138,8 +138,8 @@
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="63" value="OrderConfirmationEmail" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" vertex="1" parent="1">
-                    <mxGeometry x="912.5" y="770" width="190.5" height="60" as="geometry"/>
+                <mxCell id="63" value="OrderConfirmationEmailTemplate" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#FFFF66;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="770" width="193" height="60" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

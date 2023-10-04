@@ -48,8 +48,10 @@ const makeSut = (): SutTypes => {
   const requiredProps: Array<keyof EmailSenderData> = ['orderCode', 'userEmail', 'userName']
   const formatEmailStub = makeFormatEmail()
   const emailSenderProviderStub = makeEmailSenderProvider()
+  const subject = 'any_subject'
   const sut = new EmailSenderUseCase<EmailSenderData>(
     requiredProps,
+    subject,
     formatEmailStub,
     emailSenderProviderStub
   )

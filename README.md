@@ -108,6 +108,7 @@ API de e-commerce construída adotando arquitetura desacoplada e bem estruturada
 - Modularização de Paths
 - Configurações
 - Build
+- Generics
 
 
 ## Features de Testes

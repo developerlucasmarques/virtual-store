@@ -1,5 +1,5 @@
-import { NodemailerHelper as sut } from './nodemailer-helper'
 import nodemailer from 'nodemailer'
+import { NodemailerHelper as sut } from './nodemailer-helper'
 
 jest.mock('nodemailer', () => ({
   createTransport: jest.fn().mockReturnThis()
@@ -18,5 +18,10 @@ describe('Nodemailer Helper', () => {
       },
       tls: { rejectUnauthorized: false }
     })
+  })
+
+  it('Should return Transporter if create transport is a success', async () => {
+    const result = sut.createTransport()
+    expect(result).toBeDefined()
   })
 })

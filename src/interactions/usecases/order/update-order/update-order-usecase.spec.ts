@@ -51,6 +51,12 @@ describe('UpdateOrder UseCase', () => {
     expect(allKeysPresent).toBe(true)
   })
 
+  it('Should return undefined if StatusOfOrderModel and PaymentStatusOfOrderModel not provided', async () => {
+    const { sut } = makeSut(status, paymentStatus)
+    const result = sut.perform(makeFakeUpdateOrderData())
+    await expect(result).resolves.toBeUndefined()
+  })
+
   it('Should call UpdateOrderRepo with correct values', async () => {
     const { sut, updateOrderRepoStub } = makeSut(status, paymentStatus)
     const updateByIdSpy = jest.spyOn(updateOrderRepoStub, 'updateById')
@@ -79,7 +85,7 @@ describe('UpdateOrder UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return null if UpdateOrderRepo is a success', async () => {
+  it('Should return undefined if UpdateOrderRepo is a success', async () => {
     const { sut } = makeSut(status, paymentStatus)
     const result = sut.perform(makeFakeUpdateOrderData())
     await expect(result).resolves.toBeUndefined()

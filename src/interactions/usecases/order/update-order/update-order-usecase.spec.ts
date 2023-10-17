@@ -52,9 +52,16 @@ describe('UpdateOrder UseCase', () => {
   })
 
   it('Should return undefined if StatusOfOrderModel and PaymentStatusOfOrderModel not provided', async () => {
-    const { sut } = makeSut(status, paymentStatus)
+    const { sut } = makeSut()
     const result = sut.perform(makeFakeUpdateOrderData())
     await expect(result).resolves.toBeUndefined()
+  })
+
+  it('Should not call UpdateOrderRepo if StatusOfOrderModel and PaymentStatusOfOrderModel not provided', async () => {
+    const { sut, updateOrderRepoStub } = makeSut()
+    const updateByIdSpy = jest.spyOn(updateOrderRepoStub, 'updateById')
+    await sut.perform(makeFakeUpdateOrderData())
+    expect(updateByIdSpy).not.toHaveBeenCalled()
   })
 
   it('Should call UpdateOrderRepo with correct values', async () => {

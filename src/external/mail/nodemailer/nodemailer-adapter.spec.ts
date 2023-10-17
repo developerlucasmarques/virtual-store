@@ -29,4 +29,13 @@ describe('Nodemailer Adapter', () => {
       html: 'any_html'
     })
   })
+
+  it('Should throw if nodemailer send mail trhows', async () => {
+    const sut = makeSut()
+    jest.spyOn(nodemailer.createTransport(), 'sendMail').mockReturnValueOnce(
+      Promise.reject(new Error())
+    )
+    const promise = sut.sendEmail(makeFakeEmailSenderProviderData())
+    await expect(promise).rejects.toThrow()
+  })
 })

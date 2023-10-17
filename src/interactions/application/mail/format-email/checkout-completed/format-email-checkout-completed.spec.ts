@@ -1,3 +1,4 @@
+import { type EmailTemplate, type EmailTemplateResponse } from '@/domain/application-contracts'
 import { FormatCheckoutCompletedEmailApplication } from './format-email-checkout-completed'
 
 type FormatEmailProduct = {
@@ -26,22 +27,41 @@ const makeFakeFormatEmailData = (): FormatEmailData => ({
   }]
 })
 
+const makeEmailTemplate = (): EmailTemplate => {
+  class EmailTemplateStub implements EmailTemplate {
+    handle (): EmailTemplateResponse {
+      const html = 'Name: {{userName}}. OrderCode: {{orderCode}}. Products: {{products}}'
+      return { html }
+    }
+  }
+  return new EmailTemplateStub()
+}
+
 type SutTypes = {
   sut: FormatCheckoutCompletedEmailApplication
+  emailTemplateStub: EmailTemplate
 }
 
 const makeSut = (): SutTypes => {
-  const sut = new FormatCheckoutCompletedEmailApplication()
-  return { sut }
+  const emailTemplateStub = makeEmailTemplate()
+  const sut = new FormatCheckoutCompletedEmailApplication(emailTemplateStub)
+  return { sut, emailTemplateStub }
 }
 
 describe('FormatCheckoutCompletedEmail Application', () => {
-  it('Should return formated email with correct values', async () => {
+  it('Should call EmailTemplate', async () => {
     const { sut } = makeSut()
     const result = sut.execute(makeFakeFormatEmailData())
     expect(result.html).toContain('any_user_name')
     expect(result.html).toContain('any_order_code')
     expect(result.html).toContain('2 any_product 10.90')
     expect(result.html).toContain('1 another_product 12.90')
+  })
+
+  it('Should call EmailTemplate', async () => {
+    const { sut, emailTemplateStub } = makeSut()
+    const handleSpy = jest.spyOn(emailTemplateStub, 'handle')
+    sut.execute(makeFakeFormatEmailData())
+    expect(handleSpy).toHaveBeenCalled()
   })
 })

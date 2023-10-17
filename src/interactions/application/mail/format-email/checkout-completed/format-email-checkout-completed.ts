@@ -1,4 +1,4 @@
-import type { FormatEmail, FormatEmailResponse } from '@/domain/application-contracts'
+import type { EmailTemplate, FormatEmail, FormatEmailResponse } from '@/domain/application-contracts'
 import type { ProductCartData } from '@/domain/models'
 
 export type FormatEmailCheckoutCompletedProduct = Omit<ProductCartData, 'id'>
@@ -10,7 +10,10 @@ export type FormatEmailCheckoutCompletedData = {
 }
 
 export class FormatCheckoutCompletedEmailApplication implements FormatEmail<FormatEmailCheckoutCompletedData> {
+  constructor (private readonly emailTemplate: EmailTemplate) {}
+
   execute (data: FormatEmailCheckoutCompletedData): FormatEmailResponse {
+    this.emailTemplate.handle()
     let productsString = ''
     data.products.forEach((product) => {
       productsString += `<li>${product.quantity} ${product.name} ${product.amount.toFixed(2)}</li><br/>`

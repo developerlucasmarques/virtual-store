@@ -10,7 +10,7 @@ const makeSut = (): SutTypes => {
 }
 
 describe('CheckoutCompleted EmailTemplate', () => {
-  it('Should return an HTML email template', async () => {
+  it('Should return an HTML email template', () => {
     const { sut } = makeSut()
     const result = sut.handle()
     expect(result.html).toContain('<!DOCTYPE html>')
@@ -22,7 +22,7 @@ describe('CheckoutCompleted EmailTemplate', () => {
     expect(result.html).toContain('</body>')
   })
 
-  it('Should contain the necessary properties of the email template for checkout completed', async () => {
+  it('Should contain the necessary properties of the email template for checkout completed', () => {
     const { sut } = makeSut()
     const result = sut.handle()
     expect(result.html).toContain('{{orderCode}}')

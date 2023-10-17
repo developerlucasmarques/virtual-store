@@ -37,14 +37,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('FormatCheckoutCompletedEmail Application', () => {
-  it('Should call EmailTemplate', async () => {
+  it('Should call EmailTemplate', () => {
     const { sut, emailTemplateStub } = makeSut()
     const handleSpy = jest.spyOn(emailTemplateStub, 'handle')
     sut.execute(makeFakeOrderFormatEmailData())
     expect(handleSpy).toHaveBeenCalled()
   })
 
-  it('Should return EmailTemplate formated', async () => {
+  it('Should return EmailTemplate formated', () => {
     const { sut } = makeSut()
     const result = sut.execute(makeFakeOrderFormatEmailData())
     expect(result.html).toEqual(

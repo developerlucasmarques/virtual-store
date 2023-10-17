@@ -20,6 +20,13 @@ describe('Nodemailer Helper', () => {
     })
   })
 
+  it('Should throw if nodemailer createTransport throws', () => {
+    jest.spyOn(nodemailer, 'createTransport').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    expect(() => sut.createTransport()).toThrow()
+  })
+
   it('Should return Transporter if create transport is a success', async () => {
     const result = sut.createTransport()
     expect(result).toBeDefined()

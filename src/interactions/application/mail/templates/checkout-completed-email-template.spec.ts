@@ -21,4 +21,12 @@ describe('CheckoutCompleted EmailTemplate', () => {
     expect(result.html).toContain('<body>')
     expect(result.html).toContain('</body>')
   })
+
+  it('Should contain the necessary properties of the email template for checkout completed', async () => {
+    const { sut } = makeSut()
+    const result = sut.handle()
+    expect(result.html).toContain('{{orderCode}}')
+    expect(result.html).toContain('{{userName}}')
+    expect(result.html).toContain('{{products}}')
+  })
 })

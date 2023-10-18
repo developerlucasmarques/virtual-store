@@ -54,9 +54,9 @@ describe('LoadAllProducts UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return the same as LoadAllProductsRepo returns', async () => {
+  it('Should return a ProductModel list', async () => {
     const { sut } = makeSut()
-    const surveys = await sut.perform()
-    expect(surveys).toEqual(makeFakeProducts())
+    const products = await sut.perform()
+    expect(products).toEqual(makeFakeProducts())
   })
 })

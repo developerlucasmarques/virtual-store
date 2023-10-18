@@ -3,8 +3,8 @@ import { StripeHelper } from '@/external/gateway/stripe/helpers/stripe-helper'
 import { ObjectId, type Collection } from 'mongodb'
 import type Stripe from 'stripe'
 import request from 'supertest'
-import app from '../config/app'
-import env from '../config/env'
+import app from '../../config/app'
+import env from '../../config/env'
 
 let productCollection: Collection
 let userCollection: Collection

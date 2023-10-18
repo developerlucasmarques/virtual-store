@@ -14,7 +14,6 @@ const makeFakeEmailSenderData = (): EmailSenderData => ({
 })
 
 const makeFakeEmailSenderProviderData = (): EmailSenderProviderData => ({
-  recipientName: 'any user name',
   recipientEmail: 'any_email@mail.com',
   subject: 'any_subject',
   html: 'any_email_formated'

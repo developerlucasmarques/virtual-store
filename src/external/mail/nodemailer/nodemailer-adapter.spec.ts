@@ -4,7 +4,6 @@ import type { EmailSenderProviderData } from '@/interactions/contracts'
 
 const makeFakeEmailSenderProviderData = (): EmailSenderProviderData => ({
   recipientEmail: 'any_recipient_email@mail.com',
-  recipientName: 'any_recipient_name',
   subject: 'any_subject',
   html: 'any_html'
 })

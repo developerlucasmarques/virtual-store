@@ -12,9 +12,9 @@ export class EmailSenderUseCase<T extends RequiredFieldEmailSender> implements E
 
   async perform (data: T): Promise<void> {
     const { html } = this.formatEmail.execute(data)
-    const { userEmail: recipientEmail, userName: recipientName } = data
+    const { userEmail: recipientEmail } = data
     await this.emailSenderProvider.sendEmail({
-      html, recipientEmail, recipientName, subject: this.subject
+      html, recipientEmail, subject: this.subject
     })
   }
 }

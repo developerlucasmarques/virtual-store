@@ -1,5 +1,4 @@
 export type EmailSenderProviderData = {
-  recipientName: string
   recipientEmail: string
   subject: string
   html: string

@@ -4,9 +4,7 @@ import type { LoadProductByIdRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
 export class LoadProductByIdUseCase implements LoadProductById {
-  constructor (
-    private readonly loadProductByIdRepo: LoadProductByIdRepo
-  ) {}
+  constructor (private readonly loadProductByIdRepo: LoadProductByIdRepo) {}
 
   async perform (productId: string): Promise<LoadProductByIdResponse> {
     const product = await this.loadProductByIdRepo.loadById(productId)

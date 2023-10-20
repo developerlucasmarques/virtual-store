@@ -54,14 +54,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('AccessControl UseCase', () => {
-  test('Should call Decrypter with correct values', async () => {
+  it('Should call Decrypter with correct values', async () => {
     const { sut, decrypterStub } = makeSut()
     const decryptSpy = jest.spyOn(decrypterStub, 'decrypt')
     await sut.perform(makeFakeAccessControlData())
     expect(decryptSpy).toHaveBeenCalledWith('any_token')
   })
 
-  test('Should return InvalidTokenError if Decrypter return null', async () => {
+  it('Should return InvalidTokenError if Decrypter return null', async () => {
     const { sut, decrypterStub } = makeSut()
     jest.spyOn(decrypterStub, 'decrypt').mockReturnValueOnce(Promise.resolve(null))
     const result = await sut.perform(makeFakeAccessControlData())
@@ -77,14 +77,14 @@ describe('AccessControl UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should call LoadUsertById with correct value', async () => {
+  it('Should call LoadUsertById with correct value', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform(makeFakeAccessControlData())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_id')
   })
 
-  test('Should return AccessDeniedError if LoadUsertById return null', async () => {
+  it('Should return AccessDeniedError if LoadUsertById return null', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(Promise.resolve(null))
     const result = await sut.perform(makeFakeAccessControlData())
@@ -100,7 +100,7 @@ describe('AccessControl UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should return AccessDeniedError if the user role is different from the required role', async () => {
+  it('Should return AccessDeniedError if the user role is different from the required role', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
       Promise.resolve({
@@ -116,7 +116,7 @@ describe('AccessControl UseCase', () => {
     expect(result.value).toEqual(new AccessDeniedError())
   })
 
-  test('Should return an userId if the user role is admin', async () => {
+  it('Should return an userId if the user role is admin', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     jest.spyOn(loadUserByIdRepoStub, 'loadById').mockReturnValueOnce(
       Promise.resolve(makeFakeUserModel())
@@ -128,7 +128,7 @@ describe('AccessControl UseCase', () => {
     expect(result.value).toEqual({ userId: 'any_id' })
   })
 
-  test('Should return an userId if validations on success', async () => {
+  it('Should return an userId if validations on success', async () => {
     const { sut } = makeSut()
     const result = await sut.perform(makeFakeAccessControlData())
     expect(result.value).toEqual({ userId: 'any_id' })

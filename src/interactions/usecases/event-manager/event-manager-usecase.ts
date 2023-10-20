@@ -31,15 +31,12 @@ export class EventManagerUseCase<T extends string, D> implements EventManager<T,
     return eventDataSubset
   }
 
-  async perform (data: EventManagerData<T, D>): Promise<Either<Error, null>> {
+  async perform (data: EventManagerData<T, D>): Promise<Either<EventNotFoundError, null>> {
     const eventHandlers = this.eventHandlers.get(data.eventType)
     if (eventHandlers && eventHandlers.length !== 0) {
       for (const eventHandler of eventHandlers) {
         const eventDataSubset = this.filterEventData(data.eventData, eventHandler)
-        const result = await eventHandler.perform(eventDataSubset)
-        if (result.isLeft()) {
-          return left(result.value)
-        }
+        await eventHandler.perform(eventDataSubset)
       }
       return right(null)
     }

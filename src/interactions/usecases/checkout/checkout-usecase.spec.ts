@@ -153,7 +153,7 @@ describe('Checkout UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should call LoadUsertById with correct user id', async () => {
+  it('Should call LoadUsertById with correct user id', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform('any_user_id')
@@ -176,7 +176,7 @@ describe('Checkout UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should call AddOrder with correct values', async () => {
+  it('Should call AddOrder with correct values', async () => {
     const { sut, addOrderStub } = makeSut()
     const performSpy = jest.spyOn(addOrderStub, 'perform')
     await sut.perform('any_user_id')

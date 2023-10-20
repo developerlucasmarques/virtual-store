@@ -53,14 +53,14 @@ describe('Bcrypt Adapter', () => {
   })
 
   describe('compare()', () => {
-    test('Should call bcrypt compare with correct values', async () => {
+    it('Should call bcrypt compare with correct values', async () => {
       const sut = makeSut()
       const comparerSpy = jest.spyOn(bcrypt, 'compare')
       await sut.comparer(makeHashComparerData())
       expect(comparerSpy).toHaveBeenCalledWith('any_value', 'any_hash')
     })
 
-    test('Should return false when compare fails', async () => {
+    it('Should return false when compare fails', async () => {
       const sut = makeSut()
       const compareSpy = jest.spyOn(bcrypt, 'compare') as unknown as jest.Mock<
       ReturnType<(key: false) => Promise<boolean>>,
@@ -71,7 +71,7 @@ describe('Bcrypt Adapter', () => {
       expect(result).toBe(false)
     })
 
-    test('Should throw if bcrypt compare throws', async () => {
+    it('Should throw if bcrypt compare throws', async () => {
       const sut = makeSut()
       const compareSpy = jest.spyOn(bcrypt, 'compare') as unknown as jest.Mock<
       ReturnType<(key: Error) => Promise<Error>>,
@@ -84,7 +84,7 @@ describe('Bcrypt Adapter', () => {
       await expect(promise).rejects.toThrow()
     })
 
-    test('Should return true when bcrypt compare on success', async () => {
+    it('Should return true when bcrypt compare on success', async () => {
       const sut = makeSut()
       const retulst = await sut.comparer(makeHashComparerData())
       expect(retulst).toBe(true)

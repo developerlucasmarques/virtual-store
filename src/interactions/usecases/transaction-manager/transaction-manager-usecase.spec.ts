@@ -176,14 +176,14 @@ describe('TransactionManager UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should call LoadUsertByIdRepo with correct user id', async () => {
+  it('Should call LoadUsertByIdRepo with correct user id', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform(makeFakeTransactionManagerData())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_user_id')
   })
 
-  test('Should call LoadUsertByIdRepo only once', async () => {
+  it('Should call LoadUsertByIdRepo only once', async () => {
     const { sut, loadUserByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadUserByIdRepoStub, 'loadById')
     await sut.perform(makeFakeTransactionManagerData())
@@ -215,7 +215,7 @@ describe('TransactionManager UseCase', () => {
     expect(loadByIdSpy).toHaveBeenCalledWith('any_order_id')
   })
 
-  test('Should call LoadOrderByIdRepo only once', async () => {
+  it('Should call LoadOrderByIdRepo only once', async () => {
     const { sut, loadOrderByIdRepoStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadOrderByIdRepoStub, 'loadById')
     await sut.perform(makeFakeTransactionManagerData())
@@ -253,14 +253,14 @@ describe('TransactionManager UseCase', () => {
     expect(result.value).toEqual(new UserMismatchError())
   })
 
-  test('Should call EventManager with correct values', async () => {
+  it('Should call EventManager with correct values', async () => {
     const { sut, eventManagerStub } = makeSut()
     const performSpy = jest.spyOn(eventManagerStub, 'perform')
     await sut.perform(makeFakeTransactionManagerData())
     expect(performSpy).toHaveBeenCalledWith(makeFakeEventManagerData())
   })
 
-  test('Should call EventManager only once', async () => {
+  it('Should call EventManager only once', async () => {
     const { sut, eventManagerStub } = makeSut()
     const performSpy = jest.spyOn(eventManagerStub, 'perform')
     await sut.perform(makeFakeTransactionManagerData())

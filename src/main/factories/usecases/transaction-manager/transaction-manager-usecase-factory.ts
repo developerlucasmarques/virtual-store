@@ -6,6 +6,7 @@ import env from '@/main/config/env'
 import { makeEventManagerUseCase } from '../event-manager'
 import { OrderMongoRepo } from '@/external/db/mongo-db/order/order-mongo-repo'
 import { makeUpdateOrderUseCase } from '../order'
+import { makeSendCheckoutCompletedEmail } from '../mail/send-email/send-checkout-completed-email-factory'
 
 export const makeTransactioManagerUseCase = (): TransactionManager => {
   const stripeAdapter = new StripeAdapter(env.webhookScret)
@@ -13,7 +14,8 @@ export const makeTransactioManagerUseCase = (): TransactionManager => {
   const orderMongoRepo = new OrderMongoRepo()
   const eventManagerUseCase = makeEventManagerUseCase<TransactionEventType, TransactionEventData>({
     CheckoutCompleted: [
-      makeUpdateOrderUseCase({ status: 'Processing', paymentStatus: 'Payment_Pending' })
+      makeUpdateOrderUseCase({ status: 'Processing', paymentStatus: 'Payment_Pending' }),
+      makeSendCheckoutCompletedEmail()
     ],
     PaymentSuccess: [],
     PaymentFailure: []

@@ -1,9 +1,8 @@
-import type { UpdateOrderData } from '@/domain/usecases-contracts'
-import { MissingStatusError } from '@/domain/usecases-contracts/errors'
-import { UpdateOrderUseCase } from './update-order-usecase'
 import type { PaymentStatusOfOrderModel, StatusOfOrderModel } from '@/domain/models'
+import type { UpdateOrderData } from '@/domain/usecases-contracts'
 import type { UpdateOrderRepo, UpdateOrderRepoData } from '@/interactions/contracts'
 import MockDate from 'mockdate'
+import { UpdateOrderUseCase } from './update-order-usecase'
 
 const makeFakeUpdateOrderData = (): UpdateOrderData => ({
   orderId: 'any_order_id'
@@ -43,12 +42,6 @@ describe('UpdateOrder UseCase', () => {
     MockDate.reset()
   })
 
-  it('Should return MissingStatusError if status and payment status not informed', async () => {
-    const { sut } = makeSut()
-    const result = await sut.perform(makeFakeUpdateOrderData())
-    expect(result.value).toEqual(new MissingStatusError())
-  })
-
   it('Should contain all UpdateOrderData keys in the requiredProps', async () => {
     const { sut } = makeSut()
     const requiredProps: Array<keyof UpdateOrderData> = sut.requiredProps
@@ -56,6 +49,19 @@ describe('UpdateOrder UseCase', () => {
       requiredProps.includes(key as keyof UpdateOrderData)
     )
     expect(allKeysPresent).toBe(true)
+  })
+
+  it('Should return undefined if StatusOfOrderModel and PaymentStatusOfOrderModel not provided', async () => {
+    const { sut } = makeSut()
+    const result = sut.perform(makeFakeUpdateOrderData())
+    await expect(result).resolves.toBeUndefined()
+  })
+
+  it('Should not call UpdateOrderRepo if StatusOfOrderModel and PaymentStatusOfOrderModel not provided', async () => {
+    const { sut, updateOrderRepoStub } = makeSut()
+    const updateByIdSpy = jest.spyOn(updateOrderRepoStub, 'updateById')
+    await sut.perform(makeFakeUpdateOrderData())
+    expect(updateByIdSpy).not.toHaveBeenCalled()
   })
 
   it('Should call UpdateOrderRepo with correct values', async () => {
@@ -86,9 +92,9 @@ describe('UpdateOrder UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return null if UpdateOrderRepo is a success', async () => {
+  it('Should return undefined if UpdateOrderRepo is a success', async () => {
     const { sut } = makeSut(status, paymentStatus)
-    const result = await sut.perform(makeFakeUpdateOrderData())
-    expect(result.value).toBeNull()
+    const result = sut.perform(makeFakeUpdateOrderData())
+    await expect(result).resolves.toBeUndefined()
   })
 })

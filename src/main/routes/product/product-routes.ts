@@ -1,7 +1,7 @@
 import { adaptMiddleware, adaptRoute } from '@/main/adapters'
 import { makeAddProductController, makeLoadAllProductsController, makeLoadProductByIdController } from '@/main/factories/controllers/product'
 import type { Router } from 'express'
-import { makeAdminMiddleware } from '../middlewares'
+import { makeAdminMiddleware } from '../../middlewares'
 
 export default async (router: Router): Promise<void> => {
   router.post('/product', adaptMiddleware(makeAdminMiddleware()), adaptRoute(makeAddProductController()))

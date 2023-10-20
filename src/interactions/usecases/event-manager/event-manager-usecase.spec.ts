@@ -1,6 +1,5 @@
 import type { Event, EventManagerData } from '@/domain/usecases-contracts'
 import { EventNotFoundError } from '@/domain/usecases-contracts/errors'
-import { left, right, type Either } from '@/shared/either'
 import { EventManagerUseCase } from './event-manager-usecase'
 
 type AnyEventType = 'AnyEventType' | 'AnotherEventType'
@@ -33,8 +32,8 @@ const makeFakeEventManagerData = (): EventManagerData<AnyEventType, AnyEventGene
 const makeAnyEvent = (): Event<AnyEventData> => {
   class AnyEventStub implements Event<AnyEventData> {
     requiredProps: Array<keyof AnyEventData> = ['anyfield', 'anotherField']
-    async perform (data: AnyEventData): Promise<Either<Error, null>> {
-      return right(null)
+    async perform (data: AnyEventData): Promise<void> {
+      await Promise.resolve()
     }
   }
   return new AnyEventStub()
@@ -43,8 +42,8 @@ const makeAnyEvent = (): Event<AnyEventData> => {
 const makeAnotherEvent = (): Event<AnotherEventData> => {
   class AnotherEventStub implements Event<AnotherEventData> {
     requiredProps: Array<keyof AnotherEventData> = ['anyfield', 'someField']
-    async perform (data: AnotherEventData): Promise<Either<Error, null>> {
-      return right(null)
+    async perform (data: AnotherEventData): Promise<void> {
+      await Promise.resolve()
     }
   }
   return new AnotherEventStub()
@@ -88,15 +87,6 @@ describe('EventManager UseCase', () => {
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return an Error if AnyEvent fails', async () => {
-    const { sut, anyEventStub } = makeSut()
-    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new Error('any_message')))
-    )
-    const result = await sut.perform(makeFakeEventManagerData())
-    expect(result.value).toEqual(new Error('any_message'))
-  })
-
   it('Should return EventNotFoundError if there is no event of the same type', async () => {
     const { sut } = makeSut()
     const result = await sut.perform({
@@ -132,15 +122,6 @@ describe('EventManager UseCase', () => {
     expect(performSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('Should return an Error if AnotherEvent fails', async () => {
-    const { sut, anotherEventStub } = makeSut()
-    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new Error('any_message')))
-    )
-    const result = await sut.perform(makeFakeEventManagerData())
-    expect(result.value).toEqual(new Error('any_message'))
-  })
-
   it('Should throw if AnotherEvent throws', async () => {
     const { sut, anotherEventStub } = makeSut()
     jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
@@ -148,18 +129,6 @@ describe('EventManager UseCase', () => {
     )
     const promise = sut.perform(makeFakeEventManagerData())
     await expect(promise).rejects.toThrow()
-  })
-
-  it('Should return the first error if any event returns an error', async () => {
-    const { sut, anyEventStub, anotherEventStub } = makeSut()
-    jest.spyOn(anyEventStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new Error('any_message')))
-    )
-    jest.spyOn(anotherEventStub, 'perform').mockReturnValueOnce(
-      Promise.resolve(left(new Error('another_message')))
-    )
-    const result = await sut.perform(makeFakeEventManagerData())
-    expect(result.value).toEqual(new Error('any_message'))
   })
 
   it('Should return null if Events are a success', async () => {

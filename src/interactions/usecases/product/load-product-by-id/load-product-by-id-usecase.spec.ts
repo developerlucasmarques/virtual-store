@@ -58,4 +58,10 @@ describe('LoadProductById UseCase', () => {
     const promise = sut.perform('any_product_id')
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return ProductModel if LoadProductByIdRepo is a success', async () => {
+    const { sut } = makeSut()
+    const result = await sut.perform('any_product_id')
+    expect(result.value).toEqual(makeFakeProductModel())
+  })
 })

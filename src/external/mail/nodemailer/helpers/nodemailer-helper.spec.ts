@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import { NodemailerHelper as sut } from './nodemailer-helper'
+import env from './config-env-test'
 
 jest.mock('nodemailer', () => ({
   createTransport: jest.fn().mockReturnThis()
@@ -9,12 +10,12 @@ describe('Nodemailer Helper', () => {
   it('Should call nodemailer transport with correct values', () => {
     sut.createTransport()
     expect(nodemailer.createTransport).toHaveBeenCalledWith({
-      host: 'any_host@mail.com',
-      port: 1234,
+      host: env.MAIL_HOST,
+      port: Number(env.MAIL_PORT),
       secure: false,
       auth: {
-        user: 'any_mail_user@mail.com',
-        pass: 'any_mail_pass'
+        user: env.MAIL_USER,
+        pass: env.MAIL_PASS
       },
       tls: { rejectUnauthorized: false }
     })

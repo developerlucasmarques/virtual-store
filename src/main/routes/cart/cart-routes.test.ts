@@ -1,9 +1,9 @@
 import { MongoHelper } from '@/external/db/mongo-db/helpers/mongo-helper'
 import request from 'supertest'
-import app from '../config/app'
+import app from '../../config/app'
 import { ObjectId, type Collection } from 'mongodb'
 import { sign } from 'jsonwebtoken'
-import env from '../config/env'
+import env from '../../config/env'
 
 let productCollection: Collection
 let userCollection: Collection

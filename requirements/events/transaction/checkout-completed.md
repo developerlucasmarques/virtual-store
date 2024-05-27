@@ -12,6 +12,7 @@
 - ✅ Valida se a requisição foi feita pelo Stripe
 - ✅ Busca as informações do pedido pelo id que está no evento do Stripe
 - ✅ Atualiza o status do pedido e o status de pagamento no DB
+- ❌ Enviar um email para o usuário com as informações sobre o seu pedido
 - ✅ Retorna 200
 
 

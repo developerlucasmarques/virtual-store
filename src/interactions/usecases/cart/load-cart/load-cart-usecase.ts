@@ -1,6 +1,6 @@
 import type { CreateCart } from '@/domain/entities/contracts'
 import type { LoadCart, LoadCartResponse } from '@/domain/usecases-contracts'
-import { EmptyCartError, ProductNotAvailableError } from '@/domain/usecases-contracts/errors'
+import { EmptyCartError } from '@/domain/usecases-contracts/errors'
 import type { LoadCartByUserIdRepo, LoadProductsByIdsRepo } from '@/interactions/contracts'
 import { left, right } from '@/shared/either'
 
@@ -16,14 +16,10 @@ export class LoadCartUseCase implements LoadCart {
     if (!cart || cart.products.length === 0) {
       return left(new EmptyCartError())
     }
-    const productIds = cart.products.map((product) => (product.id))
-    const products = await this.loadProductsByIdsRepo.loadProductsByIds(productIds)
-    for (const productId of productIds) {
-      const product = products.find((product) => (product.id === productId))
-      if (!product) {
-        return left(new ProductNotAvailableError(productId))
-      }
-    }
+    const cartProductIds = cart.products.map((product) => (product.id))
+    const products = await this.loadProductsByIdsRepo.loadProductsByIds(cartProductIds)
+    const productIds = products.map(product => product.id)
+    cart.products = cart.products.filter(product => productIds.includes(product.id))
     const completeCart = this.createCart.create({ cartModel: cart, products })
     return right(completeCart)
   }
